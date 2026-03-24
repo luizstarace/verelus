@@ -1,11 +1,8 @@
 # TuneSignal + BandBrain
 
-AI-powered music newsletter and band manager platform.
+AI-powered music intelligence platform.
 
-## Stack
-- Next.js 14 + TypeScript
-- Supabase (PostgreSQL)
-- Claude API (AI)
-- Resend (Email)
-- Kiwify (Payments)
-- Vercel (Hosting)
+- **TuneSignal**: Weekly AI newsletter for musicians
+- **BandBrain**: AI band manager SaaS
+
+Powered by Next.js 14, Supabase, and Claude AI.

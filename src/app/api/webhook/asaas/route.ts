@@ -1,165 +1,176 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-// Asaas event types we care about
-type AsaasEvent =
-  | "PAYMENT_CONFIRMED"
-  | "PAYMENT_RECEIVED"
-  | "PAYMENT_OVERDUE"
-  | "PAYMENT_REFUNDED"
-  | "PAYMENT_DELETED"
-  | "SUBSCRIPTION_CREATED"
-  | "SUBSCRIPTION_UPDATED"
-  | "SUBSCRIPTION_DELETED"
-  | "SUBSCRIPTION_RENEWED";
+type AsaasEvent = {
+  event: string;
+  payment?: {
+    id: string;
+    customer: string;
+    subscription?: string;
+    value: number;
+    status: string;
+    externalReference?: string;
+    description?: string;
+  };
+  subscription?: {
+    id: string;
+    customer: string;
+    value: number;
+    status: string;
+    externalReference?: string;
+    description?: string;
+  };
+};
 
-// Map Asaas subscription value to our product tier
-function mapProduct(value: number): string {
-  if (value >= 60 && value <= 80) return "bandbrain_pro"; // R$ 69
-  if (value >= 25 && value <= 40) return "bandbrain_essencial"; // R$ 29
-  if (value >= 15 && value <= 25) return "tunesignal_premium"; // R$ 19.90
-  return "tunesignal_premium"; // default
+function mapProduct(description?: string): string {
+  if (!description) return 'tunesignal';
+  const d = description.toLowerCase();
+  if (d.includes('pro')) return 'bandbrain_pro';
+  if (d.includes('essencial')) return 'bandbrain_essencial';
+  if (d.includes('premium')) return 'tunesignal_premium';
+  return 'tunesignal';
 }
 
-// Map Asaas event to subscription status
-function mapStatus(event: string): string {
-  switch (event) {
-    case "PAYMENT_CONFIRMED":
-    case "PAYMENT_RECEIVED":
-    case "SUBSCRIPTION_CREATED":
-    case "SUBSCRIPTION_RENEWED":
-      return "active";
-    case "PAYMENT_OVERDUE":
-      return "past_due";
-    case "PAYMENT_REFUNDED":
-    case "PAYMENT_DELETED":
-    case "SUBSCRIPTION_DELETED":
-      return "canceled";
+function mapStatus(asaasStatus: string): string {
+  switch (asaasStatus) {
+    case 'CONFIRMED':
+    case 'RECEIVED':
+    case 'RECEIVED_IN_CASH':
+      return 'active';
+    case 'PENDING':
+    case 'AWAITING_RISK_ANALYSIS':
+      return 'pending';
+    case 'OVERDUE':
+      return 'past_due';
+    case 'REFUNDED':
+    case 'REFUND_REQUESTED':
+    case 'CHARGEBACK_REQUESTED':
+    case 'CHARGEBACK_DISPUTE':
+      return 'refunded';
+    case 'CANCELLED':
+    case 'DELETED':
+      return 'cancelled';
     default:
-      return "active";
+      return 'pending';
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
+    const body: AsaasEvent = await request.json();
+    const { event } = body;
 
-    // Asaas sends: { event, payment?, subscription? }
-    const { event, payment, subscription } = body as {
-      event: AsaasEvent;
-      payment?: {
-        id: string;
-        customer: string;
-        value: number;
-        status: string;
-        subscription?: string;
-        dueDate?: string;
-        paymentDate?: string;
-      };
-      subscription?: {
-        id: string;
-        customer: string;
-        value: number;
-        status: string;
-        nextDueDate?: string;
-        cycle?: string;
-      };
-    };
+    console.log('[Asaas Webhook] Event received:', event);
 
-    // Verify webhook token (optional security layer)
-    const token = req.headers.get("asaas-access-token");
-    if (process.env.ASAAS_WEBHOOK_TOKEN && token !== process.env.ASAAS_WEBHOOK_TOKEN) {
-      console.warn("Asaas webhook: invalid token");
-    }
+    if (event.startsWith('PAYMENT_') && body.payment) {
+      const payment = body.payment;
+      const status = mapStatus(payment.status);
+      const product = mapProduct(payment.description);
 
-    // Get customer ID from payment or subscription
-    const customerId = payment?.customer || subscription?.customer;
-    if (!customerId) {
-      return NextResponse.json({ error: "No customer ID" }, { status: 400 });
-    }
+      let customerEmail = '';
+      let customerName = '';
 
-    // Fetch customer details from Asaas API
-    let email = "";
-    let fullName = "";
-
-    if (process.env.ASAAS_API_KEY) {
-      try {
-        const customerRes = await fetch(
-          \`https://api.asaas.com/v3/customers/\${customerId}\`,
-          {
-            headers: {
-              access_token: process.env.ASAAS_API_KEY,
-            },
+      if (process.env.ASAAS_API_KEY) {
+        try {
+          const customerRes = await fetch(
+            `https://api.asaas.com/v3/customers/${payment.customer}`,
+            {
+              headers: {
+                'access_token': process.env.ASAAS_API_KEY,
+              },
+            }
+          );
+          if (customerRes.ok) {
+            const customerData = await customerRes.json();
+            customerEmail = customerData.email || '';
+            customerName = customerData.name || '';
           }
-        );
-        if (customerRes.ok) {
-          const customerData = await customerRes.json();
-          email = (customerData.email || "").toLowerCase().trim();
-          fullName = customerData.name || "";
+        } catch (err) {
+          console.error('[Asaas Webhook] Error fetching customer:', err);
         }
-      } catch (err) {
-        console.error("Failed to fetch Asaas customer:", err);
+      }
+
+      if (customerEmail) {
+        const { data: user, error: userError } = await supabase
+          .from('users')
+          .upsert(
+            {
+              email: customerEmail,
+              name: customerName,
+              asaas_customer_id: payment.customer,
+              current_product: product,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'email' }
+          )
+          .select()
+          .single();
+
+        if (userError) {
+          console.error('[Asaas Webhook] Error upserting user:', userError);
+        }
+
+        if (user) {
+          const { error: subError } = await supabase
+            .from('subscriptions')
+            .upsert(
+              {
+                user_id: user.id,
+                asaas_subscription_id: payment.subscription || payment.id,
+                product: product,
+                status: status,
+                amount: payment.value,
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: 'asaas_subscription_id' }
+            );
+
+          if (subError) {
+            console.error('[Asaas Webhook] Error upserting subscription:', subError);
+          }
+        }
+
+        if (status === 'active') {
+          await supabase
+            .from('email_subscribers')
+            .upsert(
+              {
+                email: customerEmail,
+                name: customerName,
+                status: 'active',
+                source: 'asaas',
+                subscribed_at: new Date().toISOString(),
+              },
+              { onConflict: 'email' }
+            );
+        }
       }
     }
 
-    if (!email) {
-      console.error("Asaas webhook: could not determine customer email");
-      return NextResponse.json({ error: "No customer email" }, { status: 400 });
+    if (event.startsWith('SUBSCRIPTION_') && body.subscription) {
+      const sub = body.subscription;
+      const status = sub.status === 'ACTIVE' ? 'active' : 'cancelled';
+
+      if (sub.status === 'INACTIVE' || sub.status === 'EXPIRED') {
+        await supabase
+          .from('subscriptions')
+          .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+          .eq('asaas_subscription_id', sub.id);
+      }
     }
 
-    // Upsert user
-    const { data: user } = await supabase
-      .from("users")
-      .upsert({ email, full_name: fullName }, { onConflict: "email" })
-      .select()
-      .single();
-
-    if (!user) {
-      return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
-    }
-
-    // Determine product and status
-    const value = subscription?.value || payment?.value || 0;
-    const productType = mapProduct(value);
-    const status = mapStatus(event);
-    const subscriptionId = subscription?.id || payment?.subscription || payment?.id;
-
-    // Upsert subscription
-    await supabase.from("subscriptions").upsert(
-      {
-        user_id: user.id,
-        product: productType,
-        status,
-        payment_provider: "asaas",
-        asaas_subscription_id: subscriptionId,
-        asaas_customer_id: customerId,
-        current_period_start: payment?.paymentDate || new Date().toISOString(),
-        current_period_end: subscription?.nextDueDate || null,
-        canceled_at: status === "canceled" ? new Date().toISOString() : null,
-      },
-      { onConflict: "asaas_subscription_id" }
+    return NextResponse.json({ received: true }, { status: 200 });
+  } catch (error) {
+    console.error('[Asaas Webhook] Error:', error);
+    return NextResponse.json(
+      { error: 'Webhook processing failed' },
+      { status: 500 }
     );
-
-    // Also add to newsletter subscribers
-    await supabase.from("email_subscribers").upsert(
-      {
-        email,
-        full_name: fullName,
-        source: "bandbrain",
-        status: "active",
-      },
-      { onConflict: "email" }
-    );
-
-    console.log(\`Asaas webhook processed: \${event} for \${email} (\${productType})\`);
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error("Asaas webhook error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+

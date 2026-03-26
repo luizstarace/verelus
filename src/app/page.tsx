@@ -199,7 +199,7 @@ export default function Home() {
       <section className="relative z-10 px-6 py-10 max-w-4xl mx-auto">
         <div className="text-center mb-6">
           <p className="text-xs text-zinc-600 uppercase tracking-wider font-mono">
-            {lang === "pt" ? "Feito para quem vive de música" : "Built for music professionals"}
+            {lang === "pt" ? "Feito para quem vive de mÃºsica" : "Built for music professionals"}
           </p>
         </div>
         <div className="flex flex-wrap justify-center items-center gap-8 opacity-40">
@@ -218,15 +218,15 @@ export default function Home() {
         </h2>
         <p className="text-zinc-400 text-center mb-12 max-w-2xl mx-auto">
           {lang === "pt"
-            ? "Três passos simples para ter inteligência de mercado musical toda semana."
+            ? "TrÃªs passos simples para ter inteligÃªncia de mercado musical toda semana."
             : "Three simple steps to get weekly music market intelligence."}
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           {(lang === "pt"
             ? [
-                { step: "01", title: "Inscreva-se", desc: "Digite seu nome e email. Leva 5 segundos. Sem cartão de crédito, sem compromisso." },
-                { step: "02", title: "Receba toda segunda", desc: "Nossa IA analisa milhares de fontes do mercado musical e cura o que realmente importa para você." },
-                { step: "03", title: "Aplique e cresça", desc: "Use os insights, oportunidades de sync e dicas práticas para alavancar sua carreira musical." },
+                { step: "01", title: "Inscreva-se", desc: "Digite seu nome e email. Leva 5 segundos. Sem cartÃ£o de crÃ©dito, sem compromisso." },
+                { step: "02", title: "Receba toda segunda", desc: "Nossa IA analisa milhares de fontes do mercado musical e cura o que realmente importa para vocÃª." },
+                { step: "03", title: "Aplique e cresÃ§a", desc: "Use os insights, oportunidades de sync e dicas prÃ¡ticas para alavancar sua carreira musical." },
               ]
             : [
                 { step: "01", title: "Subscribe", desc: "Enter your name and email. Takes 5 seconds. No credit card, no commitment." },
@@ -269,11 +269,11 @@ export default function Home() {
       {/* Newsletter Preview */}
       <section className="relative z-10 px-6 py-20 max-w-4xl mx-auto">
         <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4">
-          {lang === "pt" ? "Veja o Que Você Recebe" : "See What You Get"}
+          {lang === "pt" ? "Veja o Que VocÃª Recebe" : "See What You Get"}
         </h2>
         <p className="text-zinc-400 text-center mb-10 max-w-2xl mx-auto">
           {lang === "pt"
-            ? "Um preview de como é cada edição do TuneSignal."
+            ? "Um preview de como Ã© cada ediÃ§Ã£o do TuneSignal."
             : "A preview of what each TuneSignal edition looks like."}
         </p>
         <div className="gradient-border bg-brand-card p-6 sm:p-8 max-w-2xl mx-auto">
@@ -284,15 +284,15 @@ export default function Home() {
             </div>
             <h3 className="text-xl font-bold text-white">
               {lang === "pt"
-                ? "TuneSignal #13 — O Sinal Semanal"
-                : "TuneSignal #13 — The Weekly Signal"}
+                ? "TuneSignal #13 â O Sinal Semanal"
+                : "TuneSignal #13 â The Weekly Signal"}
             </h3>
           </div>
 
           <div className="space-y-5 text-sm">
             <div>
               <h4 className="font-semibold text-brand-green mb-2 flex items-center gap-2">
-                <span>🔥</span> {lang === "pt" ? "Top 3 Notícias" : "Top 3 News"}
+                <span>ð¥</span> {lang === "pt" ? "Top 3 NotÃ­cias" : "Top 3 News"}
               </h4>
               <div className="space-y-2 text-zinc-400">
                 <p>
@@ -304,7 +304,7 @@ export default function Home() {
                 <p>
                   <span className="text-white font-medium">2.</span>{" "}
                   {lang === "pt"
-                    ? "TikTok lança ferramenta de distribuição direta para músicos..."
+                    ? "TikTok lanÃ§a ferramenta de distribuiÃ§Ã£o direta para mÃºsicos..."
                     : "TikTok launches direct distribution tool for musicians..."}
                 </p>
                 <p>
@@ -318,29 +318,29 @@ export default function Home() {
 
             <div className="border-t border-zinc-800/50 pt-4">
               <h4 className="font-semibold text-brand-purple mb-2 flex items-center gap-2">
-                <span>🎯</span> {lang === "pt" ? "Oportunidade de Sync" : "Sync Opportunity"}
+                <span>ð¯</span> {lang === "pt" ? "Oportunidade de Sync" : "Sync Opportunity"}
               </h4>
               <p className="text-zinc-400">
                 {lang === "pt"
-                  ? "Produtora de conteúdo para Netflix BR busca indie rock/dream pop para série original. Deadline: sexta-feira..."
+                  ? "Produtora de conteÃºdo para Netflix BR busca indie rock/dream pop para sÃ©rie original. Deadline: sexta-feira..."
                   : "Content studio for Netflix BR seeks indie rock/dream pop for original series. Deadline: Friday..."}
               </p>
             </div>
 
             <div className="border-t border-zinc-800/50 pt-4">
               <h4 className="font-semibold text-brand-orange mb-2 flex items-center gap-2">
-                <span>📊</span> {lang === "pt" ? "Tendência" : "Trend"}
+                <span>ð</span> {lang === "pt" ? "TendÃªncia" : "Trend"}
               </h4>
               <p className="text-zinc-400">
                 {lang === "pt"
-                  ? "Artistas que postam 3+ Reels/semana têm 2.7x mais chance de entrar em playlists editoriais do Spotify..."
+                  ? "Artistas que postam 3+ Reels/semana tÃªm 2.7x mais chance de entrar em playlists editoriais do Spotify..."
                   : "Artists who post 3+ Reels/week are 2.7x more likely to land Spotify editorial playlists..."}
               </p>
             </div>
 
             <div className="border-t border-zinc-800/50 pt-4 text-center">
               <p className="text-zinc-600 text-xs italic">
-                {lang === "pt" ? "...e muito mais na edição completa" : "...and much more in the full edition"}
+                {lang === "pt" ? "...e muito mais na ediÃ§Ã£o completa" : "...and much more in the full edition"}
               </p>
             </div>
           </div>
@@ -351,7 +351,7 @@ export default function Home() {
             href="/archive"
             className="text-sm text-brand-green hover:text-brand-green/80 transition-colors"
           >
-            {lang === "pt" ? "Ver edições anteriores →" : "See past editions →"}
+            {lang === "pt" ? "Ver ediÃ§Ãµes anteriores â" : "See past editions â"}
           </a>
         </div>
       </section>
@@ -359,23 +359,23 @@ export default function Home() {
       {/* Testimonials / Social Proof */}
       <section className="relative z-10 px-6 py-20 max-w-6xl mx-auto">
         <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-          {lang === "pt" ? "O Que Dizem os Músicos" : "What Musicians Say"}
+          {lang === "pt" ? "O Que Dizem os MÃºsicos" : "What Musicians Say"}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {(lang === "pt"
             ? [
                 {
-                  quote: "Finalmente uma newsletter que entende o mercado indie brasileiro. As dicas de sync já me renderam 2 placements.",
+                  quote: "Finalmente uma newsletter que entende o mercado indie brasileiro. As dicas de sync jÃ¡ me renderam 2 placements.",
                   name: "Marina S.",
                   role: "Cantora/Compositora, SP",
                 },
                 {
-                  quote: "Eu lia 15 blogs por semana pra ficar atualizado. Agora só preciso do TuneSignal na segunda de manhã.",
+                  quote: "Eu lia 15 blogs por semana pra ficar atualizado. Agora sÃ³ preciso do TuneSignal na segunda de manhÃ£.",
                   name: "Rafael T.",
                   role: "Produtor Musical, RJ",
                 },
                 {
-                  quote: "A ferramenta da semana sozinha já vale a inscrição. Descobri plataformas que nunca teria encontrado.",
+                  quote: "A ferramenta da semana sozinha jÃ¡ vale a inscriÃ§Ã£o. Descobri plataformas que nunca teria encontrado.",
                   name: "Juliana M.",
                   role: "Guitarrista, Indie Rock, BH",
                 },
@@ -459,7 +459,7 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               {t.pricing.free.features.map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-green">✓</span> {f}
+                  <span className="text-brand-green">â</span> {f}
                 </li>
               ))}
             </ul>
@@ -488,12 +488,13 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               {t.pricing.pro.features.map((f, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-green">✓</span> {f}
+                  <span className="text-brand-green">â</span> {f}
                 </li>
               ))}
             </ul>
             <a
-              href="#"
+              href="https://www.asaas.com/c/zxwtne5e2456tj4w"
+              target="_blank""
               className="block w-full py-3 text-center bg-brand-green text-brand-darker font-bold rounded-lg hover:brightness-110 transition-all"
             >
               {t.pricing.pro.cta}
@@ -511,28 +512,28 @@ export default function Home() {
           {(lang === "pt"
             ? [
                 {
-                  q: "O TuneSignal é realmente grátis?",
-                  a: "Sim! A newsletter semanal é 100% gratuita e sempre será. O plano Pro oferece análises mais profundas e acesso antecipado ao BandBrain para quem quer ir além.",
+                  q: "O TuneSignal Ã© realmente grÃ¡tis?",
+                  a: "Sim! A newsletter semanal Ã© 100% gratuita e sempre serÃ¡. O plano Pro oferece anÃ¡lises mais profundas e acesso antecipado ao BandBrain para quem quer ir alÃ©m.",
                 },
                 {
-                  q: "Com que frequência recebo a newsletter?",
-                  a: "Toda segunda-feira de manhã, às 8h (horário de Brasília). Pontual como um metrônomo.",
+                  q: "Com que frequÃªncia recebo a newsletter?",
+                  a: "Toda segunda-feira de manhÃ£, Ã s 8h (horÃ¡rio de BrasÃ­lia). Pontual como um metrÃ´nomo.",
                 },
                 {
-                  q: "O que é o BandBrain?",
-                  a: "É seu gerente de banda com IA. Gera calendários de redes sociais, press releases, estratégias de setlist, pitches para playlists e relatórios mensais — tudo personalizado para sua banda e gênero.",
+                  q: "O que Ã© o BandBrain?",
+                  a: "Ã seu gerente de banda com IA. Gera calendÃ¡rios de redes sociais, press releases, estratÃ©gias de setlist, pitches para playlists e relatÃ³rios mensais â tudo personalizado para sua banda e gÃªnero.",
                 },
                 {
                   q: "Posso cancelar a qualquer momento?",
-                  a: "Claro! Cada email tem um link de cancelamento no rodapé. Sem burocracia, sem letras miúdas.",
+                  a: "Claro! Cada email tem um link de cancelamento no rodapÃ©. Sem burocracia, sem letras miÃºdas.",
                 },
                 {
-                  q: "Como a IA cura o conteúdo?",
-                  a: "Nossa IA analisa centenas de fontes do mercado musical global e brasileiro, filtra o que é relevante para músicos independentes, e entrega insights acionáveis — não apenas notícias requentadas.",
+                  q: "Como a IA cura o conteÃºdo?",
+                  a: "Nossa IA analisa centenas de fontes do mercado musical global e brasileiro, filtra o que Ã© relevante para mÃºsicos independentes, e entrega insights acionÃ¡veis â nÃ£o apenas notÃ­cias requentadas.",
                 },
                 {
-                  q: "Serve para qualquer gênero musical?",
-                  a: "Sim. Nossos insights cobrem a indústria musical como um todo, mas com foco especial na cena independente brasileira. Rock, MPB, eletrônica, hip hop, sertanejo indie — todos se beneficiam.",
+                  q: "Serve para qualquer gÃªnero musical?",
+                  a: "Sim. Nossos insights cobrem a indÃºstria musical como um todo, mas com foco especial na cena independente brasileira. Rock, MPB, eletrÃ´nica, hip hop, sertanejo indie â todos se beneficiam.",
                 },
               ]
             : [
@@ -546,7 +547,7 @@ export default function Home() {
                 },
                 {
                   q: "What is BandBrain?",
-                  a: "It's your AI band manager. It generates social media calendars, press releases, setlist strategies, playlist pitches and monthly reports — all customized for your band and genre.",
+                  a: "It's your AI band manager. It generates social media calendars, press releases, setlist strategies, playlist pitches and monthly reports â all customized for your band and genre.",
                 },
                 {
                   q: "Can I cancel anytime?",
@@ -554,11 +555,11 @@ export default function Home() {
                 },
                 {
                   q: "How does the AI curate content?",
-                  a: "Our AI analyzes hundreds of global and Brazilian music industry sources, filters what's relevant to independent musicians, and delivers actionable insights — not just reheated news.",
+                  a: "Our AI analyzes hundreds of global and Brazilian music industry sources, filters what's relevant to independent musicians, and delivers actionable insights â not just reheated news.",
                 },
                 {
                   q: "Does it work for any music genre?",
-                  a: "Yes. Our insights cover the music industry as a whole, with a special focus on the Brazilian independent scene. Rock, MPB, electronic, hip hop — everyone benefits.",
+                  a: "Yes. Our insights cover the music industry as a whole, with a special focus on the Brazilian independent scene. Rock, MPB, electronic, hip hop â everyone benefits.",
                 },
               ]
           ).map((item, i) => (
@@ -578,7 +579,7 @@ export default function Home() {
         </h2>
         <p className="text-zinc-400 mb-8 max-w-xl mx-auto">
           {lang === "pt"
-            ? "Junte-se a músicos independentes que já estão usando inteligência artificial para alavancar suas carreiras."
+            ? "Junte-se a mÃºsicos independentes que jÃ¡ estÃ£o usando inteligÃªncia artificial para alavancar suas carreiras."
             : "Join independent musicians who are already using AI intelligence to level up their careers."}
         </p>
         <div className="flex justify-center">
@@ -602,7 +603,7 @@ export default function Home() {
                 BandBrain
               </a>
               <a href="/unsubscribe" className="text-xs text-zinc-500 hover:text-white transition-colors">
-                {lang === "pt" ? "Cancelar inscrição" : "Unsubscribe"}
+                {lang === "pt" ? "Cancelar inscriÃ§Ã£o" : "Unsubscribe"}
               </a>
             </div>
           </div>
@@ -615,3 +616,4 @@ export default function Home() {
     </div>
   );
 }
+

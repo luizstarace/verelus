@@ -494,7 +494,7 @@ export default function Home() {
             </ul>
             <a
               href="https://www.asaas.com/c/zxwtne5e2456tj4w"
-              target="_blank""
+              target="_blank"
               className="block w-full py-3 text-center bg-brand-green text-brand-darker font-bold rounded-lg hover:brightness-110 transition-all"
             >
               {t.pricing.pro.cta}

@@ -444,11 +444,11 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="relative z-10 px-6 py-20 max-w-4xl mx-auto">
+      <section id="pricing" className="relative z-10 px-6 py-20 max-w-7xl mx-auto">
         <h2 className="text-3xl sm:text-4xl font-bold text-center mb-16">
           {t.pricing.title}
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Free */}
           <div className="gradient-border p-8 bg-brand-card">
             <h3 className="text-lg font-bold text-white mb-1">{t.pricing.free.name}</h3>
@@ -475,7 +475,54 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Pro */}
+          
+          {/* Premium */}
+          <div className="gradient-border p-8 bg-brand-card">
+            <h3 className="text-lg font-bold text-white mb-1">{t.pricing.premium.name}</h3>
+            <div className="flex items-baseline gap-1 mb-6">
+              <span className="text-4xl font-black text-white">{t.pricing.premium.price}</span>
+              <span className="text-sm text-zinc-500">{t.pricing.premium.period}</span>
+            </div>
+            <ul className="space-y-3 mb-8">
+              {t.pricing.premium.features.map((f, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm text-zinc-300">
+                  <span className="text-brand-green">✓</span> {f}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="https://www.asaas.com/c/umh7ayza9mqsw2wy"
+              target="_blank"
+              className="block w-full py-3 text-center border border-brand-green/50 text-brand-green font-semibold rounded-lg hover:bg-brand-green/10 transition-colors"
+            >
+              {t.pricing.premium.cta}
+            </a>
+          </div>
+
+          {/* Essencial */}
+          <div className="gradient-border p-8 bg-brand-card">
+            <h3 className="text-lg font-bold text-white mb-1">{t.pricing.essencial.name}</h3>
+            <div className="flex items-baseline gap-1 mb-6">
+              <span className="text-4xl font-black text-white">{t.pricing.essencial.price}</span>
+              <span className="text-sm text-zinc-500">{t.pricing.essencial.period}</span>
+            </div>
+            <ul className="space-y-3 mb-8">
+              {t.pricing.essencial.features.map((f, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm text-zinc-300">
+                  <span className="text-brand-green">✓</span> {f}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="https://www.asaas.com/c/jd6hk3a7juuil8n3"
+              target="_blank"
+              className="block w-full py-3 text-center bg-brand-green text-brand-darker font-bold rounded-lg hover:brightness-110 transition-all"
+            >
+              {t.pricing.essencial.cta}
+            </a>
+          </div>
+
+{/* Pro */}
           <div className="gradient-border p-8 bg-brand-card glow-green relative">
             <div className="absolute -top-3 right-6 px-3 py-1 bg-brand-green text-brand-darker text-xs font-bold rounded-full">
               POPULAR

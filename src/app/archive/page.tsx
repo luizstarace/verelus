@@ -47,7 +47,10 @@ export default function ArchivePage() {
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto border-b border-brand-border">
         <a href="/" className="flex items-center gap-3">
           <Waveform />
-          <span className="text-xl font-bold gradient-text">TuneSignal</span>
+          <div>
+            <span className="text-xl font-bold gradient-text">Verelus</span>
+            <p className="text-xs text-zinc-500">TuneSignal Archive</p>
+          </div>
         </a>
         <div className="flex items-center gap-4">
           <a
@@ -65,7 +68,7 @@ export default function ArchivePage() {
             Arquivo de <span className="gradient-text">Edições</span>
           </h1>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            Todas as edições da newsletter TuneSignal. Inteligência musical com IA, toda segunda-feira.
+            Todas as edições da newsletter TuneSignal. Um produto Verelus: inteligência musical com IA, toda segunda-feira.
           </p>
         </div>
 

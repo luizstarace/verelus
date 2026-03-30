@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateAccess } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
 
+export const runtime = 'edge';
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAccess } from "@/lib/auth";
 
+export const runtime = 'edge';
 export async function POST(req: NextRequest) {
   try {
     const { token } = await req.json();

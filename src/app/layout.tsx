@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TuneSignal — AI-Powered Music Intelligence",
+  title: "Verelus — Music Intelligence Platform",
   description:
-    "Weekly newsletter with trends, sync opportunities, and market analysis for independent musicians. Curated by AI.",
+    "Music intelligence platform with TuneSignal (weekly newsletter) and BandBrain (AI band manager). Curated by AI for independent musicians.",
   openGraph: {
-    title: "TuneSignal — AI-Powered Music Intelligence",
+    title: "Verelus — Music Intelligence Platform",
     description:
-      "Weekly newsletter with trends, sync opportunities, and market analysis for independent musicians.",
+      "Music intelligence platform with TuneSignal (weekly newsletter) and BandBrain (AI band manager). Curated by AI for independent musicians.",
     type: "website",
   },
 };

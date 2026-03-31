@@ -225,12 +225,12 @@ export default function Home() {
           {(lang === "pt"
             ? [
                 { step: "01", title: "Inscreva-se", desc: "Digite seu nome e email. Leva 5 segundos. Sem cartão de crédito, sem compromisso." },
-                { step: "02", title: "Receba toda segunda", desc: "Nossa IA analisa milhares de fontes do mercado musical e cura o que realmente importa para você." },
+                { step: "02", title: "Receba toda segunda", desc: "Nossa equipe, com apoio de IA, analisa milhares de fontes do mercado musical e cura o que realmente importa para você." },
                 { step: "03", title: "Aplique e cresça", desc: "Use os insights, oportunidades de sync e dicas práticas para alavancar sua carreira musical." },
               ]
             : [
                 { step: "01", title: "Subscribe", desc: "Enter your name and email. Takes 5 seconds. No credit card, no commitment." },
-                { step: "02", title: "Get it every Monday", desc: "Our AI analyzes thousands of music industry sources and curates what matters most to you." },
+                { step: "02", title: "Get it every Monday", desc: "Our team, powered by AI, analyzes thousands of music industry sources and curates what matters most to you." },
                 { step: "03", title: "Apply and grow", desc: "Use the insights, sync opportunities and pro tips to level up your music career." },
               ]
           ).map((item) => (
@@ -593,15 +593,15 @@ export default function Home() {
                 },
                 {
                   q: "O que é o BandBrain?",
-                  a: "É seu gerente de banda com IA. Gera calendários de redes sociais, press releases, estratégias de setlist, pitches para playlists e relatórios mensais — tudo personalizado para sua banda e gênero.",
+                  a: "É seu gerente de banda inteligente. Gera calendários de redes sociais, press releases, estratégias de setlist, pitches para playlists e relatórios mensais — tudo personalizado para sua banda e gênero.",
                 },
                 {
                   q: "Posso cancelar a qualquer momento?",
                   a: "Claro! Cada email tem um link de cancelamento no rodapé. Sem burocracia, sem letras miúdas.",
                 },
                 {
-                  q: "Como a IA cura o conteúdo?",
-                  a: "Nossa IA analisa centenas de fontes do mercado musical global e brasileiro, filtra o que é relevante para músicos independentes, e entrega insights acionáveis — não apenas notícias requentadas.",
+                  q: "Como o conteúdo é curado?",
+                  a: "Nossa equipe de especialistas, com apoio de IA, analisa centenas de fontes do mercado musical global e brasileiro, filtra o que é relevante para músicos independentes, e entrega insights acionáveis — não apenas notícias requentadas.",
                 },
                 {
                   q: "Serve para qualquer gênero musical?",
@@ -619,7 +619,7 @@ export default function Home() {
                 },
                 {
                   q: "What is BandBrain?",
-                  a: "It's your AI band manager. It generates social media calendars, press releases, setlist strategies, playlist pitches and monthly reports — all customized for your band and genre.",
+                  a: "It's your smart band manager. It generates social media calendars, press releases, setlist strategies, playlist pitches and monthly reports — all customized for your band and genre.",
                 },
                 {
                   q: "Can I cancel anytime?",
@@ -627,7 +627,7 @@ export default function Home() {
                 },
                 {
                   q: "How does the AI curate content?",
-                  a: "Our AI analyzes hundreds of global and Brazilian music industry sources, filters what's relevant to independent musicians, and delivers actionable insights — not just reheated news.",
+                  a: "Our team of experts, powered by AI, analyzes hundreds of global and Brazilian music industry sources, filters what's relevant to independent musicians, and delivers actionable insights — not just reheated news.",
                 },
                 {
                   q: "Does it work for any music genre?",
@@ -651,7 +651,7 @@ export default function Home() {
         </h2>
         <p className="text-zinc-400 mb-8 max-w-xl mx-auto">
           {lang === "pt"
-            ? "Junte-se a músicos independentes que já estão usando inteligência artificial para alavancar suas carreiras."
+            ? "Junte-se a músicos independentes que já estão usando inteligência de mercado para alavancar suas carreiras."
             : "Join independent musicians who are already using AI intelligence to level up their careers."}
         </p>
         <div className="flex justify-center">

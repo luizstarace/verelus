@@ -48,7 +48,7 @@ export const translations = {
         },
         {
           icon: "🎶",
-          title: "AI-Curated Playlist",
+          title: "Curated Playlist",
           desc: "A weekly editorial playlist based on emerging trends.",
         },
         {
@@ -182,7 +182,7 @@ export const translations = {
         },
         {
           icon: "🎶",
-          title: "Playlist Curada por IA",
+          title: "Playlist Curada",
           desc: "Uma playlist editorial semanal baseada em tendências emergentes.",
         },
         {

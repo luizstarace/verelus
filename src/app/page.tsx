@@ -144,25 +144,25 @@ export default function Home() {
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-3">
           <Waveform />
-          <span className="text-xl font-bold">
-            <span className="gradient-text">TuneSignal</span>
-          </span>
+          <div>
+            <span className="text-xl font-bold">
+              <span className="gradient-text">Verelus</span>
+            </span>
+            <p className="text-xs text-zinc-500">Music Intelligence</p>
+          </div>
         </div>
         <div className="flex items-center gap-6">
           <a href="#features" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">
-            {t.nav.features}
+            TuneSignal
           </a>
-          <a href="#how-it-works" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">
-            {lang === "pt" ? "Como Funciona" : "How It Works"}
+          <a href="#bandbrain" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">
+            {t.nav.bandbrain}
           </a>
           <a href="#pricing" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">
             {t.nav.pricing}
           </a>
           <a href="/archive" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">
             {lang === "pt" ? "Arquivo" : "Archive"}
-          </a>
-          <a href="#bandbrain" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:block">
-            {t.nav.bandbrain}
           </a>
           <button
             onClick={() => setLang(lang === "en" ? "pt" : "en")}
@@ -177,7 +177,7 @@ export default function Home() {
       <section className="relative z-10 flex flex-col items-center text-center px-6 pt-20 pb-16 max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-green/10 border border-brand-green/20 rounded-full text-brand-green text-xs font-mono mb-8">
           <span className="w-1.5 h-1.5 bg-brand-green rounded-full animate-pulse" />
-          {t.hero.badge}
+          A Verelus Product
         </div>
 
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-tight mb-6">
@@ -416,7 +416,7 @@ export default function Home() {
         <div className="gradient-border p-8 sm:p-12 bg-brand-card text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-purple/10 border border-brand-purple/20 rounded-full text-brand-purple text-xs font-mono mb-6">
             <span className="w-1.5 h-1.5 bg-brand-purple rounded-full animate-pulse" />
-            {t.bandbrain.badge}
+            A Verelus Product
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-black mb-2">{t.bandbrain.title}</h2>
@@ -444,21 +444,26 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="relative z-10 px-6 py-20 max-w-7xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-16">
-          {t.pricing.title}
-        </h2>
+      <section id="pricing" className="relative z-10 px-6 py-20 max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            {t.pricing.title}
+          </h2>
+          <p className="text-zinc-400">
+            {lang === "pt" ? "Escolha o plano perfeito para sua jornada musical." : "Choose the perfect plan for your music journey."}
+          </p>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Free */}
           <div className="gradient-border p-8 bg-brand-card">
             <h3 className="text-lg font-bold text-white mb-1">{t.pricing.free.name}</h3>
             <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-black text-white">{t.pricing.free.price}</span>
+              <span className="text-3xl font-black text-white">{t.pricing.free.price}</span>
               <span className="text-sm text-zinc-500">{t.pricing.free.period}</span>
             </div>
             <ul className="space-y-3 mb-8">
               {t.pricing.free.features.map((f, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-zinc-300">
+                <li key={i} className="flex items-center gap-2 text-xs text-zinc-300">
                   <span className="text-brand-green">✓</span> {f}
                 </li>
               ))}
@@ -469,83 +474,103 @@ export default function Home() {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="block w-full py-3 text-center border border-brand-green/50 text-brand-green font-semibold rounded-lg hover:bg-brand-green/10 transition-colors"
+              className="block w-full py-3 text-center border border-brand-green/50 text-brand-green font-semibold rounded-lg hover:bg-brand-green/10 transition-colors text-sm"
             >
               {t.pricing.free.cta}
             </a>
           </div>
 
-          
           {/* Premium */}
           <div className="gradient-border p-8 bg-brand-card">
             <h3 className="text-lg font-bold text-white mb-1">{t.pricing.premium.name}</h3>
             <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-black text-white">{t.pricing.premium.price}</span>
+              <span className="text-3xl font-black text-white">{t.pricing.premium.price}</span>
               <span className="text-sm text-zinc-500">{t.pricing.premium.period}</span>
             </div>
             <ul className="space-y-3 mb-8">
               {t.pricing.premium.features.map((f, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-zinc-300">
+                <li key={i} className="flex items-center gap-2 text-xs text-zinc-300">
                   <span className="text-brand-green">✓</span> {f}
                 </li>
               ))}
             </ul>
-            <a
-              href="https://www.asaas.com/c/umh7ayza9mqsw2wy"
-              target="_blank"
-              className="block w-full py-3 text-center border border-brand-green/50 text-brand-green font-semibold rounded-lg hover:bg-brand-green/10 transition-colors"
+            <button
+              onClick={async () => {
+                const res = await fetch("/api/checkout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ priceId: "tunesignal_premium" }),
+                });
+                const data = await res.json() as { url?: string };
+                if (data.url) window.location.href = data.url;
+              }}
+              className="block w-full py-3 text-center bg-brand-green text-brand-darker font-bold rounded-lg hover:brightness-110 transition-all text-sm"
             >
               {t.pricing.premium.cta}
-            </a>
+            </button>
           </div>
 
           {/* Essencial */}
           <div className="gradient-border p-8 bg-brand-card">
             <h3 className="text-lg font-bold text-white mb-1">{t.pricing.essencial.name}</h3>
             <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-black text-white">{t.pricing.essencial.price}</span>
+              <span className="text-3xl font-black text-white">{t.pricing.essencial.price}</span>
               <span className="text-sm text-zinc-500">{t.pricing.essencial.period}</span>
             </div>
             <ul className="space-y-3 mb-8">
               {t.pricing.essencial.features.map((f, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-green">✓</span> {f}
+                <li key={i} className="flex items-center gap-2 text-xs text-zinc-300">
+                  <span className="text-brand-purple">✓</span> {f}
                 </li>
               ))}
             </ul>
-            <a
-              href="https://www.asaas.com/c/jd6hk3a7juuil8n3"
-              target="_blank"
-              className="block w-full py-3 text-center bg-brand-green text-brand-darker font-bold rounded-lg hover:brightness-110 transition-all"
+            <button
+              onClick={async () => {
+                const res = await fetch("/api/checkout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ priceId: "bandbrain_essencial" }),
+                });
+                const data = await res.json() as { url?: string };
+                if (data.url) window.location.href = data.url;
+              }}
+              className="block w-full py-3 text-center border border-brand-purple/50 text-brand-purple font-semibold rounded-lg hover:bg-brand-purple/10 transition-colors text-sm"
             >
               {t.pricing.essencial.cta}
-            </a>
+            </button>
           </div>
 
-{/* Pro */}
+          {/* Pro */}
           <div className="gradient-border p-8 bg-brand-card glow-green relative">
             <div className="absolute -top-3 right-6 px-3 py-1 bg-brand-green text-brand-darker text-xs font-bold rounded-full">
-              POPULAR
+              {lang === "pt" ? "POPULAR" : "POPULAR"}
             </div>
             <h3 className="text-lg font-bold text-white mb-1">{t.pricing.pro.name}</h3>
             <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-black text-white">{t.pricing.pro.price}</span>
+              <span className="text-3xl font-black text-white">{t.pricing.pro.price}</span>
               <span className="text-sm text-zinc-500">{t.pricing.pro.period}</span>
             </div>
             <ul className="space-y-3 mb-8">
               {t.pricing.pro.features.map((f, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-zinc-300">
+                <li key={i} className="flex items-center gap-2 text-xs text-zinc-300">
                   <span className="text-brand-green">✓</span> {f}
                 </li>
               ))}
             </ul>
-            <a
-              href="https://www.asaas.com/c/zxwtne5e2456tj4w"
-              target="_blank"
-              className="block w-full py-3 text-center bg-brand-green text-brand-darker font-bold rounded-lg hover:brightness-110 transition-all"
+            <button
+              onClick={async () => {
+                const res = await fetch("/api/checkout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ priceId: "bandbrain_pro" }),
+                });
+                const data = await res.json() as { url?: string };
+                if (data.url) window.location.href = data.url;
+              }}
+              className="block w-full py-3 text-center bg-brand-green text-brand-darker font-bold rounded-lg hover:brightness-110 transition-all text-sm"
             >
               {t.pricing.pro.cta}
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -640,9 +665,15 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-6">
             <div className="flex items-center gap-3">
               <Waveform />
-              <span className="font-bold gradient-text">TuneSignal</span>
+              <span className="font-bold gradient-text">Verelus</span>
             </div>
             <div className="flex items-center gap-6">
+              <a href="#features" className="text-xs text-zinc-500 hover:text-white transition-colors">
+                TuneSignal
+              </a>
+              <a href="#bandbrain" className="text-xs text-zinc-500 hover:text-white transition-colors">
+                BandBrain
+              </a>
               <a href="/archive" className="text-xs text-zinc-500 hover:text-white transition-colors">
                 {lang === "pt" ? "Arquivo" : "Archive"}
               </a>
@@ -658,9 +689,9 @@ export default function Home() {
             <p className="text-xs text-zinc-600">{t.footer.tagline}</p>
             <p className="text-xs text-zinc-600">{t.footer.copy}</p>
           </div>
+          <p className="text-center text-xs text-zinc-700 mt-4">{lang === "pt" ? "TuneSignal e BandBrain são produtos da Verelus" : "TuneSignal and BandBrain are products by Verelus"}</p>
         </div>
       </footer>
     </div>
   );
 }
-

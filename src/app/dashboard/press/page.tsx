@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-browser';
 
+const NEWSPAPER_ICON = String.fromCodePoint(0x1F4F0);
+
 interface PressRelease {
   id: string;
   title: string;
@@ -91,7 +93,7 @@ export default function PressPage() {
         {/* Sidebar */}
         <div className="w-72 min-h-screen bg-[#0d1018] border-r border-white/10 p-4">
           <a href="/dashboard" className="flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
-            <span>←</span> Voltar ao Dashboard
+            <span>&lt;-</span> Voltar ao Dashboard
           </a>
           <h2 className="text-lg font-bold mb-4 font-display">Press Releases</h2>
           <div className="space-y-2">
@@ -121,7 +123,7 @@ export default function PressPage() {
         <div className="flex-1 p-8">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-8">
-              <span className="text-3xl">📰</span>
+              <span className="text-3xl">{NEWSPAPER_ICON}</span>
               <h1 className="text-3xl font-bold font-display">Press Releases</h1>
             </div>
 
@@ -132,7 +134,7 @@ export default function PressPage() {
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                placeholder="Assunto do press release (ex: lançamento de single, show, parceria...)"
+                placeholder="Assunto do press release (ex: lan\u00e7amento de single, show, parceria...)"
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 mb-4 focus:outline-none focus:border-[#00f5a0]/50"
               />
               <button
@@ -177,5 +179,4 @@ export default function PressPage() {
         </div>
       </div>
     </div>
-  );
-}
+  +}

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-browser';
 
+const CALENDAR_ICON = String.fromCodePoint(0x1F4C5);
+
 interface SocialPost {
   id: string;
   platform: string;
@@ -94,9 +96,9 @@ export default function SocialPage() {
         {/* Sidebar */}
         <div className="w-72 min-h-screen bg-[#0d1018] border-r border-white/10 p-4">
           <a href="/dashboard" className="flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
-            <span>←</span> Voltar ao Dashboard
+            <span>&lt;-</span> Voltar ao Dashboard
           </a>
-          <h2 className="text-lg font-bold mb-4 font-display">Calendário Social</h2>
+          <h2 className="text-lg font-bold mb-4 font-display">Calend\u00e1rio Social</h2>
           <div className="flex gap-2 mb-4">
             <button
               onClick={() => setView('list')}
@@ -108,7 +110,7 @@ export default function SocialPage() {
               onClick={() => setView('calendar')}
               className={`flex-1 py-2 text-sm rounded-lg ${view === 'calendar' ? 'bg-[#00f5a0]/20 text-[#00f5a0]' : 'bg-white/5 text-white/60'}`}
             >
-              Calendário
+              Calend\u00e1rio
             </button>
           </div>
           <div className="space-y-2">
@@ -147,8 +149,8 @@ export default function SocialPage() {
         <div className="flex-1 p-8">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-8">
-              <span className="text-3xl">📅</span>
-              <h1 className="text-3xl font-bold font-display">Calendário Social</h1>
+              <span className="text-3xl">{CALENDAR_ICON}</span>
+              <h1 className="text-3xl font-bold font-display">Calend\u00e1rio Social</h1>
             </div>
 
             {/* Generator */}
@@ -173,7 +175,7 @@ export default function SocialPage() {
                     type="text"
                     value={theme}
                     onChange={(e) => setTheme(e.target.value)}
-                    placeholder="Ex: novo single, bastidores, promoção..."
+                    placeholder="Ex: novo single, bastidores, promo\u00e7\u00a3o..."
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00f5a0]/50"
                   />
                 </div>

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-browser';
 
+const CHART_ICON = String.fromCodePoint(0x1F4CA);
+
 interface Report {
   id: string;
   title: string;
@@ -49,9 +51,9 @@ export default function ReportsPage() {
         })
       });
       const data = await res.json();
-      setGeneratedContent(data.content || 'Erro ao gerar relatório.');
+      setGeneratedContent(data.content || 'Erro ao gerar relat\u00f3rio.');
     } catch {
-      setGeneratedContent('Erro ao gerar relatório. Tente novamente.');
+      setGeneratedContent('Erro ao gerar relat\u00f3rio. Tente novamente.');
     }
     setGenerating(false);
   }
@@ -61,7 +63,7 @@ export default function ReportsPage() {
     if (!user || !generatedContent) return;
     await supabase.from('monthly_reports').insert({
       user_id: user.id,
-      title: `Relatório ${period}`,
+      title: `Relat\u00f3rio ${period}`,
       period,
       content: generatedContent
     });
@@ -81,12 +83,12 @@ export default function ReportsPage() {
         {/* Sidebar */}
         <div className="w-72 min-h-screen bg-[#0d1018] border-r border-white/10 p-4">
           <a href="/dashboard" className="flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
-            <span>←</span> Voltar ao Dashboard
+            <span>&lt;-</span> Voltar ao Dashboard
           </a>
-          <h2 className="text-lg font-bold mb-4 font-display">Relatórios</h2>
+          <h2 className="text-lg font-bold mb-4 font-display">Relat\u00f3rios</h2>
           <div className="space-y-2">
             {reports.length === 0 && (
-              <p className="text-white/40 text-sm">Nenhum relatório ainda.</p>
+              <p className="text-white/40 text-sm">Nenhum relat\u00f3rio ainda.</p>
             )}
             {reports.map((r) => (
               <button
@@ -109,19 +111,19 @@ export default function ReportsPage() {
         <div className="flex-1 p-8">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-8">
-              <span className="text-3xl">🎊</span>
-              <h1 className="text-3xl font-bold font-display">Relatórios Mensais</h1>
+              <span className="text-3xl">{CHART_ICON}</span>
+              <h1 className="text-3xl font-bold font-display">Relat\u00f3rios Mensais</h1>
             </div>
 
             {/* Generator */}
             <div className="bg-[#12151e] rounded-xl p-6 border border-white/10 mb-6">
-              <h3 className="text-lg font-semibold mb-4">Gerar Relatório com IA</h3>
+              <h3 className="text-lg font-semibold mb-4">Gerar Relat\u00f3rio com IA</h3>
               <p className="text-white/60 text-sm mb-4">
-                A IA vai analisar seus dados de streaming, pitches, finalças e atividade para gerar um relatório completo do período.
+                A IA vai analisar seus dados de streaming, pitches, finan\u00e7as e atividade para gerar um relat\u00f3rio completo do per\u00edodo.
               </p>
               <div className="flex gap-4 items-end">
                 <div>
-                  <label className="block text-sm text-white/60 mb-2">Período</label>
+                  <label className="block text-sm text-white/60 mb-2">Per\u00edodo</label>
                   <input
                     type="month"
                     value={period}
@@ -134,7 +136,7 @@ export default function ReportsPage() {
                   disabled={generating}
                   className="px-6 py-3 bg-[#00f5a0] text-black font-bold rounded-lg hover:bg-[#00f5a0]/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {generating ? 'Gerando...' : 'Gerar Relatório'}
+                  {generating ? 'Gerando...' : 'Gerar Relat\u00f3rio'}
                 </button>
               </div>
             </div>
@@ -144,7 +146,7 @@ export default function ReportsPage() {
               <div className="bg-[#12151e] rounded-xl p-6 border border-white/10">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold">
-                    {generatedContent ? `Relatório ${period}` : selectedReport?.title}
+                    {generatedContent ? `Relat\u00f3rio ${period}` : selectedReport?.title}
                   </h3>
                   <div className="flex gap-2">
                     <button
@@ -172,9 +174,5 @@ export default function ReportsPage() {
         </div>
       </div>
     </div>
-  
- "�8>
-  
-  
- �
-7B
+  );
+}

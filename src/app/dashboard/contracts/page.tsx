@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-browser';
 
+const DOCUMENT_ICON = String.fromCodePoint(0x1F4C4);
+
 interface Contract {
   id: string;
   title: string;
@@ -12,13 +14,13 @@ interface Contract {
   created_at: string;
 }
 
-const CONTRACT_TYPES = ['Rider Técnico', 'Rider Hospitality', 'Contrato de Show', 'Contrato de Distribuição', 'Contrato de Licenciamento', 'Acordo de Parceria', 'NDA'];
+const CONTRACT_TYPES = ['Rider T\u00e9cnico', 'Rider Hospitality', 'Contrato de Show', 'Contrato de Distribui\u00e7\u00e3o', 'Contrato de Licenciamento', 'Acordo de Parceria', 'NDA'];
 
 export default function ContractsPage() {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [contractType, setContractType] = useState('Rider Técnico');
+  const [contractType, setContractType] = useState('Rider T\u00e9cnico');
   const [details, setDetails] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
   const [copied, setCopied] = useState(false);
@@ -91,7 +93,7 @@ export default function ContractsPage() {
         {/* Sidebar */}
         <div className="w-72 min-h-screen bg-[#0d1018] border-r border-white/10 p-4">
           <a href="/dashboard" className="flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
-            <span>←</span> Voltar ao Dashboard
+            <span>&lt;-</span> Voltar ao Dashboard
           </a>
           <h2 className="text-lg font-bold mb-4 font-display">Contratos & Riders</h2>
           <div className="space-y-2">
@@ -124,7 +126,7 @@ export default function ContractsPage() {
         <div className="flex-1 p-8">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-8">
-              <span className="text-3xl">📄</span>
+              <span className="text-3xl">{DOCUMENT_ICON}</span>
               <h1 className="text-3xl font-bold font-display">Contratos & Riders</h1>
             </div>
 
@@ -148,7 +150,7 @@ export default function ContractsPage() {
                 <textarea
                   value={details}
                   onChange={(e) => setDetails(e.target.value)}
-                  placeholder="Ex: show em São Paulo, 2h de duração, banda de 5 integrantes..."
+                  placeholder="Ex: show em S\u00e3o Paulo, 2h de dura\u00e7\u00e3o, banda de 5 integrantes..."
                   rows={3}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00f5a0]/50 resize-none"
                 />

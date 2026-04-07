@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-browser';
 
+const MUSIC_NOTE_ICON = String.fromCodePoint(0x1F3B5);
+
 interface Setlist {
   id: string;
   name: string;
@@ -12,7 +14,7 @@ interface Setlist {
   created_at: string;
 }
 
-const EVENT_TYPES = ['Show', 'Festival', 'Acústico', 'Live Stream', 'Ensaio', 'Evento Corporativo'];
+const EVENT_TYPES = ['Show', 'Festival', 'Acýastico', 'Live Stream', 'Ensaio', 'Evento Corporativo'];
 
 export default function SetlistPage() {
   const [setlists, setSetlists] = useState<Setlist[]>([]);
@@ -83,7 +85,7 @@ export default function SetlistPage() {
         {/* Sidebar */}
         <div className="w-72 min-h-screen bg-[#0d1018] border-r border-white/10 p-4">
           <a href="/dashboard" className="flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
-            <span>←</span> Voltar ao Dashboard
+            <span>&lt;-</span> Voltar ao Dashboard
           </a>
           <h2 className="text-lg font-bold mb-4 font-display">Setlists</h2>
           <div className="space-y-2">
@@ -102,7 +104,7 @@ export default function SetlistPage() {
               >
                 <div className="font-medium truncate">{s.name}</div>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-white/40">{c.event_type}</span>
+                  <span className="text-xs text-white/40">{s.event_type}</span>
                   <span className="text-xs text-white/40">{s.duration_minutes}min</span>
                 </div>
               </button>
@@ -114,7 +116,7 @@ export default function SetlistPage() {
         <div className="flex-1 p-8">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-8">
-              <span className="text-3xl">🎵</span>
+              <span className="text-3xl">{MUSIC_NOTE_ICON}</span>
               <h1 className="text-3xl font-bold font-display">Setlists</h1>
             </div>
 
@@ -179,7 +181,7 @@ export default function SetlistPage() {
                   </div>
                 </div>
                 <div className="whitespace-pre-wrap text-white/80 leading-relaxed">
-                  {generatedContent || selectedSetlist?.songs?.join('\n')}
+                  {generatedContent || selectedSetlist?.songs/.join('\n')}
                 </div>
               </div>
             )}

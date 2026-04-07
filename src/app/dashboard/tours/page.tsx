@@ -33,11 +33,13 @@ export default function ToursPage() {
   const [copied, setCopied] = useState(false);
   const [showAddDate, setShowAddDate] = useState(false);
   const [newDate, setNewDate] = useState({
+  const [loading, setLoading] = useState(true);
     venue: '', city: '', date: '', fee: '', notes: ''
   });
 
   useEffect(() => {
     loadTours();
+      setLoading(false);
   }, []);
 
   async function loadTours() {
@@ -112,6 +114,15 @@ export default function ToursPage() {
     'cancelled': 'bg-red-500/20 text-red-400',
     'completed': 'bg-blue-500/20 text-blue-400'
   };
+
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[50vh]">
+        <div className="w-6 h-6 border-2 border-[#00f5a0] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#080a0f] text-white">

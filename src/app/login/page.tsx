@@ -152,14 +152,14 @@ export default function LoginPage() {
               onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
               className="text-[#00f5a0]/70 hover:text-[#00f5a0] text-sm transition"
             >
-              {isSignUp ? 'Ja tem conta? Entre aqui' : 'Novo por aqui? Crie sua conta'}
+              {isSignUp ? 'J\u00e1 tem conta? Entre aqui' : 'Novo por aqui? Crie sua conta'}
             </button>
           </div>
         </div>
 
         {/* Footer */}
         <p className="text-center text-white/20 text-xs mt-8">
-          \u00A9 2025 Verelus. Todos os direitos reservados.
+          \u00A9 2026 Verelus. Todos os direitos reservados.
         </p>
       </div>
     </div>

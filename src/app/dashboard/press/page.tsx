@@ -20,10 +20,12 @@ export default function PressPage() {
   const [generatedContent, setGeneratedContent] = useState('');
   const [copied, setCopied] = useState(false);
   const [artistName, setArtistName] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadReleases();
     loadArtist();
+      setLoading(false);
   }, []);
 
   async function loadArtist() {
@@ -85,6 +87,15 @@ export default function PressPage() {
     navigator.clipboard.writeText(generatedContent || selectedRelease?.content || '');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[50vh]">
+        <div className="w-6 h-6 border-2 border-[#00f5a0] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (

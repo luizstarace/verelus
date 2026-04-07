@@ -1,139 +1,180 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase-browser";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase-browser';
+
+interface Report {
+  id: string;
+  title: string;
+  period: string;
+  content: string;
+  created_at: string;
+}
 
 export default function ReportsPage() {
-  const [loading, setLoading] = useState(true);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [content, setContent] = useState("");
-  const [history, setHistory] = useState<any[]>([]);
+  const [period, setPeriod] = useState('');
+  const [generatedContent, setGeneratedContent] = useState('');
+  const [copied, setCopied] = useState(false);
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    loadReports();
+    // Set default period to current month
+    const now = new Date();
+    setPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+  }, []);
 
-  async function loadData() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-
-    const { data: userData } = await supabase
-      .from("users")
-      .select("id")
-      .eq("email", session.user.email)
-      .single();
-    if (!userData) { setLoading(false); return; }
-
-    const { data: outputs } = await supabase
-      .from("ai_outputs")
-      .select("id, output_content, created_at")
-      .eq("user_id", userData.id)
-      .eq("type", "monthly_report")
-      .order("created_at", { ascending: false })
-      .limit(10);
-
-    if (outputs) {
-      setHistory(outputs);
-      if (outputs.length > 0) setContent(outputs[0].output_content || "");
-    }
-    setLoading(false);
+  async function loadReports() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase
+      .from('monthly_reports')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (data) setReports(data);
   }
 
-  async function handleGenerate() {
+  async function generateReport() {
     setGenerating(true);
     try {
-      const res = await fetch("/api/ai/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "monthly_report" }),
+      const res = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'monthly_report',
+          context: { period }
+        })
       });
       const data = await res.json();
-      if (data.content) setContent(data.content);
-    } catch (err) {
-      console.error("Error:", err);
+      setGeneratedContent(data.content || 'Erro ao gerar relatório.');
+    } catch {
+      setGeneratedContent('Erro ao gerar relatório. Tente novamente.');
     }
     setGenerating(false);
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-brand-green border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+  async function saveReport() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || !generatedContent) return;
+    await supabase.from('monthly_reports').insert({
+      user_id: user.id,
+      title: `Relatório ${period}`,
+      period,
+      content: generatedContent
+    });
+    setGeneratedContent('');
+    loadReports();
+  }
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText(generatedContent || selectedReport?.content || '');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
-    <div className="min-h-screen bg-bg-primary">
-      <header className="border-b border-white/10 bg-bg-secondary/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4">
-          <a href="/dashboard" className="text-gray-400 hover:text-white transition-colors">\u2190 Dashboard</a>
-          <h1 className="font-display text-xl text-white tracking-wider">RELAT\u00d3RIOS MENSAIS</h1>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar: History */}
-          <div className="lg:col-span-1">
-            <div className="bg-bg-surface border border-white/10 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-white mb-3">Hist\u00f3rico</h3>
-              {history.length === 0 ? (
-                <p className="text-gray-500 text-xs">Nenhum registro</p>
-              ) : (
-                <div className="space-y-2">
-                  {history.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => setContent(item.output_content || "")}
-                      className="w-full text-left px-3 py-2 rounded-lg border border-white/5 hover:border-brand-green/30 transition-colors"
-                    >
-                      <p className="text-white text-xs font-medium">
-                        {new Date(item.created_at).toLocaleDateString("pt-BR")}
-                      </p>
-                      <p className="text-gray-400 text-xs truncate">
-                        {(item.output_content || "").substring(0, 50)}...
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+    <div className="min-h-screen bg-[#080a0f] text-white">
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-72 min-h-screen bg-[#0d1018] border-r border-white/10 p-4">
+          <a href="/dashboard" className="flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
+            <span>←</span> Voltar ao Dashboard
+          </a>
+          <h2 className="text-lg font-bold mb-4 font-display">Relatórios</h2>
+          <div className="space-y-2">
+            {reports.length === 0 && (
+              <p className="text-white/40 text-sm">Nenhum relatório ainda.</p>
+            )}
+            {reports.map((r) => (
+              <button
+                key={r.id}
+                onClick={() => { setSelectedReport(r); setGeneratedContent(''); }}
+                className={`w-full text-left p-3 rounded-lg text-sm transition ${
+                  selectedReport?.id === r.id
+                    ? 'bg-[#00f5a0]/20 text-[#00f5a0]'
+                    : 'bg-white/5 hover:bg-white/10 text-white/70'
+                }`}
+              >
+                <div className="font-medium truncate">{r.title}</div>
+                <div className="text-xs text-white/40 mt-1">{r.period}</div>
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <div className="bg-bg-surface border border-white/10 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-white">Relat\u00f3rio de Performance</h2>
+        {/* Main Content */}
+        <div className="flex-1 p-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center gap-3 mb-8">
+              <span className="text-3xl">🎊</span>
+              <h1 className="text-3xl font-bold font-display">Relatórios Mensais</h1>
+            </div>
+
+            {/* Generator */}
+            <div className="bg-[#12151e] rounded-xl p-6 border border-white/10 mb-6">
+              <h3 className="text-lg font-semibold mb-4">Gerar Relatório com IA</h3>
+              <p className="text-white/60 text-sm mb-4">
+                A IA vai analisar seus dados de streaming, pitches, finalças e atividade para gerar um relatório completo do período.
+              </p>
+              <div className="flex gap-4 items-end">
+                <div>
+                  <label className="block text-sm text-white/60 mb-2">Período</label>
+                  <input
+                    type="month"
+                    value={period}
+                    onChange={(e) => setPeriod(e.target.value)}
+                    className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#00f5a0]/50"
+                  />
+                </div>
                 <button
-                  onClick={handleGenerate}
+                  onClick={generateReport}
                   disabled={generating}
-                  className="px-4 py-2 bg-gradient-to-r from-brand-green to-brand-green/80 text-bg-primary rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-brand-green/25 transition-all disabled:opacity-50"
+                  className="px-6 py-3 bg-[#00f5a0] text-black font-bold rounded-lg hover:bg-[#00f5a0]/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {generating ? "Gerando..." : "\u2728 Gerar Relat\u00f3rio"}
+                  {generating ? 'Gerando...' : 'Gerar Relatório'}
                 </button>
               </div>
-
-              {content ? (
-                <div>
-                  <div className="bg-bg-primary border border-white/10 rounded-xl p-6 whitespace-pre-wrap text-gray-300 text-sm leading-relaxed max-h-[600px] overflow-y-auto">
-                    {content}
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    <button onClick={() => navigator.clipboard.writeText(content)} className="px-4 py-2 bg-white/10 text-white rounded-lg text-sm hover:bg-white/20 transition-colors">
-                      Copiar
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-16 text-gray-400">
-                  <p className="text-4xl mb-4">\u{1F4C8}</p>
-                  <p className="text-sm">Gere um relat\u00f3rio completo de performance</p>
-                </div>
-              )}
             </div>
+
+            {/* Content Display */}
+            {(generatedContent || selectedReport) && (
+              <div className="bg-[#12151e] rounded-xl p-6 border border-white/10">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">
+                    {generatedContent ? `Relatório ${period}` : selectedReport?.title}
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={copyToClipboard}
+                      className="px-4 py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition"
+                    >
+                      {copied ? 'Copiado!' : 'Copiar'}
+                    </button>
+                    {generatedContent && (
+                      <button
+                        onClick={saveReport}
+                        className="px-4 py-2 bg-[#00f5a0]/20 text-[#00f5a0] rounded-lg text-sm hover:bg-[#00f5a0]/30 transition"
+                      >
+                        Salvar
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="whitespace-pre-wrap text-white/80 leading-relaxed">
+                  {generatedContent || selectedReport?.content}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </main>
+      </div>
     </div>
-  );
-}
+  
+ "�8>
+  
+  
+ �
+7B

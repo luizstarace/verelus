@@ -24,6 +24,7 @@ export default function BudgetPage() {
   const [generatedContent, setGeneratedContent] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
+  const [loading, setLoading] = useState(true);
     description: '',
     amount: '',
     type: 'expense' as 'income' | 'expense',
@@ -33,6 +34,7 @@ export default function BudgetPage() {
 
   useEffect(() => {
     loadTransactions();
+      setLoading(false);
   }, []);
 
   async function loadTransactions() {
@@ -84,6 +86,15 @@ export default function BudgetPage() {
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
   const balance = totalIncome - totalExpense;
+
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[50vh]">
+        <div className="w-6 h-6 border-2 border-[#00f5a0] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#080a0f] text-white">

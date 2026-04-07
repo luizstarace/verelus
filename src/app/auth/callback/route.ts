@@ -1,59 +1,39 @@
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
 export async function GET(request: Request) {
-  const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get('code');
-  const token_hash = requestUrl.searchParams.get('token_hash');
-  const type = requestUrl.searchParams.get('type');
+  const { searchParams, origin } = new URL(request.url);
+  const code = searchParams.get('code');
+  const next = searchParams.get('next') || '/dashboard';
 
-  if (token_hash && type) {
-    const supabase = createClient(
+  if (code) {
+    const cookieStore = cookies();
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            cookieStore.set({ name, value, ...options });
+          },
+          remove(name: string, options: CookieOptions) {
+            cookieStore.delete({ name, ...options });
+          },
+        },
+      }
     );
 
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash,
-      type: type as any,
-    });
-
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      // Check if user exists in our users table, create if not
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const serviceSupabase = createClient(
-          process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
-
-        const { data: existingUser } = await serviceSupabase
-          .from('users')
-          .select('id')
-          .eq('email', user.email)
-          .single();
-
-        if (!existingUser) {
-          await serviceSupabase.from('users').insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || null,
-            plan: 'free',
-          });
-        }
-      }
-
-      return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
+      return NextResponse.redirect(`${origin}${next}`);
     }
   }
 
-  // If code-based auth (OAuth)
-  if (code) {
-    return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
-  }
-
-  // Error - redirect to login
-  return NextResponse.redirect(new URL('/login?error=auth_failed', requestUrl.origin));
+  return NextResponse.redirect(`${origin}/login?error=auth_callback_error`);
 }

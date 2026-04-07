@@ -23,10 +23,12 @@ export default function SocialPage() {
   const [theme, setTheme] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState<'calendar' | 'list'>('list');
 
   useEffect(() => {
     loadPosts();
+      setLoading(false);
   }, []);
 
   async function loadPosts() {
@@ -89,6 +91,15 @@ export default function SocialPage() {
     'YouTube': '#FF0000',
     'LinkedIn': '#0077B5'
   };
+
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[50vh]">
+        <div className="w-6 h-6 border-2 border-[#00f5a0] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#080a0f] text-white">

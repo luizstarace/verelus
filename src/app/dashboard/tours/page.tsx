@@ -33,9 +33,9 @@ export default function ToursPage() {
   const [copied, setCopied] = useState(false);
   const [showAddDate, setShowAddDate] = useState(false);
   const [newDate, setNewDate] = useState({
-  const [loading, setLoading] = useState(true);
     venue: '', city: '', date: '', fee: '', notes: ''
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadTours();

@@ -169,7 +169,7 @@ export default function Home() {
       <section className="relative z-10 flex flex-col items-center text-center px-6 pt-20 pb-16 max-w-5xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-green/10 border border-brand-green/20 rounded-full text-brand-green text-xs font-mono mb-8">
           <span className="w-1.5 h-1.5 bg-brand-green rounded-full animate-pulse" />
-          {lang === "pt" ? "Plataforma de Inteligência Musical" : "Music Intelligence Platform"}
+          {lang === "pt" ? "Plataforma de InteligÃªncia Musical" : "Music Intelligence Platform"}
         </div>
 
         <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl tracking-tight leading-none mb-6">
@@ -193,7 +193,7 @@ export default function Home() {
       <section className="relative z-10 px-6 py-10 max-w-4xl mx-auto">
         <div className="text-center mb-6">
           <p className="text-xs text-brand-muted/50 uppercase tracking-wider font-mono">
-            {lang === "pt" ? "Feito para quem vive de música" : "Built for music professionals"}
+            {lang === "pt" ? "Feito para quem vive de mÃºsica" : "Built for music professionals"}
           </p>
         </div>
         <div className="flex flex-wrap justify-center items-center gap-8 opacity-30">
@@ -205,7 +205,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Promotion Section â Playlist Pitching */}
+      {/* Promotion Section Ã¢ÂÂ Playlist Pitching */}
       <section id="promotion" className="relative z-10 px-6 py-20 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-green/10 border border-brand-green/20 rounded-full text-brand-green text-xs font-mono mb-6">
@@ -220,7 +220,7 @@ export default function Home() {
           {Object.values(t.promotion.features).map((feature, i) => (
             <FeatureCard
               key={i}
-              icon={["ðµ", "ð¤", "âï¸", "ð", "ð", "ð¯"][i]}
+              icon={["Ã°ÂÂÂµ", "Ã°ÂÂ¤Â", "Ã¢ÂÂÃ¯Â¸Â", "Ã°ÂÂÂ", "Ã°ÂÂÂ", "Ã°ÂÂÂ¯"][i]}
               title={feature.title}
               desc={feature.description}
               accent="green"
@@ -229,7 +229,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Management Section â Career Tools */}
+      {/* Management Section Ã¢ÂÂ Career Tools */}
       <section id="management" className="relative z-10 px-6 py-20 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-purple/10 border border-brand-purple/20 rounded-full text-brand-purple text-xs font-mono mb-6">
@@ -244,7 +244,7 @@ export default function Home() {
           {Object.values(t.management.features).map((feature, i) => (
             <FeatureCard
               key={i}
-              icon={["ð", "ð°", "ð", "ð¸", "ð°", "ðºï¸", "ð", "ð"][i]}
+              icon={["Ã°ÂÂÂ", "Ã°ÂÂÂ°", "Ã°ÂÂÂ", "Ã°ÂÂÂ¸", "Ã°ÂÂÂ°", "Ã°ÂÂÂºÃ¯Â¸Â", "Ã°ÂÂÂ", "Ã°ÂÂÂ"][i]}
               title={feature.title}
               desc={feature.description}
               accent="purple"
@@ -261,12 +261,12 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { ...t.features.aiPowered, icon: "ð§ " },
-            { ...t.features.expertTuned, icon: "ð¯" },
-            { ...t.features.integrated, icon: "â¡" },
-            { ...t.features.realTime, icon: "ð" },
-            { ...t.features.teamCollaboration, icon: "ð¥" },
-            { ...t.features.apiIntegration, icon: "ð" },
+            { ...t.features.aiPowered, icon: "Ã°ÂÂ§Â " },
+            { ...t.features.expertTuned, icon: "Ã°ÂÂÂ¯" },
+            { ...t.features.integrated, icon: "Ã¢ÂÂ¡" },
+            { ...t.features.realTime, icon: "Ã°ÂÂÂ" },
+            { ...t.features.teamCollaboration, icon: "Ã°ÂÂÂ¥" },
+            { ...t.features.apiIntegration, icon: "Ã°ÂÂÂ" },
           ].map((feature, i) => (
             <FeatureCard
               key={i}
@@ -317,12 +317,12 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               {t.pricing.plans.free.features.map((f, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-green mt-0.5">â</span> {f}
+                  <span className="text-brand-green mt-0.5">Ã¢ÂÂ</span> {f}
                 </li>
               ))}
             </ul>
             <a
-              href="#"
+              href="/login"
               onClick={(e) => {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: "smooth" });
@@ -333,7 +333,7 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Pro â POPULAR */}
+          {/* Pro Ã¢ÂÂ POPULAR */}
           <div className="gradient-border p-8 bg-brand-card glow-green relative">
             <div className="absolute -top-3 right-6 px-3 py-1 bg-brand-green text-brand-dark text-xs font-bold rounded-full">
               {lang === "pt" ? "MAIS POPULAR" : "MOST POPULAR"}
@@ -347,7 +347,7 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               {t.pricing.plans.pro.features.map((f, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-green mt-0.5">â</span> {f}
+                  <span className="text-brand-green mt-0.5">Ã¢ÂÂ</span> {f}
                 </li>
               ))}
             </ul>
@@ -378,7 +378,7 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               {t.pricing.plans.business.features.map((f, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-purple mt-0.5">â</span> {f}
+                  <span className="text-brand-purple mt-0.5">Ã¢ÂÂ</span> {f}
                 </li>
               ))}
             </ul>
@@ -423,7 +423,7 @@ export default function Home() {
         </h2>
         <p className="text-brand-muted mb-8 max-w-xl mx-auto">
           {lang === "pt"
-            ? "Junte-se a artistas que já estão usando inteligência de mercado para alavancar suas carreiras."
+            ? "Junte-se a artistas que jÃ¡ estÃ£o usando inteligÃªncia de mercado para alavancar suas carreiras."
             : "Join artists who are already using market intelligence to level up their careers."}
         </p>
         <div className="flex justify-center">
@@ -453,7 +453,7 @@ export default function Home() {
                 Dashboard
               </a>
               <a href="/unsubscribe" className="text-xs text-brand-muted hover:text-white transition-colors">
-                {lang === "pt" ? "Cancelar inscrição" : "Unsubscribe"}
+                {lang === "pt" ? "Cancelar inscriÃ§Ã£o" : "Unsubscribe"}
               </a>
             </div>
           </div>

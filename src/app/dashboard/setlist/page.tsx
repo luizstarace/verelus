@@ -14,7 +14,7 @@ interface Setlist {
   created_at: string;
 }
 
-const EVENT_TYPES = ['Show', 'Festival', 'Acýastico', 'Live Stream', 'Ensaio', 'Evento Corporativo'];
+const EVENT_TYPES = ['Show', 'Festival', 'Ac\u00fastico', 'Live Stream', 'Ensaio', 'Evento Corporativo'];
 
 export default function SetlistPage() {
   const [setlists, setSetlists] = useState<Setlist[]>([]);
@@ -137,7 +137,7 @@ export default function SetlistPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-white/60 mb-2">Duração (minutos)</label>
+                  <label className="block text-sm text-white/60 mb-2">Dura\u00e7\u00e3o (minutos)</label>
                   <input
                     type="number"
                     value={duration}
@@ -181,7 +181,7 @@ export default function SetlistPage() {
                   </div>
                 </div>
                 <div className="whitespace-pre-wrap text-white/80 leading-relaxed">
-                  {generatedContent || selectedSetlist?.songs/.join('\n')}
+                  {generatedContent || selectedSetlist?.songs?.join('\n')}
                 </div>
               </div>
             )}

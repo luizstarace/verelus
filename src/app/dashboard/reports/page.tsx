@@ -20,12 +20,14 @@ export default function ReportsPage() {
   const [period, setPeriod] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadReports();
     // Set default period to current month
     const now = new Date();
     setPeriod(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+      setLoading(false);
   }, []);
 
   async function loadReports() {
@@ -75,6 +77,15 @@ export default function ReportsPage() {
     navigator.clipboard.writeText(generatedContent || selectedReport?.content || '');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[50vh]">
+        <div className="w-6 h-6 border-2 border-[#00f5a0] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (

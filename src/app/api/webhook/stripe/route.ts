@@ -47,7 +47,6 @@ function mapStatus(stripeStatus: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-  try {
     // Verify Stripe webhook signature (edge-compatible)
     const rawBody = await req.text();
     const sig = req.headers.get('stripe-signature');
@@ -251,5 +250,4 @@ export async function POST(req: NextRequest) {
     console.error("Stripe webhook error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-}
 }

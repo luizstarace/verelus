@@ -2,12 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap");
-
 :root {
-  --brand-green: #00ff88;
-  --brand-purple: #a855f7;
-  --brand-orange: #ff6b35;
+  --brand-green: #00f5a0;
+  --brand-purple: #e040fb;
+  --brand-orange: #f5a623;
+  --brand-dark: #080a0f;
+  --brand-surface: #12151e;
+  --brand-card: #0d1018;
 }
 
 html {
@@ -15,8 +16,8 @@ html {
 }
 
 body {
-  background: #050508;
-  color: #e4e4e7;
+  background: var(--brand-dark);
+  color: #e8eaf0;
 }
 
 /* Scrollbar */
@@ -24,27 +25,27 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0f;
+  background: var(--brand-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e1e2e;
+  background: rgba(255,255,255,0.1);
   border-radius: 3px;
 }
 
 /* Glow effects */
 .glow-green {
-  box-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
+  box-shadow: 0 0 30px rgba(0, 245, 160, 0.15);
 }
 .glow-purple {
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
+  box-shadow: 0 0 30px rgba(224, 64, 251, 0.15);
 }
 .glow-text-green {
-  text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+  text-shadow: 0 0 20px rgba(0, 245, 160, 0.5);
 }
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #00ff88 0%, #a855f7 50%, #ff6b35 100%);
+  background: linear-gradient(135deg, #00f5a0 0%, #e040fb 50%, #f5a623 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -62,7 +63,7 @@ body {
   inset: 0;
   padding: 1px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #00ff88, #a855f7, #ff6b35);
+  background: linear-gradient(135deg, #00f5a0, #e040fb, #f5a623);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -101,4 +102,10 @@ body {
 }
 .animate-section {
   animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Display font utility */
+.font-display {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  letter-spacing: 0.02em;
 }

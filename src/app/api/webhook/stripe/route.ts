@@ -8,21 +8,25 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Map Stripe price ID to our product tier
+// Map Stripe price ID to our unified product tier
 function mapProduct(priceId: string): string {
-  // TuneSignal Premium: R$29.90/mo
-  if (priceId.includes("tunesignal_premium") || priceId.includes("price_tunesignal")) {
-    return "tunesignal_premium";
+  const proPriceId = process.env.STRIPE_PRICE_PRO || "";
+  const businessPriceId = process.env.STRIPE_PRICE_BUSINESS || "";
+
+  if (priceId === businessPriceId || priceId.includes("business")) {
+    return "business";
   }
-  // BandBrain Essencial: R$47/mo
-  if (priceId.includes("bandbrain_essencial") || priceId.includes("essencial")) {
-    return "bandbrain_essencial";
+  if (priceId === proPriceId || priceId.includes("pro")) {
+    return "pro";
   }
-  // BandBrain Pro: R$97/mo
-  if (priceId.includes("bandbrain_pro") || priceId.includes("pro")) {
-    return "bandbrain_pro";
+  // Legacy mappings
+  if (priceId.includes("bandbrain_pro") || priceId.includes("bandbrain_essencial")) {
+    return "pro";
   }
-  return "tunesignal_premium"; // default
+  if (priceId.includes("tunesignal_premium")) {
+    return "pro";
+  }
+  return "pro"; // default paid tier
 }
 
 // Map Stripe subscription status to our status
@@ -114,7 +118,7 @@ export async function POST(req: NextRequest) {
         await supabase.from("email_subscribers").upsert(
           {
             email: email.toLowerCase().trim(),
-            source: "stripe_checkout",
+            source: "dashboard",
             status: "active",
           },
           { onConflict: "email" }

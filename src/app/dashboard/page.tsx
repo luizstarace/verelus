@@ -1,804 +1,361 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase-browser";
 
-// ═══════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════
+type PlanTier = "free" | "pro" | "business";
 
-type ModuleId = "calendar" | "press" | "setlist" | "pitch" | "report";
-type Tier = "starter" | "pro";
-type View = "login" | "setup" | "dashboard";
-
-interface ModuleConfig {
-  id: ModuleId;
-  icon: string;
-  title: string;
-  titlePt: string;
-  desc: string;
-  descPt: string;
-  prompt: string;
-  tier: "starter" | "pro";
-  contextLabel: string;
-  contextLabelPt: string;
-  contextPlaceholder: string;
-  contextPlaceholderPt: string;
-}
-
-interface UserSession {
-  token: string;
+interface UserData {
   id: string;
   email: string;
-  name: string;
-  tier: Tier;
-  product: string;
+  full_name: string | null;
+  plan: PlanTier;
+  spotify_connected: boolean;
+  onboarding_completed: boolean;
 }
 
-interface HistoryItem {
+interface Module {
   id: string;
-  module: ModuleId;
-  content: string;
-  bandName: string;
-  context: string;
-  timestamp: string;
-  tokensUsed: number;
+  name: string;
+  nameEn: string;
+  description: string;
+  descriptionEn: string;
+  icon: string;
+  tier: PlanTier;
+  href: string;
+  comingSoon?: boolean;
 }
 
-// ═══════════════════════════════════════
-// MODULE DEFINITIONS
-// ═══════════════════════════════════════
-
-const modules: ModuleConfig[] = [
+const MODULES: Module[] = [
   {
-    id: "calendar",
-    icon: "📅",
-    title: "Social Media Calendar",
-    titlePt: "Calendário de Redes Sociais",
-    desc: "30-day content calendar with captions, hashtags & timing",
-    descPt: "Calendário de 30 dias com legendas, hashtags e horários",
-    prompt: "social_calendar",
-    tier: "starter",
-    contextLabel: "What's happening with your band?",
-    contextLabelPt: "O que está acontecendo com sua banda?",
-    contextPlaceholder: "e.g. We're releasing a new single next month, playing a festival in 2 weeks...",
-    contextPlaceholderPt: "Ex: Estamos lançando um single novo mês que vem, temos um show em 2 semanas...",
+    id: "playlist_pitch",
+    name: "Envio de Playlists",
+    nameEn: "Playlist Pitching",
+    description: "Encontre playlists compatíveis e envie pitches profissionais com IA",
+    descriptionEn: "Find matching playlists and send professional AI-powered pitches",
+    icon: "🎵",
+    tier: "free",
+    href: "/dashboard/pitching",
   },
   {
-    id: "press",
+    id: "epk",
+    name: "Kit de Imprensa (EPK)",
+    nameEn: "Electronic Press Kit",
+    description: "Gere EPKs profissionais automaticamente com seus dados do Spotify",
+    descriptionEn: "Auto-generate professional EPKs with your Spotify data",
+    icon: "📋",
+    tier: "free",
+    href: "/dashboard/epk",
+  },
+  {
+    id: "artist_analysis",
+    name: "Análise de Artista",
+    nameEn: "Artist Analysis",
+    description: "Insights detalhados sobre seu perfil, audiência e crescimento",
+    descriptionEn: "Detailed insights about your profile, audience and growth",
+    icon: "📊",
+    tier: "free",
+    href: "/dashboard/analysis",
+  },
+  {
+    id: "press_release",
+    name: "Comunicados de Imprensa",
+    nameEn: "Press Releases",
+    description: "Crie comunicados profissionais para lançamentos e eventos",
+    descriptionEn: "Create professional releases for launches and events",
     icon: "📰",
-    title: "Press Release",
-    titlePt: "Press Release",
-    desc: "Professional press release ready to send to media",
-    descPt: "Press release profissional pronto para enviar à mídia",
-    prompt: "press_release",
-    tier: "starter",
-    contextLabel: "What is this press release about?",
-    contextLabelPt: "Sobre o que é esse press release?",
-    contextPlaceholder: "e.g. New album 'Midnight Signal' dropping March 15, recorded in São Paulo with producer X...",
-    contextPlaceholderPt: "Ex: Novo álbum 'Midnight Signal' saindo dia 15 de março, gravado em SP com produtor X...",
+    tier: "pro",
+    href: "/dashboard/press",
+  },
+  {
+    id: "social_calendar",
+    name: "Calendário Social",
+    nameEn: "Social Calendar",
+    description: "Planeje suas redes sociais com sugestões de conteúdo por IA",
+    descriptionEn: "Plan your social media with AI content suggestions",
+    icon: "📅",
+    tier: "pro",
+    href: "/dashboard/social",
   },
   {
     id: "setlist",
-    icon: "🎵",
-    title: "Setlist Strategy",
-    titlePt: "Estratégia de Setlist",
-    desc: "3 smart setlists with energy mapping & stage tips",
-    descPt: "3 setlists inteligentes com mapa de energia e dicas de palco",
-    prompt: "setlist",
+    name: "Gestão de Setlists",
+    nameEn: "Setlist Management",
+    description: "Organize setlists inteligentes baseadas em dados de audiência",
+    descriptionEn: "Organize smart setlists based on audience data",
+    icon: "🎶",
     tier: "pro",
-    contextLabel: "Tell us about the show",
-    contextLabelPt: "Conte sobre o show",
-    contextPlaceholder: "e.g. 45-min opening set for a 500-cap venue, audience mostly 20-30 year olds...",
-    contextPlaceholderPt: "Ex: Set de 45 min abrindo pra banda X, venue de 500 pessoas, público de 20-30 anos...",
+    href: "/dashboard/setlist",
   },
   {
-    id: "pitch",
-    icon: "✉️",
-    title: "Playlist Pitch Kit",
-    titlePt: "Kit de Pitch para Playlists",
-    desc: "Complete pitch kit with emails, DMs & curator targets",
-    descPt: "Kit completo com emails, DMs e curadores-alvo",
-    prompt: "playlist_pitch",
-    tier: "starter",
-    contextLabel: "What are you pitching?",
-    contextLabelPt: "O que você está pitchando?",
-    contextPlaceholder: "e.g. New single 'Neon Dreams', indie pop with electronic elements, similar to Terno Rei...",
-    contextPlaceholderPt: "Ex: Single novo 'Neon Dreams', indie pop com elementos eletrônicos, similar a Terno Rei...",
+    id: "budget",
+    name: "Orçamento e Finanças",
+    nameEn: "Budget & Finance",
+    description: "Controle receitas, despesas e projeções financeiras",
+    descriptionEn: "Track revenue, expenses and financial projections",
+    icon: "💰",
+    tier: "pro",
+    href: "/dashboard/budget",
   },
   {
-    id: "report",
-    icon: "📊",
-    title: "Monthly Strategy Report",
-    titlePt: "Relatório Mensal de Estratégia",
-    desc: "Full business report with metrics, goals & action items",
-    descPt: "Relatório completo com métricas, metas e ações",
-    prompt: "monthly_report",
+    id: "contract",
+    name: "Contratos e Riders",
+    nameEn: "Contracts & Riders",
+    description: "Gere contratos e riders técnicos profissionais",
+    descriptionEn: "Generate professional contracts and technical riders",
+    icon: "📝",
     tier: "pro",
-    contextLabel: "Share any metrics or context",
-    contextLabelPt: "Compartilhe métricas ou contexto",
-    contextPlaceholder: "e.g. 5k monthly listeners, 2k Instagram followers, played 3 shows last month...",
-    contextPlaceholderPt: "Ex: 5k ouvintes mensais, 2k seguidores no Instagram, fizemos 3 shows mês passado...",
+    href: "/dashboard/contracts",
+  },
+  {
+    id: "monthly_report",
+    name: "Relatórios Mensais",
+    nameEn: "Monthly Reports",
+    description: "Relatórios completos de performance e crescimento",
+    descriptionEn: "Complete performance and growth reports",
+    icon: "📈",
+    tier: "pro",
+    href: "/dashboard/reports",
+  },
+  {
+    id: "tour_plan",
+    name: "Planejamento de Turnês",
+    nameEn: "Tour Planning",
+    description: "Planeje rotas, logística e orçamento de turnês",
+    descriptionEn: "Plan routes, logistics and tour budgets",
+    icon: "🌍",
+    tier: "business",
+    href: "/dashboard/tours",
   },
 ];
 
-// ═══════════════════════════════════════
-// SIMPLE MARKDOWN RENDERER
-// ═══════════════════════════════════════
+const TIER_ORDER: Record<PlanTier, number> = { free: 0, pro: 1, business: 2 };
 
-function renderMarkdown(text: string): string {
-  let html = text
-    // Headers
-    .replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold text-brand-purple mt-6 mb-2">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold text-brand-green mt-8 mb-3">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-black gradient-text mt-8 mb-4">$1</h1>')
-    // Bold
-    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
-    // Italic
-    .replace(/\*(.+?)\*/g, '<em class="text-zinc-300">$1</em>')
-    // Tables
-    .replace(/^\|(.+)\|$/gm, (match) => {
-      const cells = match.split("|").filter(Boolean).map((c) => c.trim());
-      const isHeader = cells.every((c) => /^[-:]+$/.test(c));
-      if (isHeader) return "";
-      return `<tr>${cells.map((c) => `<td class="px-3 py-2 border border-zinc-700/50 text-sm">${c}</td>`).join("")}</tr>`;
-    })
-    // Checkboxes
-    .replace(/^- \[ \] (.+)$/gm, '<div class="flex items-start gap-2 my-1"><span class="text-zinc-600 mt-0.5">☐</span><span class="text-zinc-300 text-sm">$1</span></div>')
-    .replace(/^- \[x\] (.+)$/gm, '<div class="flex items-start gap-2 my-1"><span class="text-brand-green mt-0.5">☑</span><span class="text-zinc-400 text-sm line-through">$1</span></div>')
-    // Bullet points
-    .replace(/^- (.+)$/gm, '<div class="flex items-start gap-2 my-1"><span class="text-brand-purple">•</span><span class="text-zinc-300 text-sm">$1</span></div>')
-    // Numbered lists
-    .replace(/^(\d+)\. (.+)$/gm, '<div class="flex items-start gap-2 my-1"><span class="text-brand-orange font-mono text-sm min-w-[1.5rem]">$1.</span><span class="text-zinc-300 text-sm">$2</span></div>')
-    // Horizontal rules
-    .replace(/^---$/gm, '<hr class="border-zinc-700/50 my-6" />')
-    // Code blocks
-    .replace(/`(.+?)`/g, '<code class="bg-zinc-800 px-1.5 py-0.5 rounded text-brand-green text-sm font-mono">$1</code>')
-    // Paragraphs (lines that aren't already wrapped)
-    .replace(/^(?!<[hdt]|<div|<hr|<tr)(.+)$/gm, '<p class="text-zinc-300 text-sm leading-relaxed my-1">$1</p>');
+export default function DashboardPage() {
+  const [user, setUser] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [lang] = useState<"pt" | "en">("pt");
 
-  // Wrap table rows
-  html = html.replace(/(<tr>[\s\S]*?<\/tr>)+/g, (match) => {
-    return `<div class="overflow-x-auto my-4"><table class="w-full border-collapse border border-zinc-700/50 bg-zinc-900/50 rounded-lg">${match}</table></div>`;
-  });
-
-  return html;
-}
-
-// ═══════════════════════════════════════
-// MAIN DASHBOARD COMPONENT
-// ═══════════════════════════════════════
-
-export default function Dashboard() {
-  const [view, setView] = useState<View>("login");
-  const [user, setUser] = useState<UserSession | null>(null);
-  const [lang, setLang] = useState<"pt" | "en">("pt");
-
-  // Band profile
-  const [bandName, setBandName] = useState("");
-  const [genre, setGenre] = useState("");
-
-  // Generation state
-  const [activeModule, setActiveModule] = useState<ModuleId | null>(null);
-  const [context, setContext] = useState("");
-  const [output, setOutput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [tokensUsed, setTokensUsed] = useState(0);
-
-  // History
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
-
-  // Login state
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const [loginLoading, setLoginLoading] = useState(false);
-
-  // Copy feedback
-  const [copied, setCopied] = useState(false);
-
-  const outputRef = useRef<HTMLDivElement>(null);
-
-  // Check for stored session on mount
   useEffect(() => {
-    const stored = localStorage.getItem("bandbrain_session");
-    if (stored) {
-      try {
-        const session = JSON.parse(stored);
-        setUser(session);
-        const savedBand = localStorage.getItem("bandbrain_band");
-        const savedGenre = localStorage.getItem("bandbrain_genre");
-        if (savedBand && savedGenre) {
-          setBandName(savedBand);
-          setGenre(savedGenre);
-          setView("dashboard");
-        } else {
-          setView("setup");
-        }
-      } catch {
-        localStorage.removeItem("bandbrain_session");
-      }
-    }
-    // Load history
-    const savedHistory = localStorage.getItem("bandbrain_history");
-    if (savedHistory) {
-      try { setHistory(JSON.parse(savedHistory)); } catch {}
-    }
+    checkAuth();
   }, []);
 
-  // Save history when it changes
-  useEffect(() => {
-    if (history.length > 0) {
-      localStorage.setItem("bandbrain_history", JSON.stringify(history.slice(0, 50)));
-    }
-  }, [history]);
-
-  // ─── LOGIN ───────────────────────────
-
-  async function handleLogin() {
-    setLoginLoading(true);
-    setLoginError("");
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: loginEmail }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setLoginError(
-          data.error === "no_subscription"
-            ? lang === "pt"
-              ? "Nenhuma assinatura ativa encontrada para este email."
-              : "No active subscription found for this email."
-            : data.message || "Login failed"
-        );
-        return;
-      }
-      const session: UserSession = { token: data.token, ...data.user };
-      setUser(session);
-      localStorage.setItem("bandbrain_session", JSON.stringify(session));
-      setView("setup");
-    } catch {
-      setLoginError(lang === "pt" ? "Erro de conexão. Tente novamente." : "Connection error. Try again.");
-    } finally {
-      setLoginLoading(false);
-    }
-  }
-
-  // ─── SETUP ──────────────────────────
-
-  function handleSetup() {
-    if (bandName && genre) {
-      localStorage.setItem("bandbrain_band", bandName);
-      localStorage.setItem("bandbrain_genre", genre);
-      setView("dashboard");
-    }
-  }
-
-  // ─── LOGOUT ─────────────────────────
-
-  function handleLogout() {
-    localStorage.removeItem("bandbrain_session");
-    localStorage.removeItem("bandbrain_band");
-    localStorage.removeItem("bandbrain_genre");
-    setUser(null);
-    setView("login");
-    setOutput("");
-    setActiveModule(null);
-  }
-
-  // ─── GENERATE ───────────────────────
-
-  async function handleGenerate(mod: ModuleConfig) {
-    if (user && mod.tier === "pro" && user.tier === "starter") {
-      setOutput(
-        lang === "pt"
-          ? `## 🔒 Módulo Pro\n\nEste módulo está disponível apenas no plano **BandBrain Pro**.\n\nSeu plano atual: **Starter**\n\n[Faça upgrade para o Pro](/) para acessar:\n- ${modules.filter(m => m.tier === "pro").map(m => lang === "pt" ? m.titlePt : m.title).join("\n- ")}`
-          : `## 🔒 Pro Module\n\nThis module is only available on the **BandBrain Pro** plan.\n\nYour current plan: **Starter**\n\n[Upgrade to Pro](/) to access:\n- ${modules.filter(m => m.tier === "pro").map(m => m.title).join("\n- ")}`
-      );
-      setActiveModule(mod.id);
+  async function checkAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.href = "/login";
       return;
     }
 
-    setActiveModule(mod.id);
-    setLoading(true);
-    setOutput("");
-    setTokensUsed(0);
+    const { data: userData } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", session.user.email)
+      .single();
 
-    try {
-      const res = await fetch("/api/ai/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: mod.prompt,
-          bandName,
-          genre,
-          context,
-          lang,
-        }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setOutput(
-          lang === "pt"
-            ? "## Erro\n\nNão foi possível gerar o conteúdo. Tente novamente em alguns segundos."
-            : "## Error\n\nCould not generate content. Please try again in a few seconds."
-        );
-        setLoading(false);
-        return;
-      }
-
-      setOutput(data.content || "No content generated");
-      setTokensUsed(data.tokensUsed || 0);
-
-      // Save to history
-      const historyItem: HistoryItem = {
-        id: Date.now().toString(),
-        module: mod.id,
-        content: data.content,
-        bandName,
-        context,
-        timestamp: new Date().toISOString(),
-        tokensUsed: data.tokensUsed || 0,
-      };
-      setHistory((prev) => [historyItem, ...prev]);
-    } catch {
-      setOutput(
-        lang === "pt"
-          ? "## Erro de Conexão\n\nVerifique sua conexão e tente novamente."
-          : "## Connection Error\n\nCheck your connection and try again."
-      );
+    if (userData) {
+      setUser(userData as UserData);
     }
     setLoading(false);
   }
 
-  // ─── COPY ───────────────────────────
-
-  function handleCopy() {
-    navigator.clipboard.writeText(output).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    window.location.href = "/";
   }
 
-  // ─── EXPORT TXT ─────────────────────
-
-  function handleExport() {
-    const blob = new Blob([output], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `bandbrain-${activeModule}-${bandName.replace(/\s+/g, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
+  function canAccess(moduleTier: PlanTier): boolean {
+    if (!user) return false;
+    return TIER_ORDER[user.plan] >= TIER_ORDER[moduleTier];
   }
 
-  // ─── LOAD FROM HISTORY ──────────────
-
-  function loadFromHistory(item: HistoryItem) {
-    setActiveModule(item.module);
-    setOutput(item.content);
-    setTokensUsed(item.tokensUsed);
-    setShowHistory(false);
-  }
-
-  // ═══════════════════════════════════════
-  // LOGIN VIEW
-  // ═══════════════════════════════════════
-
-  if (view === "login") {
+  function getTierBadge(tier: PlanTier) {
+    const colors = {
+      free: "bg-gray-500/20 text-gray-400",
+      pro: "bg-brand-green/20 text-brand-green",
+      business: "bg-brand-purple/20 text-brand-purple",
+    };
+    const labels = { free: "Free", pro: "Pro", business: "Business" };
     return (
-      <div className="min-h-screen bg-brand-darker flex items-center justify-center px-6">
-        <div className="gradient-border p-8 bg-brand-card max-w-lg w-full">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-black mb-2">
-              <span className="gradient-text">BandBrain</span>
-            </h1>
-            <p className="text-zinc-400 text-sm">
-              {lang === "pt" ? "Seu gerente de banda com IA" : "Your AI band manager"}
-            </p>
-          </div>
+      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[tier]}`}>
+        {labels[tier]}
+      </span>
+    );
+  }
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm text-zinc-400 mb-1 block">
-                {lang === "pt" ? "Email da sua assinatura" : "Your subscription email"}
-              </label>
-              <input
-                type="email"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                placeholder={lang === "pt" ? "seu@email.com" : "your@email.com"}
-                className="w-full px-4 py-3 bg-brand-dark border border-brand-border rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-brand-purple/50"
-              />
-            </div>
-
-            {loginError && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-red-400 text-sm">{loginError}</p>
-                <a
-                  href="/"
-                  className="text-brand-green text-xs hover:underline mt-1 inline-block"
-                >
-                  {lang === "pt" ? "→ Adquira seu plano" : "→ Get your plan"}
-                </a>
-              </div>
-            )}
-
-            <button
-              onClick={handleLogin}
-              disabled={!loginEmail || loginLoading}
-              className="w-full py-3 bg-brand-purple text-white font-bold rounded-lg hover:brightness-110 transition-all disabled:opacity-30"
-            >
-              {loginLoading
-                ? lang === "pt" ? "Verificando..." : "Verifying..."
-                : lang === "pt" ? "Entrar" : "Sign In"}
-            </button>
-
-            <div className="text-center">
-              <button
-                onClick={() => setLang(lang === "pt" ? "en" : "pt")}
-                className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
-              >
-                {lang === "pt" ? "English" : "Português"}
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-zinc-800 text-center">
-            <p className="text-xs text-zinc-600">
-              {lang === "pt"
-                ? "Use o email da sua assinatura"
-                : "Use the email from your subscription"}
-            </p>
-          </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Carregando...</p>
         </div>
       </div>
     );
   }
 
-  // ═══════════════════════════════════════
-  // SETUP VIEW
-  // ═══════════════════════════════════════
+  if (!user) return null;
 
-  if (view === "setup") {
-    return (
-      <div className="min-h-screen bg-brand-darker flex items-center justify-center px-6">
-        <div className="gradient-border p-8 bg-brand-card max-w-lg w-full">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-black mb-2">
-              <span className="gradient-text">BandBrain</span>
-            </h1>
-            <p className="text-zinc-400 text-sm">
-              {lang === "pt"
-                ? `Olá, ${user?.name || "músico"}! Configure seu perfil.`
-                : `Hey, ${user?.name || "musician"}! Set up your profile.`}
-            </p>
-            <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-mono bg-brand-purple/20 text-brand-purple border border-brand-purple/30">
-              {user?.tier === "pro" ? "PRO" : "STARTER"}
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm text-zinc-400 mb-1 block">
-                {lang === "pt" ? "Nome da Banda / Artista" : "Band / Artist Name"}
-              </label>
-              <input
-                type="text"
-                value={bandName}
-                onChange={(e) => setBandName(e.target.value)}
-                placeholder={lang === "pt" ? "Ex: Os Sinais" : "e.g. The Signal Makers"}
-                className="w-full px-4 py-3 bg-brand-dark border border-brand-border rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-brand-purple/50"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-zinc-400 mb-1 block">
-                {lang === "pt" ? "Gênero Musical" : "Genre"}
-              </label>
-              <input
-                type="text"
-                value={genre}
-                onChange={(e) => setGenre(e.target.value)}
-                placeholder={lang === "pt" ? "Ex: Indie Rock, MPB, Lo-fi" : "e.g. Indie Rock, Alternative"}
-                className="w-full px-4 py-3 bg-brand-dark border border-brand-border rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-brand-purple/50"
-              />
-            </div>
-            <button
-              onClick={handleSetup}
-              disabled={!bandName || !genre}
-              className="w-full py-3 bg-brand-purple text-white font-bold rounded-lg hover:brightness-110 transition-all disabled:opacity-30"
-            >
-              {lang === "pt" ? "Começar a usar o BandBrain" : "Start Using BandBrain"}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ═══════════════════════════════════════
-  // MAIN DASHBOARD VIEW
-  // ═══════════════════════════════════════
-
-  const currentModule = modules.find((m) => m.id === activeModule);
+  const accessibleModules = MODULES.filter((m) => canAccess(m.tier));
+  const lockedModules = MODULES.filter((m) => !canAccess(m.tier));
 
   return (
-    <div className="min-h-screen bg-brand-darker">
-      {/* ─── HEADER ─── */}
-      <header className="border-b border-brand-border px-4 sm:px-6 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-lg font-black gradient-text">BandBrain</span>
-            <span className="text-zinc-700">|</span>
-            <span className="text-sm text-zinc-400 truncate max-w-[120px]">{bandName}</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-brand-purple/20 text-brand-purple border border-brand-purple/30">
-              {user?.tier === "pro" ? "PRO" : "STARTER"}
-            </span>
+    <div className="min-h-screen bg-bg-primary">
+      {/* Header */}
+      <header className="border-b border-white/10 bg-bg-secondary/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="font-display text-2xl text-white tracking-wider">VERELUS</h1>
+            {getTierBadge(user.plan)}
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className="text-xs text-zinc-500 hover:text-brand-green transition-colors"
-              title={lang === "pt" ? "Histórico" : "History"}
-            >
-              {lang === "pt" ? "📋 Histórico" : "📋 History"}
-            </button>
-            <button
-              onClick={() => setLang(lang === "pt" ? "en" : "pt")}
-              className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
-            >
-              {lang === "pt" ? "EN" : "PT"}
-            </button>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-400 hidden sm:block">{user.email}</span>
             <button
               onClick={handleLogout}
-              className="text-xs text-zinc-600 hover:text-red-400 transition-colors"
+              className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
             >
-              {lang === "pt" ? "Sair" : "Logout"}
+              {lang === "pt" ? "Sair" : "Sign out"}
             </button>
-            <a href="/" className="text-xs text-zinc-600 hover:text-brand-green transition-colors hidden sm:block">
-              TuneSignal
-            </a>
           </div>
         </div>
       </header>
 
-      {/* ─── HISTORY PANEL ─── */}
-      {showHistory && (
-        <div className="border-b border-brand-border bg-brand-card/50 px-4 sm:px-6 py-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-zinc-400">
-                {lang === "pt" ? "Histórico de Gerações" : "Generation History"}
-              </h3>
-              <button
-                onClick={() => setShowHistory(false)}
-                className="text-xs text-zinc-600 hover:text-white"
-              >
-                ✕
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold text-white mb-1">
+            {lang === "pt" ? "Bem-vindo de volta" : "Welcome back"}{user.full_name ? `, ${user.full_name}` : ""}
+          </h2>
+          <p className="text-gray-400">
+            {lang === "pt"
+              ? "Acesse suas ferramentas de inteligência musical"
+              : "Access your music intelligence tools"}
+          </p>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-bg-surface border border-white/10 rounded-xl p-4">
+            <p className="text-xs text-gray-400 mb-1">{lang === "pt" ? "Plano" : "Plan"}</p>
+            <p className="text-lg font-semibold text-white capitalize">{user.plan}</p>
+          </div>
+          <div className="bg-bg-surface border border-white/10 rounded-xl p-4">
+            <p className="text-xs text-gray-400 mb-1">{lang === "pt" ? "Módulos" : "Modules"}</p>
+            <p className="text-lg font-semibold text-white">{accessibleModules.length}/{MODULES.length}</p>
+          </div>
+          <div className="bg-bg-surface border border-white/10 rounded-xl p-4">
+            <p className="text-xs text-gray-400 mb-1">Spotify</p>
+            <p className="text-lg font-semibold text-white">
+              {user.spotify_connected
+                ? (lang === "pt" ? "Conectado" : "Connected")
+                : (lang === "pt" ? "Não conectado" : "Not connected")}
+            </p>
+          </div>
+          <div className="bg-bg-surface border border-white/10 rounded-xl p-4">
+            <p className="text-xs text-gray-400 mb-1">{lang === "pt" ? "Pitches este mês" : "Pitches this month"}</p>
+            <p className="text-lg font-semibold text-white">{user.plan === "free" ? "0/3" : "∞"}</p>
+          </div>
+        </div>
+
+        {/* Spotify Connection CTA */}
+        {!user.spotify_connected && (
+          <div className="mb-8 bg-gradient-to-r from-brand-green/10 to-brand-purple/10 border border-brand-green/20 rounded-xl p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-[#1DB954]/20 flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-[#1DB954]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-semibold">
+                  {lang === "pt" ? "Conecte seu Spotify" : "Connect your Spotify"}
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  {lang === "pt"
+                    ? "Desbloqueie análises completas e matching inteligente de playlists"
+                    : "Unlock full analytics and smart playlist matching"}
+                </p>
+              </div>
+              <button className="px-4 py-2 bg-[#1DB954] text-white rounded-lg font-medium text-sm hover:bg-[#1ed760] transition-colors flex-shrink-0">
+                {lang === "pt" ? "Conectar" : "Connect"}
               </button>
             </div>
-            {history.length === 0 ? (
-              <p className="text-xs text-zinc-600">
-                {lang === "pt" ? "Nenhum conteúdo gerado ainda." : "No content generated yet."}
-              </p>
-            ) : (
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {history.slice(0, 20).map((item) => {
-                  const mod = modules.find((m) => m.id === item.module);
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => loadFromHistory(item)}
-                      className="flex-shrink-0 p-3 rounded-lg bg-brand-dark border border-brand-border hover:border-brand-purple/40 transition-all text-left min-w-[180px]"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm">{mod?.icon}</span>
-                        <span className="text-xs font-semibold text-white truncate">
-                          {lang === "pt" ? mod?.titlePt : mod?.title}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-zinc-600">
-                        {new Date(item.timestamp).toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", {
-                          day: "2-digit",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+          </div>
+        )}
+
+        {/* Accessible Modules */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-white mb-4">
+            {lang === "pt" ? "Suas Ferramentas" : "Your Tools"}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {accessibleModules.map((mod) => (
+              <a
+                key={mod.id}
+                href={mod.href}
+                className="group bg-bg-surface border border-white/10 rounded-xl p-5 hover:border-brand-green/30 hover:bg-bg-surface/80 transition-all"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <span className="text-2xl">{mod.icon}</span>
+                  {getTierBadge(mod.tier)}
+                </div>
+                <h4 className="text-white font-medium mb-1 group-hover:text-brand-green transition-colors">
+                  {lang === "pt" ? mod.name : mod.nameEn}
+                </h4>
+                <p className="text-gray-400 text-sm">
+                  {lang === "pt" ? mod.description : mod.descriptionEn}
+                </p>
+              </a>
+            ))}
           </div>
         </div>
-      )}
 
-      {/* ─── MAIN CONTENT ─── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-          {/* ─── SIDEBAR: MODULES ─── */}
-          <div className="lg:col-span-3 space-y-2">
-            <h2 className="text-xs font-mono text-zinc-600 uppercase tracking-wider mb-3">
-              {lang === "pt" ? "Módulos IA" : "AI Modules"}
-            </h2>
-
-            {modules.map((mod) => {
-              const isLocked = mod.tier === "pro" && user?.tier === "starter";
-              const isActive = activeModule === mod.id;
-
-              return (
-                <button
-                  key={mod.id}
-                  onClick={() => {
-                    setActiveModule(mod.id);
-                    setContext("");
-                    if (isLocked) {
-                      handleGenerate(mod);
-                    }
-                  }}
-                  disabled={loading}
-                  className={`w-full text-left p-3 rounded-lg border transition-all ${
-                    isActive
-                      ? "border-brand-purple bg-brand-purple/10"
-                      : isLocked
-                      ? "border-brand-border bg-brand-card/50 opacity-60"
-                      : "border-brand-border bg-brand-card hover:border-brand-purple/30"
-                  } disabled:opacity-50`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{mod.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-white text-sm truncate">
-                          {lang === "pt" ? mod.titlePt : mod.title}
-                        </h3>
-                        {isLocked && (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 font-mono flex-shrink-0">
-                            PRO
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-zinc-500 truncate">
-                        {lang === "pt" ? mod.descPt : mod.desc}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-
-            {/* Context input appears when module is selected */}
-            {activeModule && currentModule && !(currentModule.tier === "pro" && user?.tier === "starter") && (
-              <div className="mt-4 space-y-3">
-                <div>
-                  <label className="text-xs text-zinc-500 mb-1 block">
-                    {lang === "pt" ? currentModule.contextLabelPt : currentModule.contextLabel}
-                  </label>
-                  <textarea
-                    value={context}
-                    onChange={(e) => setContext(e.target.value)}
-                    placeholder={lang === "pt" ? currentModule.contextPlaceholderPt : currentModule.contextPlaceholder}
-                    rows={4}
-                    className="w-full px-3 py-2 bg-brand-dark border border-brand-border rounded-lg text-white placeholder-zinc-700 text-sm focus:outline-none focus:border-brand-purple/50 resize-none"
-                  />
-                </div>
-                <button
-                  onClick={() => handleGenerate(currentModule)}
-                  disabled={loading}
-                  className="w-full py-2.5 bg-gradient-to-r from-brand-green/80 to-brand-purple/80 text-white font-bold rounded-lg hover:brightness-110 transition-all disabled:opacity-30 text-sm"
-                >
-                  {loading
-                    ? lang === "pt" ? "Gerando..." : "Generating..."
-                    : lang === "pt" ? "Gerar Conteúdo" : "Generate Content"}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* ─── MAIN: OUTPUT ─── */}
-          <div className="lg:col-span-9" ref={outputRef}>
-            {loading ? (
-              <div className="gradient-border p-12 bg-brand-card flex flex-col items-center justify-center min-h-[500px]">
-                <div className="flex gap-2 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-1.5 bg-brand-purple rounded-full wave-bar"
-                      style={{ animationDelay: `${i * 0.1}s` }}
-                    />
-                  ))}
-                </div>
-                <p className="text-zinc-400 text-sm mb-1">
-                  {lang === "pt" ? "BandBrain está criando seu conteúdo..." : "BandBrain is creating your content..."}
-                </p>
-                <p className="text-zinc-600 text-xs">
-                  {lang === "pt" ? "Isso pode levar 15-30 segundos para conteúdo premium" : "This may take 15-30 seconds for premium content"}
-                </p>
-              </div>
-            ) : output ? (
-              <div className="gradient-border bg-brand-card min-h-[500px]">
-                {/* Output header */}
-                <div className="flex items-center justify-between px-6 py-3 border-b border-zinc-800/50">
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">{currentModule?.icon}</span>
-                    <h3 className="text-sm font-bold text-white">
-                      {lang === "pt" ? currentModule?.titlePt : currentModule?.title}
-                    </h3>
-                    {tokensUsed > 0 && (
-                      <span className="text-[10px] text-zinc-600 font-mono">
-                        {tokensUsed.toLocaleString()} tokens
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handleCopy}
-                      className="px-3 py-1 text-xs border border-brand-border rounded-md text-zinc-400 hover:text-white hover:border-brand-green/50 transition-colors"
-                    >
-                      {copied
-                        ? lang === "pt" ? "Copiado!" : "Copied!"
-                        : lang === "pt" ? "Copiar" : "Copy"}
-                    </button>
-                    <button
-                      onClick={handleExport}
-                      className="px-3 py-1 text-xs border border-brand-border rounded-md text-zinc-400 hover:text-white hover:border-brand-purple/50 transition-colors"
-                    >
-                      {lang === "pt" ? "Exportar .md" : "Export .md"}
-                    </button>
-                  </div>
-                </div>
-                {/* Output content */}
+        {/* Locked Modules */}
+        {lockedModules.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-500 mb-4">
+              {lang === "pt" ? "Desbloqueie com upgrade" : "Unlock with upgrade"}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {lockedModules.map((mod) => (
                 <div
-                  className="px-6 py-6 overflow-auto max-h-[70vh]"
-                  dangerouslySetInnerHTML={{ __html: renderMarkdown(output) }}
-                />
-              </div>
-            ) : (
-              <div className="gradient-border p-12 bg-brand-card flex flex-col items-center justify-center min-h-[500px] text-center">
-                <span className="text-6xl mb-4">🧠</span>
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {lang === "pt" ? "Pronto para criar" : "Ready to create"}
-                </h3>
-                <p className="text-zinc-500 max-w-md text-sm">
-                  {lang === "pt"
-                    ? `Selecione um módulo à esquerda para gerar conteúdo profissional para `
-                    : `Select a module on the left to generate professional content for `}
-                  <span className="text-brand-purple font-semibold">{bandName}</span>.
-                </p>
-                <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-md">
-                  {modules
-                    .filter((m) => !(m.tier === "pro" && user?.tier === "starter"))
-                    .map((mod) => (
-                      <button
-                        key={mod.id}
-                        onClick={() => setActiveModule(mod.id)}
-                        className="p-3 rounded-lg bg-brand-dark border border-brand-border hover:border-brand-purple/30 transition-all text-center"
-                      >
-                        <span className="text-2xl block mb-1">{mod.icon}</span>
-                        <span className="text-[10px] text-zinc-500">
-                          {lang === "pt" ? mod.titlePt : mod.title}
-                        </span>
-                      </button>
-                    ))}
+                  key={mod.id}
+                  className="relative bg-bg-surface/50 border border-white/5 rounded-xl p-5 opacity-60"
+                >
+                  <div className="absolute top-3 right-3">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="text-2xl grayscale">{mod.icon}</span>
+                    {getTierBadge(mod.tier)}
+                  </div>
+                  <h4 className="text-gray-400 font-medium mb-1">
+                    {lang === "pt" ? mod.name : mod.nameEn}
+                  </h4>
+                  <p className="text-gray-500 text-sm">
+                    {lang === "pt" ? mod.description : mod.descriptionEn}
+                  </p>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+              ))}
+            </div>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="border-t border-brand-border px-6 py-3 mt-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-zinc-700">
-          <span>BandBrain by Verelus</span>
-          <span>{user?.email}</span>
-        </div>
-      </footer>
+            {/* Upgrade CTA */}
+            <div className="mt-6 text-center">
+              <a
+                href="/#pricing"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-green to-brand-purple text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-brand-green/25 transition-all"
+              >
+                {lang === "pt" ? "Fazer upgrade agora" : "Upgrade now"}
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

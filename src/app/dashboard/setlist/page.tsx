@@ -24,9 +24,11 @@ export default function SetlistPage() {
   const [duration, setDuration] = useState('60');
   const [generatedContent, setGeneratedContent] = useState('');
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadSetlists();
+      setLoading(false);
   }, []);
 
   async function loadSetlists() {
@@ -77,6 +79,15 @@ export default function SetlistPage() {
     navigator.clipboard.writeText(generatedContent || selectedSetlist?.songs?.join('\n') || '');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[50vh]">
+        <div className="w-6 h-6 border-2 border-[#00f5a0] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (

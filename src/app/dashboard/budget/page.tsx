@@ -24,13 +24,13 @@ export default function BudgetPage() {
   const [generatedContent, setGeneratedContent] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-  const [loading, setLoading] = useState(true);
     description: '',
     amount: '',
     type: 'expense' as 'income' | 'expense',
     category: 'Produ\u00e7\u00e3o',
     date: new Date().toISOString().split('T')[0]
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadTransactions();

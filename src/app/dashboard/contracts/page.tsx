@@ -24,9 +24,11 @@ export default function ContractsPage() {
   const [details, setDetails] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadContracts();
+      setLoading(false);
   }, []);
 
   async function loadContracts() {
@@ -86,6 +88,15 @@ export default function ContractsPage() {
     'signed': 'bg-green-500/20 text-green-400',
     'expired': 'bg-red-500/20 text-red-400'
   };
+
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center min-h-[50vh]">
+        <div className="w-6 h-6 border-2 border-[#00f5a0] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#080a0f] text-white">

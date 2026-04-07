@@ -47,8 +47,49 @@ function mapStatus(stripeStatus: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+  try {
+    // Verify Stripe webhook signature (edge-compatible)
+    const rawBody = await req.text();
+    const sig = req.headers.get('stripe-signature');
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+    if (!sig || !webhookSecret) {
+      return NextResponse.json({ error: 'Missing signature or webhook secret' }, { status: 400 });
+    }
+
+    // Parse Stripe signature header
+    const sigParts = Object.fromEntries(
+      sig.split(',').map(part => {
+        const [key, value] = part.split('=');
+        return [key, value];
+      })
+    );
+    const timestamp = sigParts['t'];
+    const expectedSig = sigParts['v1'];
+
+    // Verify timestamp (reject if older than 5 minutes)
+    const tolerance = 300;
+    const now = Math.floor(Date.now() / 1000);
+    if (Math.abs(now - parseInt(timestamp)) > tolerance) {
+      return NextResponse.json({ error: 'Timestamp too old' }, { status: 400 });
+    }
+
+    // Compute expected signature using Web Crypto API
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(webhookSecret);
+    const key = await crypto.subtle.importKey(
+      'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    const payload = encoder.encode(`${timestamp}.${rawBody}`);
+    const signatureBuffer = await crypto.subtle.sign('HMAC', key, payload);
+    const computedSig = Array.from(new Uint8Array(signatureBuffer))
+      .map(b => b.toString(16).padStart(2, '0')).join('');
+
+    if (computedSig !== expectedSig) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const body = JSON.parse(rawBody);
     // Stripe webhook event structure
     const { type, data } = body as {
       type: string;

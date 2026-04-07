@@ -11,7 +11,7 @@ export const translations = {
     hero: {
       headline: "Your Complete Music Intelligence Platform",
       subheadline: "Connect your music, pitch to the right playlists, and manage your entire career in one place.",
-      description: "Verelus combines AI-powered playlist pitching with professional career management tools—built by music industry experts.",
+      description: "Verelus combines AI-powered playlist pitching with professional career management toolsâbuilt by music industry experts.",
       cta: "Start Free Today",
       secondaryCta: "View Plans",
       trust: "Trusted by artists and labels worldwide",
@@ -106,7 +106,7 @@ export const translations = {
       description: "Verelus gives you the tools of major label artists, without the major label.",
       aiPowered: {
         title: "Market Intelligence at Your Fingertips",
-        description: "Our AI analyzes playlists, curators, listener behavior, and trends—but your strategy stays in your hands. We inform, you decide.",
+        description: "Our AI analyzes playlists, curators, listener behavior, and trendsâbut your strategy stays in your hands. We inform, you decide.",
       },
       expertTuned: {
         title: "Built by Music Industry Professionals",
@@ -290,7 +290,7 @@ export const translations = {
           role: "Independent Artist",
         },
         {
-          quote: "Managing 5 artists was chaotic. Now we track everything in Verelus. Tours, releases, analytics—all in one place.",
+          quote: "Managing 5 artists was chaotic. Now we track everything in Verelus. Tours, releases, analyticsâall in one place.",
           author: "Miguel P.",
           role: "Artist Manager",
         },
@@ -302,7 +302,7 @@ export const translations = {
       ],
     },
     footer: {
-      copyright: "© 2026 Verelus. All rights reserved.",
+      copyright: "Â© 2026 Verelus. All rights reserved.",
       company: "Company",
       companyLinks: {
         about: "About",
@@ -358,7 +358,7 @@ export const translations = {
     hero: {
       headline: "Sua Plataforma Completa de Inteligência Musical",
       subheadline: "Conecte sua música, envie para as playlists certas e gerencie toda a sua carreira em um único lugar.",
-      description: "Verelus combina envio de música potenciado por IA com ferramentas profissionais de gestão de carreira—construído por especialistas da indústria musical.",
+      description: "Verelus combina envio de música potenciado por IA com ferramentas profissionais de gestão de carreiraâconstruído por especialistas da indústria musical.",
       cta: "Comece Gratuitamente Hoje",
       secondaryCta: "Ver Planos",
       trust: "Confiado por artistas e labels em todo o mundo",
@@ -379,7 +379,7 @@ export const translations = {
     promotion: {
       title: "Promoção Musical",
       subtitle: "Envio de Playlists Potenciado por IA",
-      description: "Coloque sua música em frente às playlists, curadores e ouvintes certos com inteligência de mercado que funciona 24/7.",
+      description: "Coloque sua música em frente Ã s playlists, curadores e ouvintes certos com inteligência de mercado que funciona 24/7.",
       features: {
         spotifyConnect: {
           title: "Conecte seu Spotify",
@@ -453,7 +453,7 @@ export const translations = {
       description: "Verelus oferece as ferramentas de artistas de grandes labels, sem a grande label.",
       aiPowered: {
         title: "Inteligência de Mercado na Ponta dos Dedos",
-        description: "Nossa IA analisa playlists, curadores, comportamento de ouvintes e tendências—mas sua estratégia fica em suas mãos. Informamos, você decide.",
+        description: "Nossa IA analisa playlists, curadores, comportamento de ouvintes e tendênciasâmas sua estratégia fica em suas mãos. Informamos, você decide.",
       },
       expertTuned: {
         title: "Construído por Profissionais da Indústria Musical",
@@ -533,7 +533,7 @@ export const translations = {
             "Planejamento de turnês e gestão de datas",
             "Gestão de contratos e riders",
             "Ferramentas de colaboração em equipe",
-            "Acesso avançado à API",
+            "Acesso avançado Ã  API",
             "Integrações personalizadas",
             "Gerente de conta dedicado",
             "Suporte prioritário (24/7)",
@@ -589,7 +589,7 @@ export const translations = {
               { name: "Envios Mensais", free: "3", pro: "Ilimitado", business: "Ilimitado" },
               { name: "Correspondência de Playlists com IA", free: false, pro: true, business: true },
               { name: "Texto de Envio Personalizado", free: false, pro: true, business: true },
-              { name: "Acesso à Rede de Curadores", free: false, pro: true, business: true },
+              { name: "Acesso Ã  Rede de Curadores", free: false, pro: true, business: true },
               { name: "Correspondência Prioritária", free: false, pro: false, business: true },
             ],
           },
@@ -611,7 +611,7 @@ export const translations = {
               { name: "Painel Básico", free: true, pro: true, business: true },
               { name: "Relatórios Avançados", free: false, pro: true, business: true },
               { name: "Relatórios Personalizados", free: false, pro: false, business: true },
-              { name: "Acesso à API", free: false, pro: false, business: true },
+              { name: "Acesso Ã  API", free: false, pro: false, business: true },
             ],
           },
           {
@@ -637,7 +637,7 @@ export const translations = {
           role: "Artista Independente",
         },
         {
-          quote: "Gerenciar 5 artistas era caótico. Agora rastreamos tudo em Verelus. Turnês, lançamentos, análises—tudo em um lugar.",
+          quote: "Gerenciar 5 artistas era caótico. Agora rastreamos tudo em Verelus. Turnês, lançamentos, análisesâtudo em um lugar.",
           author: "Miguel P.",
           role: "Gerente de Artista",
         },
@@ -649,7 +649,7 @@ export const translations = {
       ],
     },
     footer: {
-      copyright: "© 2026 Verelus. Todos os direitos reservados.",
+      copyright: "Â© 2026 Verelus. Todos os direitos reservados.",
       company: "Empresa",
       companyLinks: {
         about: "Sobre",

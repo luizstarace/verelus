@@ -205,7 +205,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Promotion Section — Playlist Pitching */}
+      {/* Promotion Section â Playlist Pitching */}
       <section id="promotion" className="relative z-10 px-6 py-20 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-green/10 border border-brand-green/20 rounded-full text-brand-green text-xs font-mono mb-6">
@@ -220,7 +220,7 @@ export default function Home() {
           {Object.values(t.promotion.features).map((feature, i) => (
             <FeatureCard
               key={i}
-              icon={["🎵", "🤖", "✍️", "🚀", "📈", "🎯"][i]}
+              icon={["ðµ", "ð¤", "âï¸", "ð", "ð", "ð¯"][i]}
               title={feature.title}
               desc={feature.description}
               accent="green"
@@ -229,7 +229,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Management Section — Career Tools */}
+      {/* Management Section â Career Tools */}
       <section id="management" className="relative z-10 px-6 py-20 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-purple/10 border border-brand-purple/20 rounded-full text-brand-purple text-xs font-mono mb-6">
@@ -244,7 +244,7 @@ export default function Home() {
           {Object.values(t.management.features).map((feature, i) => (
             <FeatureCard
               key={i}
-              icon={["📋", "📰", "📅", "🎸", "💰", "🗺️", "📝", "📊"][i]}
+              icon={["ð", "ð°", "ð", "ð¸", "ð°", "ðºï¸", "ð", "ð"][i]}
               title={feature.title}
               desc={feature.description}
               accent="purple"
@@ -261,12 +261,12 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { ...t.features.aiPowered, icon: "🧠" },
-            { ...t.features.expertTuned, icon: "🎯" },
-            { ...t.features.integrated, icon: "⚡" },
-            { ...t.features.realTime, icon: "📊" },
-            { ...t.features.teamCollaboration, icon: "👥" },
-            { ...t.features.apiIntegration, icon: "🔗" },
+            { ...t.features.aiPowered, icon: "ð§ " },
+            { ...t.features.expertTuned, icon: "ð¯" },
+            { ...t.features.integrated, icon: "â¡" },
+            { ...t.features.realTime, icon: "ð" },
+            { ...t.features.teamCollaboration, icon: "ð¥" },
+            { ...t.features.apiIntegration, icon: "ð" },
           ].map((feature, i) => (
             <FeatureCard
               key={i}
@@ -317,7 +317,7 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               {t.pricing.plans.free.features.map((f, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-green mt-0.5">✓</span> {f}
+                  <span className="text-brand-green mt-0.5">â</span> {f}
                 </li>
               ))}
             </ul>
@@ -333,7 +333,7 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Pro — POPULAR */}
+          {/* Pro â POPULAR */}
           <div className="gradient-border p-8 bg-brand-card glow-green relative">
             <div className="absolute -top-3 right-6 px-3 py-1 bg-brand-green text-brand-dark text-xs font-bold rounded-full">
               {lang === "pt" ? "MAIS POPULAR" : "MOST POPULAR"}
@@ -347,7 +347,7 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               {t.pricing.plans.pro.features.map((f, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-green mt-0.5">✓</span> {f}
+                  <span className="text-brand-green mt-0.5">â</span> {f}
                 </li>
               ))}
             </ul>
@@ -378,7 +378,7 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               {t.pricing.plans.business.features.map((f, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-purple mt-0.5">✓</span> {f}
+                  <span className="text-brand-purple mt-0.5">â</span> {f}
                 </li>
               ))}
             </ul>

@@ -85,7 +85,7 @@ export default function ToursPage() {
   }
 
   async function addTourDate() {
-    if (!selectedTour || !newDate.venue || !newDate.city || (newDate.date) return;
+    if (!selectedTour || !newDate.venue || !newDate.city || !newDate.date) return;
     await supabase.from('tour_dates').insert({
       tour_id: selectedTour.id,
       venue: newDate.venue,
@@ -121,10 +121,10 @@ export default function ToursPage() {
           <a href="/dashboard" className="flex items-center gap-2 text-white/60 hover:text-white mb-6 text-sm">
             <span>&lt;-</span> Voltar ao Dashboard
           </a>
-          <h2 className="text-lg font-bold mb-4 font-display">TurnY\u00eas</h2>
+          <h2 className="text-lg font-bold mb-4 font-display">Turn\u00eas</h2>
           <div className="space-y-2">
             {tours.length === 0 && (
-              <p className="text-white-40 text-sm">Nenhuma turn\u00ea ainda.</p>
+              <p className="text-white/40 text-sm">Nenhuma turn\u00ea ainda.</p>
             )}
             {tours.map((t) => (
               <button
@@ -138,12 +138,12 @@ export default function ToursPage() {
               >
                 <div className="font-medium truncate">{t.name}</div>
                 <div className="text-xs text-white/40 mt-1">
-                    {t.dates.length} data{t.dates.length !== 1 ? 's' : ''}
-     #†    </div>
+                  {t.dates.length} data{t.dates.length !== 1 ? 's' : ''}
+                </div>
               </button>
             ))}
           </div>
-         </div>
+        </div>
 
         {/* Main Content */}
         <div className="flex-1 p-8">
@@ -164,7 +164,7 @@ export default function ToursPage() {
                     type="text"
                     value={region}
                     onChange={(e) => setRegion(e.target.value)}
-                    placeholder="Ex: Sul do Brasil, S\u00e3o Paull e interior..."
+                    placeholder="Ex: Sul do Brasil, S\u00e3o Paulo e interior..."
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#e040fb]/50"
                   />
                 </div>
@@ -184,7 +184,6 @@ export default function ToursPage() {
                 onClick={generateTourPlan}
                 disabled={generating || !region.trim()}
                 className="px-6 py-3 bg-[#e040fb] text-white font-bold rounded-lg hover:bg-[#e040fb]/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                
               >
                 {generating ? 'Planejando...' : 'Gerar Plano de Turn\u00ea'}
               </button>
@@ -220,7 +219,7 @@ export default function ToursPage() {
             {selectedTour && !generatedContent && (
               <div className="bg-[#12151e] rounded-xl p-6 border border-white/10">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-semiblold">{selectedTour.name}</h3>
+                  <h3 className="text-xl font-semibold">{selectedTour.name}</h3>
                   <button
                     onClick={() => setShowAddDate(!showAddDate)}
                     className="px-4 py-2 bg-[#e040fb]/20 text-[#e040fb] rounded-lg text-sm hover:bg-[#e040fb]/30 transition"
@@ -250,7 +249,7 @@ export default function ToursPage() {
                         type="date"
                         value={newDate.date}
                         onChange={(e) => setNewDate({ ...newDate, date: e.target.value })}
-                        className="bg[-white-5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+                        className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
                       />
                       <input
                         type="number"
@@ -309,10 +308,8 @@ export default function ToursPage() {
                     </div>
                   </div>
                 )}
-                </div>
-               </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

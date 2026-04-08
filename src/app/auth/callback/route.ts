@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 export const runtime = 'edge';
 
 export async function GET(request: Request) {
+  try {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   const next = searchParams.get('next') || '/dashboard';
@@ -36,4 +37,8 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_callback_error`);
+  } catch (error) {
+    console.error("Auth callback error:", error);
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 }

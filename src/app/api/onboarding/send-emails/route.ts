@@ -47,11 +47,17 @@ export async function POST(request: NextRequest) {
   const supabase = getServerSupabase();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://verelus.com';
 
-  // Find all users with incomplete onboarding
+  // Find all users with incomplete onboarding.
+  // Skip users whose updated_at is within the last 48 hours to prevent
+  // re-sending the same onboarding email on every cron run.
+  const cooldownCutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+
   const { data: incompleteUsers, error: fetchError } = await supabase
     .from('onboarding_progress')
     .select('user_id')
-    .eq('onboarding_completed', false);
+    .eq('onboarding_completed', false)
+    .or(`updated_at.is.null,updated_at.lt.${cooldownCutoff}`)
+    .limit(500); // Paginate to avoid overwhelming the system at scale
 
   if (fetchError) {
     console.error('[onboarding/send-emails] Failed to fetch incomplete users:', fetchError.message);
@@ -62,9 +68,11 @@ export async function POST(request: NextRequest) {
   }
 
   // Also find users who have no onboarding row yet (new users)
+  // NOTE: For large user bases, this should be paginated with cursor-based pagination.
   const { data: allUsers, error: allUsersError } = await supabase
     .from('users')
-    .select('id, email');
+    .select('id, email')
+    .limit(500);
 
   if (allUsersError) {
     console.error('[onboarding/send-emails] Failed to fetch all users:', allUsersError.message);
@@ -155,10 +163,14 @@ export async function POST(request: NextRequest) {
           await updateOnboarding(userId, 'welcome_email_sent', true);
         }
 
-        // Update last_active_at to track when we last contacted this user
+        // Update updated_at to record that an email was sent. This prevents
+        // the 48-hour cooldown filter from re-sending the same email type.
+        // NOTE: Do NOT update last_active_at here — that field tracks real
+        // user activity. System-sent emails are not user activity and would
+        // corrupt churn detection.
         await supabase
           .from('onboarding_progress')
-          .update({ last_active_at: new Date().toISOString() })
+          .update({ updated_at: new Date().toISOString() })
           .eq('user_id', userId);
 
         results.push({ user_id: userId, email_type: nextEmail, status: 'sent' });

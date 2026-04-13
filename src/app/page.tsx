@@ -162,6 +162,12 @@ export default function Home() {
           >
             {t.nav.language}
           </button>
+          <a
+            href="/login"
+            className="px-4 py-2 text-sm font-semibold bg-brand-green text-brand-dark rounded-lg hover:brightness-110 transition-all"
+          >
+            {lang === "pt" ? "Entrar" : "Login"}
+          </a>
         </div>
       </nav>
 
@@ -323,10 +329,6 @@ export default function Home() {
             </ul>
             <a
               href="/login"
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
               className="block w-full py-3 text-center border border-brand-green/50 text-brand-green font-semibold rounded-lg hover:bg-brand-green/10 transition-colors text-sm"
             >
               {t.pricing.plans.free.cta}
@@ -451,6 +453,12 @@ export default function Home() {
               </a>
               <a href="/dashboard" className="text-xs text-brand-muted hover:text-white transition-colors">
                 Dashboard
+              </a>
+              <a href="/privacy" className="text-xs text-brand-muted hover:text-white transition-colors">
+                {lang === "pt" ? "Privacidade" : "Privacy"}
+              </a>
+              <a href="/terms" className="text-xs text-brand-muted hover:text-white transition-colors">
+                {lang === "pt" ? "Termos" : "Terms"}
               </a>
               <a href="/unsubscribe" className="text-xs text-brand-muted hover:text-white transition-colors">
                 {lang === "pt" ? "Cancelar inscrição" : "Unsubscribe"}

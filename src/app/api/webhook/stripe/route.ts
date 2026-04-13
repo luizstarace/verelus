@@ -163,7 +163,9 @@ export async function POST(req: NextRequest) {
         object: {
           id: string;
           customer: string;
-          email?: string;
+          subscription?: string;
+          customer_email?: string;
+          customer_details?: { email?: string };
           items?: {
             data: Array<{ price: { id: string } }>;
           };
@@ -180,18 +182,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No event object" }, { status: 400 });
     }
 
+    // Helper to fetch subscription details from Stripe
+    const getSubscriptionDetails = async (subscriptionId: string) => {
+      const res = await fetch(`https://api.stripe.com/v1/subscriptions/${subscriptionId}`, {
+        headers: { Authorization: "Bearer " + process.env.STRIPE_SECRET_KEY },
+      });
+      return res.json();
+    };
+
     // Handle different Stripe event types
     switch (type) {
       case "checkout.session.completed": {
         // New subscription created via checkout
         const customerId = event.customer;
-        const email = event.email;
+        // Stripe checkout session has email in customer_details.email or customer_email
+        const email = event.customer_details?.email || event.customer_email;
 
         if (!email) {
           return NextResponse.json({ error: "No customer email" }, { status: 400 });
         }
 
-        const priceId = event.items?.data?.[0]?.price?.id || "";
+        // Fetch subscription to get the price ID (checkout session doesn't include line items directly)
+        let priceId = "";
+        if (event.subscription) {
+          const sub = await getSubscriptionDetails(event.subscription);
+          priceId = sub.items?.data?.[0]?.price?.id || "";
+        }
         const productType = mapProduct(priceId);
 
         // Upsert user
@@ -205,14 +221,15 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
         }
 
-        // Upsert subscription
+        // Upsert subscription (use subscription ID, not session ID)
+        const subscriptionId = event.subscription || event.id;
         await supabase.from("subscriptions").upsert(
           {
             user_id: user.id,
             product: productType,
             status: "active",
             payment_provider: "stripe",
-            stripe_subscription_id: event.id,
+            stripe_subscription_id: subscriptionId,
             stripe_customer_id: customerId,
             current_period_start: event.current_period_start ? new Date(event.current_period_start * 1000).toISOString() : new Date().toISOString(),
             current_period_end: event.current_period_end ? new Date(event.current_period_end * 1000).toISOString() : null,

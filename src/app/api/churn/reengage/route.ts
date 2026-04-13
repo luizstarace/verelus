@@ -1,6 +1,8 @@
 export const runtime = "edge";
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeChurnRisk, REENGAGEMENT_EMAILS } from '@/lib/churn-detection';
+import { getServerSupabase } from '@/lib/auth';
+import { trackEvent } from '@/lib/tracking';
 
 /**
  * POST /api/churn/reengage
@@ -61,8 +63,28 @@ export async function POST(request: NextRequest) {
       detail?: string;
     }> = [];
 
+    // Check which users already received a re-engagement email in the last 7 days
+    const supabase = getServerSupabase();
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const targetUserIds = targetUsers.map((u) => u.user_id);
+
+    const { data: recentEmails } = await supabase
+      .from('events')
+      .select('user_id')
+      .eq('event_name', 'reengage_email_sent')
+      .in('user_id', targetUserIds)
+      .gte('created_at', sevenDaysAgo);
+
+    const recentlySentSet = new Set((recentEmails || []).map((e) => e.user_id));
+
     for (const user of targetUsers) {
       try {
+        // Skip users who received a re-engagement email in the last 7 days
+        if (recentlySentSet.has(user.user_id)) {
+          results.push({ user_id: user.user_id, email_type: null, status: 'skipped', detail: 'cooldown: email sent within last 7 days' });
+          continue;
+        }
+
         // Determine which email template to use
         let templateKey: string | null = null;
 
@@ -97,6 +119,8 @@ export async function POST(request: NextRequest) {
         });
 
         if (res.ok) {
+          // Track the sent email to enforce cooldown on future runs
+          await trackEvent('reengage_email_sent', 'feature_use', { template: templateKey }, user.user_id);
           results.push({ user_id: user.user_id, email_type: templateKey, status: 'sent' });
         } else {
           const errorText = await res.text();

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export const runtime = 'edge';
 
@@ -45,13 +47,37 @@ export async function POST(request: Request) {
 
     const origin = new URL(request.url).origin || process.env.NEXT_PUBLIC_APP_URL || "https://verelus.com";
 
-    const session = await stripePost("/checkout/sessions", {
+    // Get authenticated user email to pre-fill Stripe checkout
+    const checkoutParams: Record<string, string> = {
       mode: "subscription",
       "line_items[0][price]": stripePriceId,
       "line_items[0][quantity]": "1",
       success_url: origin + "/dashboard?welcome=true",
       cancel_url: origin + "/#pricing",
-    });
+    };
+
+    try {
+      const cookieStore = cookies();
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            get(name: string) {
+              return cookieStore.get(name)?.value;
+            },
+          },
+        }
+      );
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        checkoutParams.customer_email = user.email;
+      }
+    } catch {
+      // Continue without email if auth fails
+    }
+
+    const session = await stripePost("/checkout/sessions", checkoutParams);
 
     if (session.error) {
       return NextResponse.json(

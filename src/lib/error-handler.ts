@@ -18,6 +18,8 @@ export function withErrorHandler(handler: RouteHandler, endpoint?: string): Rout
       // Log to console for server logs
       console.error(`[BugHunter] ${endpoint || req.url}:`, error);
 
+      const severity = categorizeError(error);
+
       // Log to database
       await trackError(
         'api_error',
@@ -25,11 +27,11 @@ export function withErrorHandler(handler: RouteHandler, endpoint?: string): Rout
         stack,
         endpoint || new URL(req.url).pathname,
         undefined,
-        categorizeError(error)
+        severity
       ).catch(() => {}); // Don't let logging failure crash the response
 
       // Notify if critical
-      if (categorizeError(error) === 'critical') {
+      if (severity === 'critical') {
         await notifyDiscord(message, endpoint || req.url).catch(() => {});
       }
 

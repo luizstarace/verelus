@@ -10,10 +10,12 @@ function getSupabase() {
   );
 }
 
+type Mode = 'signin' | 'signup' | 'reset';
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [mode, setMode] = useState<Mode>('signin');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +28,7 @@ export default function LoginPage() {
 
     try {
       const supabase = getSupabase();
-      if (isSignUp) {
+      if (mode === 'signup') {
         const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -36,6 +38,12 @@ export default function LoginPage() {
         });
         if (signUpError) throw signUpError;
         setMessage('Verifique seu email para confirmar o cadastro.');
+      } else if (mode === 'reset') {
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/auth/callback?next=/auth/reset',
+        });
+        if (resetError) throw resetError;
+        setMessage('Email de recuperacao enviado. Verifique sua caixa de entrada.');
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
@@ -84,10 +92,11 @@ export default function LoginPage() {
         {/* Card */}
         <div className="bg-brand-surface/80 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl shadow-black/20">
           <h2 className="text-xl font-semibold text-white mb-6">
-            {isSignUp ? 'Criar conta' : 'Entrar'}
+            {mode === 'signup' ? 'Criar conta' : mode === 'reset' ? 'Recuperar senha' : 'Entrar'}
           </h2>
 
           {/* Google OAuth */}
+          {mode !== 'reset' && (
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
@@ -101,12 +110,15 @@ export default function LoginPage() {
             </svg>
             Continuar com Google
           </button>
+          )}
 
+          {mode !== 'reset' && (
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-px bg-white/10" />
             <span className="text-white/30 text-sm">ou</span>
             <div className="flex-1 h-px bg-white/10" />
           </div>
+          )}
 
           {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -122,19 +134,32 @@ export default function LoginPage() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors"
               />
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm text-white/60 mb-1.5">Senha</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={isSignUp ? 'Crie uma senha (min. 6 caracteres)' : 'Sua senha'}
-                required
-                minLength={6}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors"
-              />
-            </div>
+            {mode !== 'reset' && (
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="password" className="block text-sm text-white/60">Senha</label>
+                  {mode === 'signin' && (
+                    <button
+                      type="button"
+                      onClick={() => { setMode('reset'); setError(''); setMessage(''); }}
+                      className="text-xs text-brand-green/70 hover:text-brand-green transition-colors"
+                    >
+                      Esqueci minha senha
+                    </button>
+                  )}
+                </div>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === 'signup' ? 'Crie uma senha (min. 6 caracteres)' : 'Sua senha'}
+                  required
+                  minLength={6}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors"
+                />
+              </div>
+            )}
 
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm">
@@ -153,18 +178,27 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full px-4 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-brand-green/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Aguarde...' : isSignUp ? 'Criar conta' : 'Entrar'}
+              {loading ? 'Aguarde...' : mode === 'signup' ? 'Criar conta' : mode === 'reset' ? 'Enviar email de recuperacao' : 'Entrar'}
             </button>
           </form>
 
           {/* Toggle */}
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-              className="text-brand-green/70 hover:text-brand-green text-sm transition-colors"
-            >
-              {isSignUp ? 'Já tem conta? Entre aqui' : 'Novo por aqui? Crie sua conta'}
-            </button>
+          <div className="mt-6 text-center space-y-2">
+            {mode === 'reset' ? (
+              <button
+                onClick={() => { setMode('signin'); setError(''); setMessage(''); }}
+                className="text-brand-green/70 hover:text-brand-green text-sm transition-colors"
+              >
+                Voltar para login
+              </button>
+            ) : (
+              <button
+                onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setError(''); setMessage(''); }}
+                className="text-brand-green/70 hover:text-brand-green text-sm transition-colors"
+              >
+                {mode === 'signup' ? 'Já tem conta? Entre aqui' : 'Novo por aqui? Crie sua conta'}
+              </button>
+            )}
           </div>
         </div>
 

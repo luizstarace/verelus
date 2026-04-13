@@ -18,10 +18,28 @@ export async function analyzeChurnRisk(): Promise<ChurnRiskUser[]> {
   // Get all paying users with their subscription info
   const { data: subscriptions } = await supabase
     .from('subscriptions')
-    .select('user_id, product, status, stripe_customer_id, current_period_end')
+    .select('user_id, product, status, stripe_customer_id, current_period_end, current_period_start, created_at')
     .in('status', ['active', 'past_due', 'trialing']);
 
   if (!subscriptions || subscriptions.length === 0) return [];
+
+  // Batch-fetch all users and onboarding records to avoid N+1 queries
+  const userIds = subscriptions.map((s) => s.user_id);
+
+  const [{ data: allUsers }, { data: allOnboarding }] = await Promise.all([
+    supabase.from('users').select('id, email').in('id', userIds),
+    supabase.from('onboarding_progress').select('user_id, last_active_at').in('user_id', userIds),
+  ]);
+
+  const userMap = new Map<string, { email: string }>();
+  for (const u of allUsers || []) {
+    userMap.set(u.id, { email: u.email });
+  }
+
+  const onboardingMap = new Map<string, { last_active_at: string | null }>();
+  for (const o of allOnboarding || []) {
+    onboardingMap.set(o.user_id, { last_active_at: o.last_active_at });
+  }
 
   const riskUsers: ChurnRiskUser[] = [];
 
@@ -29,26 +47,28 @@ export async function analyzeChurnRisk(): Promise<ChurnRiskUser[]> {
     const factors: string[] = [];
     let score = 0;
 
-    // Get user email
-    const { data: user } = await supabase
-      .from('users')
-      .select('email')
-      .eq('id', sub.user_id)
-      .single();
-
+    const user = userMap.get(sub.user_id);
     if (!user) continue;
 
     // Check last activity from onboarding_progress
-    const { data: onboarding } = await supabase
-      .from('onboarding_progress')
-      .select('last_active_at')
-      .eq('user_id', sub.user_id)
-      .single();
+    const onboarding = onboardingMap.get(sub.user_id);
 
-    const lastActive = onboarding?.last_active_at;
-    const daysInactive = lastActive
-      ? Math.floor((Date.now() - new Date(lastActive).getTime()) / (1000 * 60 * 60 * 24))
-      : 999;
+    const lastActive = onboarding?.last_active_at ?? null;
+    let daysInactive: number;
+
+    if (lastActive) {
+      daysInactive = Math.floor((Date.now() - new Date(lastActive).getTime()) / (1000 * 60 * 60 * 24));
+    } else {
+      // No activity record — fall back to subscription creation date to avoid
+      // flagging brand-new users as critically inactive (previously defaulted to 999).
+      const fallbackDate = sub.created_at || sub.current_period_start;
+      if (fallbackDate) {
+        const daysSinceCreation = Math.floor((Date.now() - new Date(fallbackDate).getTime()) / (1000 * 60 * 60 * 24));
+        daysInactive = daysSinceCreation < 7 ? 0 : daysSinceCreation;
+      } else {
+        daysInactive = 0;
+      }
+    }
 
     // Factor 1: Inactivity
     if (daysInactive > 30) { score += 40; factors.push(`Inativo ha ${daysInactive} dias`); }
@@ -65,6 +85,7 @@ export async function analyzeChurnRisk(): Promise<ChurnRiskUser[]> {
     }
 
     // Factor 4: Low feature usage (count events in last 30 days)
+    // TODO: Batch event counts into a single query with GROUP BY user_id to eliminate remaining N+1
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const { count: eventCount } = await supabase
       .from('events')

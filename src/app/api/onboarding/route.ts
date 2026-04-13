@@ -123,6 +123,17 @@ export async function POST(request: NextRequest) {
             const { updateOnboarding } = await import('@/lib/tracking');
             await updateOnboarding(user.id, 'welcome_email_sent', true);
           }
+
+          // Update updated_at to prevent the cron job from re-sending
+          // the same email within the cooldown window
+          const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          );
+          await supabase
+            .from('onboarding_progress')
+            .update({ updated_at: new Date().toISOString() })
+            .eq('user_id', user.id);
         } else {
           console.error('[onboarding] Failed to send email via Resend:', await res.text());
         }

@@ -45,7 +45,22 @@ export async function checkOnboardingMilestones(userId: string) {
     }
   }
 
-  // Check all milestones complete
+  // Check if first pitch was submitted
+  if (!progress.first_pitch) {
+    const { count } = await supabase
+      .from('pitch_submissions')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    if ((count || 0) > 0) {
+      await updateOnboarding(userId, 'first_pitch', true);
+    }
+  }
+
+  // NOTE: first_export and spotify_connected are tracked separately
+  // by their respective feature modules (export and Spotify integration).
+
+  // Core onboarding is complete when profile is filled and first AI generation is done.
   const updated = await getOnboardingProgress(userId);
   if (updated && updated.profile_completed && updated.first_generation && !updated.onboarding_completed) {
     await updateOnboarding(userId, 'onboarding_completed', true);

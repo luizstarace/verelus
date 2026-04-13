@@ -5,13 +5,16 @@ import { useState, useEffect, useRef } from 'react';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  isWelcome?: boolean;
 }
 
 const STORAGE_KEY = 'verelus-chat-messages';
+const MAX_STORED_MESSAGES = 50;
 const WELCOME_MESSAGE: Message = {
   role: 'assistant',
   content:
     'Ola! Eu sou a Vee, assistente virtual do Verelus. Como posso te ajudar hoje? Posso tirar duvidas sobre a plataforma, funcionalidades, planos e muito mais!',
+  isWelcome: true,
 };
 
 export default function ChatWidget() {
@@ -39,11 +42,14 @@ export default function ChatWidget() {
     setMessages([WELCOME_MESSAGE]);
   }, []);
 
-  // Persist messages to sessionStorage
+  // Persist messages to sessionStorage (capped to prevent unbounded growth)
   useEffect(() => {
     if (messages.length > 0) {
       try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+        const toStore = messages.length > MAX_STORED_MESSAGES
+          ? messages.slice(-MAX_STORED_MESSAGES)
+          : messages;
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
       } catch {
         // ignore storage errors
       }
@@ -73,10 +79,15 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
+      // Filter out the welcome message to avoid wasting API tokens
+      const apiMessages = updatedMessages
+        .filter((m) => !m.isWelcome)
+        .map(({ role, content }) => ({ role, content }));
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify({ messages: apiMessages }),
       });
 
       const data = await res.json();

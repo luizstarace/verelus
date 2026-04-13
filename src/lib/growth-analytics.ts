@@ -63,8 +63,8 @@ export interface RevenueMetrics {
 // ── Price mapping ──────────────────────────────────────────────────────────────
 
 const PLAN_PRICES: Record<string, number> = {
-  pro: 29.9,
-  business: 79.9,
+  pro: 97,
+  business: 297,
 };
 
 const AI_COST_PER_GENERATION: Record<string, number> = {
@@ -323,12 +323,22 @@ export async function getChurnRate(days: number): Promise<ChurnRateResult> {
   ).toISOString();
 
   // Active subscriptions at the start of the period:
-  // subscriptions created before the period that were active or trialing
-  const { count: activeAtStart } = await supabase
+  // subscriptions created before the period that were still active at that point.
+  // Best proxy: created before period AND (still active/trialing/past_due now, OR canceled after the period started)
+  const { count: currentlyActiveAtStart } = await supabase
     .from("subscriptions")
     .select("*", { count: "exact", head: true })
     .lte("created_at", periodStart)
-    .in("status", ["active", "trialing", "canceled", "past_due"]);
+    .in("status", ["active", "trialing", "past_due"]);
+
+  const { count: canceledAfterStart } = await supabase
+    .from("subscriptions")
+    .select("*", { count: "exact", head: true })
+    .lte("created_at", periodStart)
+    .eq("status", "canceled")
+    .gte("canceled_at", periodStart);
+
+  const activeAtStart = (currentlyActiveAtStart || 0) + (canceledAfterStart || 0);
 
   // Canceled during the period
   const { count: canceledDuringPeriod } = await supabase
@@ -337,7 +347,7 @@ export async function getChurnRate(days: number): Promise<ChurnRateResult> {
     .not("canceled_at", "is", null)
     .gte("canceled_at", periodStart);
 
-  const active = activeAtStart || 0;
+  const active = activeAtStart;
   const canceled = canceledDuringPeriod || 0;
 
   const churnRate = active > 0 ? Math.round((canceled / active) * 10000) / 100 : 0;
@@ -408,13 +418,11 @@ export async function getRevenueMetrics(): Promise<RevenueMetrics> {
   const { count: thisMonthNew } = await supabase
     .from("subscriptions")
     .select("*", { count: "exact", head: true })
-    .in("status", ["active", "trialing"])
     .gte("created_at", thisMonthStart);
 
   const { count: lastMonthNew } = await supabase
     .from("subscriptions")
     .select("*", { count: "exact", head: true })
-    .in("status", ["active", "trialing"])
     .gte("created_at", lastMonthStart)
     .lte("created_at", lastMonthEnd);
 

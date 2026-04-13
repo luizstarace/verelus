@@ -1,5 +1,5 @@
 /**
- * Professional HTML email template for TuneSignal newsletter.
+ * Professional HTML email template for Verelus newsletter.
  * This template is used as reference for the n8n workflow.
  * The Claude AI node should wrap its output in this template structure.
  *
@@ -14,7 +14,7 @@ export function wrapInEmailTemplate(content: string, weekNumber: string, unsubsc
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TuneSignal #${weekNumber} — O Sinal Semanal</title>
+  <title>Verelus #${weekNumber} — O Sinal Semanal</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
@@ -59,7 +59,7 @@ export function wrapInEmailTemplate(content: string, weekNumber: string, unsubsc
     <div class="header">
       <div class="badge">Edi&ccedil;&atilde;o #${weekNumber}</div>
       <div class="logo">
-        <span class="logo-green">Tune</span><span class="logo-purple">Sig</span><span class="logo-orange">nal</span>
+        <span class="logo-green">Ver</span><span class="logo-purple">el</span><span class="logo-orange">us</span>
       </div>
       <p style="color: #52525b; font-size: 13px; margin: 8px 0 0 0;">Intelig&ecirc;ncia musical com IA &bull; Toda segunda-feira</p>
     </div>
@@ -69,10 +69,10 @@ export function wrapInEmailTemplate(content: string, weekNumber: string, unsubsc
     </div>
 
     <div class="footer">
-      <p><strong style="color: #00ff88;">TuneSignal</strong> — Intelig&ecirc;ncia musical para artistas independentes</p>
-      <p>Voc&ecirc; recebeu este email porque se inscreveu no TuneSignal.</p>
-      <p><a href="${unsubscribeUrl}">Cancelar inscri&ccedil;&atilde;o</a> &bull; <a href="https://tunesignal-bandbrain.vercel.app/archive">Ver edi&ccedil;&otilde;es anteriores</a></p>
-      <p style="margin-top: 12px;">&copy; 2026 TuneSignal. Todos os direitos reservados.</p>
+      <p><strong style="color: #00ff88;">Verelus</strong> — Intelig&ecirc;ncia musical para artistas independentes</p>
+      <p>Voc&ecirc; recebeu este email porque se inscreveu no Verelus.</p>
+      <p><a href="${unsubscribeUrl}">Cancelar inscri&ccedil;&atilde;o</a> &bull; <a href="https://verelus.com/archive">Ver edi&ccedil;&otilde;es anteriores</a></p>
+      <p style="margin-top: 12px;">&copy; 2026 Verelus. Todos os direitos reservados.</p>
     </div>
   </div>
 </body>
@@ -83,7 +83,7 @@ export function wrapInEmailTemplate(content: string, weekNumber: string, unsubsc
  * System prompt for Claude to generate newsletter content
  * as HTML sections that fit within the email template.
  */
-export const NEWSLETTER_SYSTEM_PROMPT = `Você é o editor-chefe do TuneSignal, uma newsletter semanal de inteligência musical com IA para músicos independentes brasileiros.
+export const NEWSLETTER_SYSTEM_PROMPT = `Você é o editor-chefe do Verelus, uma newsletter semanal de inteligência musical com IA para músicos independentes brasileiros.
 
 === REGRA FUNDAMENTAL DE VERACIDADE ===
 - TODAS as informações devem ser VERDADEIRAS e VERIFICÁVEIS

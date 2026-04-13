@@ -1,8 +1,5 @@
-# TuneSignal + BandBrain
+# Verelus
 
-AI-powered music intelligence platform.
+AI-powered music intelligence platform for independent musicians.
 
-- **TuneSignal**: Weekly AI newsletter for musicians
-- **BandBrain**: AI band manager SaaS
-
-Powered by Next.js 14, Supabase, and Claude AI.
+Powered by Next.js 14, Supabase, Stripe, and Claude AI.

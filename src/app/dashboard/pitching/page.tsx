@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase-browser";
+import { useArtistProfile } from "@/lib/use-artist-profile";
 
 interface Track {
   id: string;
@@ -33,6 +34,7 @@ interface PitchSubmission {
 }
 
 export default function PitchingPage() {
+  const { profile: artistProfile } = useArtistProfile();
   const [tracks, setTracks] = useState<Track[]>([]);
   const [pitches, setPitches] = useState<PitchSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,7 +96,7 @@ export default function PitchingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "playlist_pitch",
-          trackId: selectedTrack,
+          context: { trackId: selectedTrack, artistProfile },
         }),
       });
       const data = await res.json();

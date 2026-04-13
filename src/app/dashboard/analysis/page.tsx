@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase-browser";
+import { useArtistProfile } from "@/lib/use-artist-profile";
 
 export default function AnalysisPage() {
+  const { profile: artistProfile } = useArtistProfile();
   const [loading, setLoading] = useState(true);
   const [analysis, setAnalysis] = useState<string>("");
   const [generating, setGenerating] = useState(false);
@@ -48,7 +50,7 @@ export default function AnalysisPage() {
       const res = await fetch("/api/ai/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "artist_analysis" }),
+        body: JSON.stringify({ type: "artist_analysis", context: { artistProfile } }),
       });
       const data = await res.json();
       if (data.content) setAnalysis(data.content);

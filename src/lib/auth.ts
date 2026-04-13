@@ -58,10 +58,6 @@ function mapProductToTier(product: string): PlanTier {
     case "business":
       return "business";
     case "pro":
-    // Legacy mappings
-    case "bandbrain_pro":
-    case "bandbrain_essencial":
-    case "tunesignal_premium":
       return "pro";
     default:
       return "free";

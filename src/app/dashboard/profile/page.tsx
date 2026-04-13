@@ -43,6 +43,9 @@ export default function ProfilePage() {
   const [userId, setUserId] = useState<string>("");
   const [profileId, setProfileId] = useState<string>("");
   const [userPlan, setUserPlan] = useState("free");
+  const [canceling, setCanceling] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => { loadProfile(); }, []);
 
@@ -59,6 +62,7 @@ export default function ProfilePage() {
 
     setUserId(userData.id);
     setUserPlan(userData.plan || "free");
+    setUserEmail(session.user.email || "");
 
     const { data: profile } = await supabase
       .from("artist_profiles")
@@ -102,6 +106,29 @@ export default function ProfilePage() {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  }
+
+  async function handleCancelSubscription() {
+    if (!confirm("Tem certeza que deseja cancelar sua assinatura? Voce continuara com acesso ate o fim do periodo atual.")) return;
+    setCanceling(true);
+    setCancelMessage("");
+    try {
+      const res = await fetch("/api/subscription/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const cancelDate = data.cancel_at ? new Date(data.cancel_at).toLocaleDateString("pt-BR") : "";
+        setCancelMessage(`Assinatura cancelada. Acesso ativo ate ${cancelDate || "o fim do periodo"}.`);
+      } else {
+        setCancelMessage(data.error || "Erro ao cancelar. Tente novamente.");
+      }
+    } catch {
+      setCancelMessage("Erro ao cancelar. Tente novamente.");
+    }
+    setCanceling(false);
   }
 
   function updateField(field: keyof ProfileForm, value: string) {
@@ -216,10 +243,22 @@ export default function ProfilePage() {
               </span>
               {userPlan === "free" && (
                 <a href="/#pricing" className="text-brand-green text-sm hover:underline">
-                  Fazer upgrade →
+                  Fazer upgrade &rarr;
                 </a>
               )}
+              {userPlan !== "free" && (
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={canceling}
+                  className="text-red-400 text-sm hover:underline disabled:opacity-50"
+                >
+                  {canceling ? "Cancelando..." : "Cancelar assinatura"}
+                </button>
+              )}
             </div>
+            {cancelMessage && (
+              <p className="text-sm mt-2 text-gray-400">{cancelMessage}</p>
+            )}
           </div>
 
           {/* Save Button */}

@@ -3,10 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 
 export const runtime = 'edge';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 // Map Stripe price ID to our unified product tier
 function mapProduct(priceId: string): string {
@@ -17,13 +19,6 @@ function mapProduct(priceId: string): string {
     return "business";
   }
   if (priceId === proPriceId || priceId.includes("pro")) {
-    return "pro";
-  }
-  // Legacy mappings
-  if (priceId.includes("bandbrain_pro") || priceId.includes("bandbrain_essencial")) {
-    return "pro";
-  }
-  if (priceId.includes("tunesignal_premium")) {
     return "pro";
   }
   return "pro"; // default paid tier
@@ -42,6 +37,77 @@ function mapStatus(stripeStatus: string): string {
       return "canceled";
     default:
       return "active";
+  }
+}
+
+async function sendPurchaseEmail(email: string, plan: string) {
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) return;
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://verelus.com";
+  const planLabel = plan === "business" ? "Business" : "Pro";
+
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${resendKey}`,
+      },
+      body: JSON.stringify({
+        from: "Verelus <noreply@verelus.com>",
+        to: [email],
+        subject: `Bem-vindo ao Verelus ${planLabel}!`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #e5e5e5; padding: 40px 30px; border-radius: 12px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #f5f5f5; font-size: 28px; margin: 0;">Verelus</h1>
+              <p style="color: #00f5a0; font-size: 14px; margin: 4px 0 0;">Music Intelligence Platform</p>
+            </div>
+            <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 30px; margin-bottom: 24px; border: 1px solid #262626;">
+              <h2 style="color: #00f5a0; margin: 0 0 16px; font-size: 22px;">Parabens! Seu plano ${planLabel} esta ativo.</h2>
+              <p style="color: #d4d4d4; line-height: 1.7; margin: 0 0 16px;">
+                Agora voce tem acesso completo a todas as ferramentas de inteligencia musical do Verelus.
+              </p>
+              <p style="color: #d4d4d4; line-height: 1.7; margin: 0;">
+                Aqui esta o que voce pode fazer agora:
+              </p>
+            </div>
+            <div style="margin-bottom: 24px;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #f5f5f5;">Geracao ilimitada com IA</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Press releases, posts sociais, contratos e mais</p>
+              </div>
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #f5f5f5;">Setlists e Relatorios</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Planejamento musical inteligente</p>
+              </div>
+              ${plan === "business" ? `
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #e040fb;">Planejamento de Turnes</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Exclusivo Business — planeje turnes com IA</p>
+              </div>
+              ` : ""}
+            </div>
+            <div style="text-align: center; margin-bottom: 24px;">
+              <a href="${appUrl}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #00f5a0, #00d9f5); color: #000; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 15px;">
+                Acessar meu Dashboard
+              </a>
+            </div>
+            <div style="text-align: center; border-top: 1px solid #262626; padding-top: 20px;">
+              <p style="color: #737373; font-size: 13px; margin: 0;">
+                <strong style="color: #a3a3a3;">Verelus</strong> — Music Intelligence Platform
+              </p>
+              <p style="color: #525252; font-size: 12px; margin: 8px 0 0;">
+                &copy; 2026 Verelus. Todos os direitos reservados.
+              </p>
+            </div>
+          </div>
+        `,
+      }),
+    });
+  } catch (err) {
+    console.error("Failed to send purchase email:", err);
   }
 }
 
@@ -88,6 +154,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
+    const supabase = getSupabase();
     const body = JSON.parse(rawBody);
     // Stripe webhook event structure
     const { type, data } = body as {
@@ -164,12 +231,13 @@ export async function POST(req: NextRequest) {
           { onConflict: "email" }
         );
 
-        console.log(`Stripe checkout completed: ${email} (${productType})`);
-        break;
+        // Send post-purchase welcome email via Resend
+        await sendPurchaseEmail(email.toLowerCase().trim(), productType);
+
+            break;
       }
 
       case "customer.subscription.updated": {
-        // Subscription updated
         const customerId = event.customer;
         const status = mapStatus(event.status || "active");
         const priceId = event.items?.data?.[0]?.price?.id || "";
@@ -189,12 +257,10 @@ export async function POST(req: NextRequest) {
           { onConflict: "stripe_subscription_id" }
         );
 
-        console.log(`Stripe subscription updated: ${event.id} (${status})`);
         break;
       }
 
       case "customer.subscription.deleted": {
-        // Subscription canceled
         const customerId = event.customer;
 
         await supabase.from("subscriptions").upsert(
@@ -208,35 +274,28 @@ export async function POST(req: NextRequest) {
           { onConflict: "stripe_subscription_id" }
         );
 
-        console.log(`Stripe subscription deleted: ${event.id}`);
         break;
       }
 
       case "invoice.payment_succeeded": {
-        // Payment received
         const customerId = event.customer;
 
-        // Update subscription status to active
         await supabase
           .from("subscriptions")
           .update({ status: "active" })
           .eq("stripe_customer_id", customerId);
 
-        console.log(`Stripe payment succeeded for customer: ${customerId}`);
         break;
       }
 
       case "invoice.payment_failed": {
-        // Payment failed
         const customerId = event.customer;
 
-        // Update subscription status to past_due
         await supabase
           .from("subscriptions")
           .update({ status: "past_due" })
           .eq("stripe_customer_id", customerId);
 
-        console.log(`Stripe payment failed for customer: ${customerId}`);
         break;
       }
 

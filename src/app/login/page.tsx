@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -23,6 +25,7 @@ export default function LoginPage() {
     setMessage('');
 
     try {
+      const supabase = getSupabase();
       if (isSignUp) {
         const { error: signUpError } = await supabase.auth.signUp({
           email,
@@ -48,9 +51,10 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
   const handleGoogleLogin = async () => {
     setLoading(true);
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+    const { error: oauthError } = await getSupabase().auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: window.location.origin + '/auth/callback',
@@ -63,16 +67,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080a0f] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-brand-dark flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Background orbs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-brand-green/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-brand-purple/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="w-full max-w-md relative z-10">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold font-display text-white tracking-wider">VERELUS</h1>
-          <p className="text-white/50 mt-2">Music Intelligence Platform</p>
+        <div className="text-center mb-10">
+          <a href="/" className="inline-block">
+            <h1 className="text-5xl font-bold font-display text-white tracking-wider">VERELUS</h1>
+          </a>
+          <p className="text-brand-muted mt-2 text-sm">Music Intelligence Platform</p>
         </div>
 
         {/* Card */}
-        <div className="bg-[#12151e] rounded-2xl p-8 border border-white/10">
+        <div className="bg-brand-surface/80 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl shadow-black/20">
           <h2 className="text-xl font-semibold text-white mb-6">
             {isSignUp ? 'Criar conta' : 'Entrar'}
           </h2>
@@ -81,7 +91,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white hover:bg-white/10 transition mb-6 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10 transition mb-6 disabled:opacity-50"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
@@ -91,6 +101,7 @@ export default function LoginPage() {
             </svg>
             Continuar com Google
           </button>
+
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-px bg-white/10" />
             <span className="text-white/30 text-sm">ou</span>
@@ -108,7 +119,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00f5a0]/50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors"
               />
             </div>
             <div>
@@ -121,18 +132,18 @@ export default function LoginPage() {
                 placeholder={isSignUp ? 'Crie uma senha (min. 6 caracteres)' : 'Sua senha'}
                 required
                 minLength={6}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00f5a0]/50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors"
               />
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400 text-sm">
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm">
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="bg-[#00f5a0]/10 border border-[#00f5a0]/20 rounded-lg p-3 text-[#00f5a0] text-sm">
+              <div className="bg-brand-green/10 border border-brand-green/20 rounded-xl p-3 text-brand-green text-sm">
                 {message}
               </div>
             )}
@@ -140,7 +151,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-4 py-3 bg-[#00f5a0] text-black font-bold rounded-lg hover:bg-[#00f5a0]/80 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-brand-green/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Aguarde...' : isSignUp ? 'Criar conta' : 'Entrar'}
             </button>
@@ -150,16 +161,16 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <button
               onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-              className="text-[#00f5a0]/70 hover:text-[#00f5a0] text-sm transition"
+              className="text-brand-green/70 hover:text-brand-green text-sm transition-colors"
             >
-              {isSignUp ? 'J\u00e1 tem conta? Entre aqui' : 'Novo por aqui? Crie sua conta'}
+              {isSignUp ? 'Já tem conta? Entre aqui' : 'Novo por aqui? Crie sua conta'}
             </button>
           </div>
         </div>
 
         {/* Footer */}
         <p className="text-center text-white/20 text-xs mt-8">
-          \u00A9 2026 Verelus. Todos os direitos reservados.
+          &copy; 2026 Verelus. Todos os direitos reservados.
         </p>
       </div>
     </div>

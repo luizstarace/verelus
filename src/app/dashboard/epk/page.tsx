@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase-browser";
+import { useArtistProfile } from "@/lib/use-artist-profile";
 
 interface ArtistProfile {
   id: string;
@@ -18,6 +19,7 @@ interface ArtistProfile {
 }
 
 export default function EPKPage() {
+  const { profile: artistProfile } = useArtistProfile();
   const [profile, setProfile] = useState<ArtistProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -62,7 +64,7 @@ export default function EPKPage() {
       const res = await fetch("/api/ai/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "epk", profileId: profile?.id }),
+        body: JSON.stringify({ type: "epk", context: { profileId: profile?.id, artistProfile } }),
       });
       const data = await res.json();
       if (data.content) setEpkContent(data.content);

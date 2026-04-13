@@ -21,6 +21,12 @@ const config: Config = {
           text: "#e8eaf0",
           muted: "#6b7280",
         },
+        // Aliases for dashboard pages (bg-bg-primary, etc.)
+        bg: {
+          primary: "#080a0f",
+          secondary: "#0c0e15",
+          surface: "#12151e",
+        },
       },
       fontFamily: {
         display: ["'Bebas Neue'", "Impact", "sans-serif"],

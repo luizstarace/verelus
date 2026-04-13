@@ -4,13 +4,21 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Verelus — Music Intelligence Platform",
   description:
-    "AI-powered playlist pitching and professional career management for independent musicians. Built by music industry experts.",
+    "Plataforma de inteligencia musical com IA para musicos independentes. Pitching de playlists, gestao de carreira e ferramentas profissionais.",
   openGraph: {
     title: "Verelus — Music Intelligence Platform",
     description:
-      "Connect your music, pitch to the right playlists, and manage your entire career in one place. Built by music industry experts with AI.",
+      "Plataforma de inteligencia musical com IA. Pitching de playlists, press releases, contratos, turnes e muito mais.",
     type: "website",
+    url: "https://verelus.com",
+    siteName: "Verelus",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Verelus — Music Intelligence Platform",
+    description: "Inteligencia musical com IA para musicos independentes.",
+  },
+  robots: "index, follow",
 };
 
 export default function RootLayout({
@@ -19,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="pt-BR" className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

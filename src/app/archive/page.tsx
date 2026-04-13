@@ -49,7 +49,7 @@ export default function ArchivePage() {
           <Waveform />
           <div>
             <span className="text-xl font-bold gradient-text">Verelus</span>
-            <p className="text-xs text-zinc-500">TuneSignal Archive</p>
+            <p className="text-xs text-zinc-500">Arquivo de Newsletters</p>
           </div>
         </a>
         <div className="flex items-center gap-4">
@@ -68,7 +68,7 @@ export default function ArchivePage() {
             Arquivo de <span className="gradient-text">Edições</span>
           </h1>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            Todas as edições da newsletter TuneSignal. Um produto Verelus: inteligência musical com IA, toda segunda-feira.
+            Todas as edições da newsletter Verelus. Inteligência musical com IA, toda segunda-feira.
           </p>
         </div>
 
@@ -182,13 +182,13 @@ export default function ArchivePage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Waveform />
-            <span className="font-bold gradient-text">TuneSignal</span>
+            <span className="font-bold gradient-text">Verelus</span>
           </div>
           <p className="text-xs text-zinc-600">
             Inteligência musical com IA para artistas independentes.
           </p>
           <p className="text-xs text-zinc-600">
-            © 2026 TuneSignal. Todos os direitos reservados.
+            © 2026 Verelus. Todos os direitos reservados.
           </p>
         </div>
       </footer>

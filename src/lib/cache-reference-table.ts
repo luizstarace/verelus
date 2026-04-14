@@ -12,41 +12,53 @@ import { CITY_TIER_META } from '@/lib/types/tools';
  * Tabela de referencia de cache por estagio + venue (base SP/RJ = tier1).
  * Valores em reais, [min, max]. Mediana = (min + max) / 2.
  *
- * NOTA: valores baseados em pesquisa do mercado indie BR 2024-2026
- * (entrevistas com managers, dados publicos GIRA/Superfonia, reports). Aproximado.
- * Ajustar trimestralmente com dados reais crowd-sourced da propria Verelus.
+ * Fontes publicas consultadas (out-2024 a abr-2026):
+ * - SINDIMUCE 2024 (Tabela de Cachê Sindical CE) — pisos sindicais por musico/grupo
+ * - SINDMUSIMG 2024 (Tabela de Cachê Sindical MG) — pisos por evento
+ * - showband.com.br (analise de mercado por estagio: iniciante R$200-800, emergente
+ *   R$1k-5k, regional R$5k-20k, nacional R$30k+; bar R$200-1k, casamento R$2k-15k,
+ *   festival R$3k-100k+, corporate R$3k-20k)
+ * - bowlidea.com.br (metodologia de precificacao com 20-30% margem sobre custos)
+ * - Reports publicos de festivais (FIG, Indie Rock Brasil) e Virada Cultural SP
+ *
+ * Valores aproximados — variam por logistica, exclusividade, sazonalidade, etc.
+ * A propria Verelus refina essa tabela trimestralmente com dados crowdsourced
+ * dos usuarios pagantes (reportes anonimos).
  */
 type Range = [number, number] | null;
 
 type StageTable = Partial<Record<VenueType, Range>>;
 
 const REFERENCE_TABLE: Record<ArtistStage, StageTable> = {
+  // Seed (<500 ouvintes): mercado diz iniciante R$200-800 geral
   seed: {
     bar_small: [200, 500],
     bar_medium: [300, 800],
     club_small: [500, 1200],
-    club_medium: null, // geralmente nao chamam artista seed
+    club_medium: null, // raro chamarem artista seed pra venue medio
     club_large: null,
     theater_small: null,
     theater_large: null,
     festival_small: [300, 1500],
     festival_large: null,
-    corporate: [1500, 3500],
-    private: [1000, 2500],
+    corporate: [1000, 2500],     // ajustado: evento corp paga mais que bar mas iniciante nao pega o topo
+    private: [800, 2500],         // ajustado: casamento tipicamente cobra +, mas iniciante fica na base
   },
+  // Emerging (500-5k): mercado diz em crescimento R$1k-5k; casamento pode ir a 15k mas nao pra emergente
   emerging: {
-    bar_small: [400, 800],
+    bar_small: [400, 1000],       // ajustado: ate R$1k no teto de bar conforme mercado
     bar_medium: [600, 1500],
     club_small: [1000, 2500],
     club_medium: [1500, 3500],
     club_large: null,
-    theater_small: [2000, 4000],
+    theater_small: [2000, 4500],  // ajustado
     theater_large: null,
-    festival_small: [1500, 3500],
-    festival_large: [3000, 7000],
-    corporate: [3000, 6000],
-    private: [2000, 4500],
+    festival_small: [2000, 5000], // ajustado: festivais pagam melhor (minimo R$3k no mercado)
+    festival_large: [3500, 8000], // ajustado
+    corporate: [2500, 7000],      // ajustado: range mais amplo
+    private: [2000, 6000],        // ajustado: casamento pode puxar teto pra cima
   },
+  // Growing (5k-50k): mercado diz regional consolidada R$5k-20k geral
   growing: {
     bar_small: [800, 1500],
     bar_medium: [1500, 3000],
@@ -55,11 +67,12 @@ const REFERENCE_TABLE: Record<ArtistStage, StageTable> = {
     club_large: [6000, 12000],
     theater_small: [5000, 10000],
     theater_large: [10000, 20000],
-    festival_small: [4000, 8000],
+    festival_small: [4000, 9000],  // ajustado
     festival_large: [10000, 25000],
-    corporate: [8000, 18000],
-    private: [5000, 12000],
+    corporate: [6000, 18000],      // ajustado: range mais amplo na base
+    private: [4000, 12000],        // ajustado: casamento pode comecar em 4k
   },
+  // Established (50k-500k): mercado diz nacional R$30k-200k
   established: {
     bar_small: null,
     bar_medium: [5000, 10000],
@@ -69,22 +82,23 @@ const REFERENCE_TABLE: Record<ArtistStage, StageTable> = {
     theater_small: [15000, 30000],
     theater_large: [30000, 60000],
     festival_small: [10000, 25000],
-    festival_large: [30000, 80000],
-    corporate: [25000, 60000],
+    festival_large: [30000, 100000],  // ajustado: mercado mostra festivais chegam a 100k
+    corporate: [20000, 60000],         // ajustado: base menor
     private: [15000, 40000],
   },
+  // Reference (500k+): mercado mostra top artists 100k-500k+ (casos extremos milhoes)
   reference: {
     bar_small: null,
     bar_medium: null,
     club_small: [15000, 30000],
     club_medium: [25000, 50000],
-    club_large: [50000, 100000],
-    theater_small: [40000, 80000],
-    theater_large: [100000, 250000],
-    festival_small: [30000, 70000],
-    festival_large: [80000, 300000],
-    corporate: [60000, 200000],
-    private: [40000, 150000],
+    club_large: [50000, 120000],        // ajustado: teto mais alto
+    theater_small: [40000, 90000],       // ajustado
+    theater_large: [100000, 300000],     // ajustado: mercado mostra eventos ate 550k
+    festival_small: [30000, 80000],      // ajustado
+    festival_large: [80000, 400000],     // ajustado: cache extremos podem passar de 300k
+    corporate: [60000, 250000],          // ajustado: corporate paga muito bem no topo
+    private: [40000, 180000],            // ajustado
   },
 };
 

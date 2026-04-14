@@ -133,3 +133,74 @@ export interface RiderOutput {
   pdf_base64: string;    // PDF encoded base64
   share_id: string;      // id unico pra link compartilhavel
 }
+
+// ===================== CONTRATO DE SHOW =====================
+
+export interface ContractParty {
+  type: 'pf' | 'pj';          // pessoa fisica ou juridica
+  name: string;               // nome ou razao social
+  document: string;           // CPF ou CNPJ
+  address_street: string;
+  address_city: string;
+  address_state: string;
+  address_zip: string;
+  representative?: string;    // se PJ, nome do representante
+  representative_document?: string; // CPF do representante
+}
+
+export interface ContractInput {
+  contractor: ContractParty;  // CONTRATANTE (quem contrata / casa de show)
+  artist: ContractParty;      // CONTRATADO (artista/banda)
+
+  // Detalhes do show
+  show_date: string;          // ISO YYYY-MM-DD
+  show_time: string;          // HH:MM
+  show_duration_min: number;  // 30/45/60/90/120 etc
+  venue_name: string;         // nome do local
+  venue_address: string;      // endereco completo do show
+  event_type: string;         // ex: "show privado", "festival", "show em bar", free text
+  has_opening_act: boolean;
+  opening_act_name?: string;
+
+  // Cache e pagamento
+  cache_total: number;        // em centavos para precisao
+  payment_method: 'pix' | 'transfer' | 'cash' | 'boleto';
+  deposit_percent: number;    // % do sinal (ex: 50 = 50%)
+  deposit_due_date?: string;  // ISO data; opcional
+  balance_due_timing: 'before_show' | 'on_show_day' | 'after_show';
+
+  // Responsabilidades do CONTRATANTE
+  provides_accommodation: boolean;
+  provides_transport: boolean;
+  provides_meals: boolean;
+  provides_equipment: boolean;      // equipamento tecnico conforme rider
+  provides_security: boolean;
+  provides_promotion: boolean;
+
+  // Cancelamento
+  cancel_fee_less_7_days: number;   // % multa se cancelar <7 dias
+  cancel_fee_7_to_30_days: number;  // 7-30 dias
+  cancel_fee_more_30_days: number;  // >30 dias
+
+  // Direitos de imagem e gravacao
+  recording_allowed: 'prohibited' | 'personal_only' | 'promo_with_credit' | 'full_rights';
+  streaming_allowed: boolean;
+  image_rights_for_promo: boolean;
+
+  // Exclusividade
+  has_exclusivity: boolean;
+  exclusivity_radius_km?: number;
+  exclusivity_days_before?: number;
+
+  // Juridico
+  forum_city: string;
+  forum_state: string;
+
+  // Observacoes extras
+  extra_clauses?: string;
+}
+
+export interface ContractOutput {
+  pdf_base64: string;
+  share_id: string;
+}

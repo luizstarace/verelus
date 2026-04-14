@@ -17,7 +17,7 @@ const TOOLS: Tool[] = [
   { key: 'bio', name: 'Bio Adaptativa', description: '4 bios profissionais nos tamanhos de Spotify, Instagram, EPK e Twitter', href: '/dashboard/bio', tier: 1 },
   { key: 'cache', name: 'Calculadora de Cache', description: 'Quanto cobrar por show e quanto sobra no bolso', href: null, tier: 1 },
   { key: 'rider', name: 'Rider Tecnico', description: 'PDF profissional com diagrama de palco', href: '/dashboard/rider', tier: 1 },
-  { key: 'contract', name: 'Contrato de Show', description: 'Contrato juridico validado, pronto pra assinatura', href: null, tier: 1 },
+  { key: 'contract', name: 'Contrato de Show', description: 'Contrato juridico validado, pronto pra assinatura', href: '/dashboard/contract', tier: 1 },
   { key: 'pitch-kit', name: 'Pitch Kit', description: 'Email + 1-pager + release pra enviar a curador', href: null, tier: 2 },
   { key: 'release-timing', name: 'Quando Lancar', description: '3 datas ideais para seu proximo lancamento', href: null, tier: 2 },
   { key: 'launch-checklist', name: 'Checklist de Lancamento', description: 'Planejamento completo de 8 semanas antes ao pos', href: null, tier: 2 },

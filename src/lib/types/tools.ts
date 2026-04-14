@@ -382,3 +382,37 @@ export interface PitchOutput {
   };
   press_release: string;         // texto completo
 }
+
+// ===================== QUANDO LANCAR =====================
+
+export type ReleaseType = 'single' | 'ep' | 'album';
+
+export interface ReleaseTimingInput {
+  release_type: ReleaseType;
+  window_days: 30 | 60 | 90;      // janela de sugestao
+  months_to_avoid: number[];       // 0=jan, 11=dez. Opcional.
+  artist_name: string;
+  genre: string;
+  has_growth_data: boolean;        // se tem dados historicos do Growth Tracker
+  main_market: 'br' | 'latam' | 'international';
+  goal: 'discovery' | 'grow_base' | 'monetize' | 'playlist_placement' | 'press';
+}
+
+export interface SuggestedDate {
+  iso_date: string;          // YYYY-MM-DD
+  day_of_week: string;       // "sexta-feira"
+  score: number;             // 0-100
+  reasons: string[];         // ate 3 razoes concretas
+  warnings: string[];        // potenciais problemas
+  context: string;           // "o que vai estar acontecendo no mundo"
+}
+
+export interface ReleaseTimingOutput {
+  suggestions: SuggestedDate[];      // top 3
+  calendar_candidates: Array<{       // todas as sextas da janela, pontuadas
+    iso_date: string;
+    score: number;
+    color: 'green' | 'yellow' | 'red';
+  }>;
+  strategy_summary: string;           // paragrafo geral
+}

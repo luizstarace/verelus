@@ -1,4 +1,4 @@
-import type { SpotifyArtistData, SpotifyTrack } from '@/lib/types/career';
+import type { SpotifyArtistData } from '@/lib/types/career';
 
 /**
  * Extrai o ID do artista do Spotify a partir de uma URL ou URI.
@@ -54,16 +54,106 @@ export async function getSpotifyAccessToken(): Promise<string> {
 }
 
 /**
- * Busca dados do artista no Spotify Web API.
- * Retorna artista + top 10 tracks.
- * Throws se artista nao existe ou Spotify retorna erro.
+ * Extrai monthly listeners da pagina publica do Spotify via scraping do meta description.
+ * A Web API para apps novos (pos-nov-2024) nao retorna mais esse dado — temos que scrapear.
+ *
+ * Retorna undefined se nao conseguir extrair.
  */
-export async function fetchSpotifyArtistData(artistId: string): Promise<SpotifyArtistData> {
-  const token = await getSpotifyAccessToken();
-  const headers = { Authorization: `Bearer ${token}` };
+export async function scrapeSpotifyMonthlyListeners(artistId: string): Promise<number | undefined> {
+  try {
+    const res = await fetch(`https://open.spotify.com/artist/${artistId}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15',
+      },
+    });
+    if (!res.ok) return undefined;
+    const html = await res.text();
 
-  // Fetch artist info
-  const artistRes = await fetch(`https://api.spotify.com/v1/artists/${artistId}`, { headers });
+    // Procura na meta description: "Artist · 2.2M monthly listeners." ou "2,242,648 monthly listeners"
+    // Primeiro pega o numero cheio com virgulas (mais preciso)
+    const exactMatch = html.match(/(\d[\d,]+)\s*monthly listeners/);
+    if (exactMatch) {
+      return parseInt(exactMatch[1].replace(/,/g, ''), 10);
+    }
+
+    // Fallback: numero abreviado tipo "2.2M" ou "350K" da meta description
+    const metaDesc = html.match(/<meta[^>]*(?:name|property)=["'](?:description|og:description)["'][^>]*content=["']([^"']+)["']/);
+    if (metaDesc) {
+      const abbrevMatch = metaDesc[1].match(/(\d+(?:\.\d+)?)\s*([KMB])\s*monthly listeners/i);
+      if (abbrevMatch) {
+        const num = parseFloat(abbrevMatch[1]);
+        const mult: Record<string, number> = { K: 1_000, M: 1_000_000, B: 1_000_000_000 };
+        return Math.round(num * (mult[abbrevMatch[2].toUpperCase()] ?? 1));
+      }
+    }
+
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Tipo do item de catalogo retornado pelo endpoint /albums.
+ */
+export interface SpotifyAlbum {
+  id: string;
+  name: string;
+  release_date: string;  // YYYY-MM-DD
+  album_type: 'album' | 'single' | 'compilation';
+  total_tracks: number;
+  image_url: string | null;
+}
+
+/**
+ * Busca o catalogo recente do artista (albums + singles).
+ * Limitado a 5 items nos apps novos do Spotify (pos-nov-2024).
+ */
+export async function fetchSpotifyCatalog(artistId: string, token: string): Promise<SpotifyAlbum[]> {
+  const res = await fetch(
+    `https://api.spotify.com/v1/artists/${artistId}/albums?market=BR&limit=5&include_groups=album,single`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (!res.ok) return [];
+
+  const data = (await res.json()) as {
+    items: Array<{
+      id: string;
+      name: string;
+      release_date: string;
+      album_type: 'album' | 'single' | 'compilation';
+      total_tracks: number;
+      images: Array<{ url: string }>;
+    }>;
+  };
+
+  return data.items.map((a) => ({
+    id: a.id,
+    name: a.name,
+    release_date: a.release_date,
+    album_type: a.album_type,
+    total_tracks: a.total_tracks,
+    image_url: a.images[0]?.url ?? null,
+  }));
+}
+
+/**
+ * Busca dados do artista no Spotify.
+ *
+ * NOTA IMPORTANTE: Para apps novos criados apos nov/2024, a Web API nao retorna mais
+ * followers, popularity, genres, nem top-tracks. Esses dados sao obtidos via:
+ * - Monthly listeners: scraping da pagina publica (open.spotify.com)
+ * - Genres: fornecidos pelo usuario no survey (primary_genre)
+ * - Followers/popularity: nao disponiveis no MVP (fallback para 0 no stage calculator)
+ * - Top tracks: nao disponiveis no MVP; usamos albums endpoint para catalogo
+ */
+export async function fetchSpotifyArtistData(artistId: string): Promise<SpotifyArtistData & { albums: SpotifyAlbum[] }> {
+  const token = await getSpotifyAccessToken();
+
+  // Fetch basic artist info (nome, id, url, imagem)
+  const artistRes = await fetch(`https://api.spotify.com/v1/artists/${artistId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (!artistRes.ok) {
     if (artistRes.status === 404) throw new Error(`Artist not found: ${artistId}`);
     throw new Error(`Spotify artist fetch failed: ${artistRes.status}`);
@@ -71,46 +161,27 @@ export async function fetchSpotifyArtistData(artistId: string): Promise<SpotifyA
   const artist = (await artistRes.json()) as {
     id: string;
     name: string;
-    genres: string[];
-    followers: { total: number };
-    popularity: number;
     external_urls: { spotify: string };
+    followers?: { total: number };
+    popularity?: number;
+    genres?: string[];
   };
 
-  // Fetch top tracks (BR market)
-  const tracksRes = await fetch(
-    `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=BR`,
-    { headers }
-  );
-  if (!tracksRes.ok) throw new Error(`Spotify top tracks fetch failed: ${tracksRes.status}`);
-  const tracksData = (await tracksRes.json()) as {
-    tracks: Array<{
-      id: string;
-      name: string;
-      popularity: number;
-      preview_url: string | null;
-      duration_ms: number;
-      album: { images: Array<{ url: string }> };
-    }>;
-  };
+  // Fetch monthly listeners via scraping (unica fonte confiavel pos-nov-2024)
+  const monthlyListeners = await scrapeSpotifyMonthlyListeners(artistId);
 
-  const topTracks: SpotifyTrack[] = tracksData.tracks.slice(0, 10).map((t) => ({
-    id: t.id,
-    name: t.name,
-    popularity: t.popularity,
-    preview_url: t.preview_url,
-    duration_ms: t.duration_ms,
-    album_image_url: t.album.images[0]?.url ?? null,
-  }));
+  // Fetch catalogo (albums + singles) via API oficial
+  const albums = await fetchSpotifyCatalog(artistId, token);
 
   return {
     spotify_artist_id: artist.id,
     spotify_url: artist.external_urls.spotify,
     name: artist.name,
-    genres: artist.genres,
-    followers: artist.followers.total,
-    popularity: artist.popularity,
-    monthly_listeners: undefined, // Nao disponivel via API publica; fica para Plano 2 (scraping)
-    top_tracks: topTracks,
+    genres: artist.genres ?? [],  // vazio para apps novos; usuario fornece no survey
+    followers: artist.followers?.total ?? 0,  // 0 para apps novos
+    popularity: artist.popularity ?? 0,  // 0 para apps novos
+    monthly_listeners: monthlyListeners,
+    top_tracks: [],  // nao disponivel para apps novos; usamos albums
+    albums,
   };
 }

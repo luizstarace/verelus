@@ -3,8 +3,8 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 import { generateRiderPDF } from '@/lib/rider-pdf';
-import type { RiderInput, MusicianSpec, StageTemplate } from '@/lib/types/tools';
-import { STAGE_TEMPLATES } from '@/lib/types/tools';
+import type { RiderInput, MusicianSpec, StageTemplate, StageItem, StageItemType } from '@/lib/types/tools';
+import { STAGE_TEMPLATES, STAGE_ITEM_META } from '@/lib/types/tools';
 
 // NOTA: Next.js edge runtime tem limites de tamanho de bundle.
 // pdf-lib funciona em edge mas adiciona ~300kb. Funciona.
@@ -56,6 +56,28 @@ function validateInput(raw: unknown): RiderInput | { error: string } {
 
   const mealsCount = Number(r.meals_count ?? 0);
 
+  // Validacao opcional de stage_items
+  let stageItems: StageItem[] | undefined;
+  if (Array.isArray(r.stage_items)) {
+    stageItems = [];
+    for (const raw of r.stage_items) {
+      if (!raw || typeof raw !== 'object') continue;
+      const item = raw as Record<string, unknown>;
+      const type = String(item.type) as StageItemType;
+      if (!(type in STAGE_ITEM_META)) continue;
+      const x = Number(item.x);
+      const y = Number(item.y);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      stageItems.push({
+        id: String(item.id ?? `${Date.now()}-${stageItems.length}`),
+        type,
+        x: Math.max(0, Math.min(1, x)),
+        y: Math.max(0, Math.min(1, y)),
+        label: item.label ? String(item.label).trim() : undefined,
+      });
+    }
+  }
+
   return {
     artist_name: String(r.artist_name).trim(),
     contact_name: String(r.contact_name).trim(),
@@ -63,6 +85,7 @@ function validateInput(raw: unknown): RiderInput | { error: string } {
     contact_phone: String(r.contact_phone).trim(),
     stage_template: r.stage_template as StageTemplate,
     musicians,
+    stage_items: stageItems,
     pa_minimum_watts: pa,
     lighting: r.lighting as RiderInput['lighting'],
     lighting_notes: r.lighting_notes ? String(r.lighting_notes).trim() : undefined,

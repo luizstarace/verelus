@@ -69,6 +69,45 @@ export interface MusicianSpec {
   notes?: string;
 }
 
+export type StageItemType =
+  | 'vocal_mic'
+  | 'instrument_mic'
+  | 'drum_kit'
+  | 'guitar_amp'
+  | 'bass_amp'
+  | 'monitor'
+  | 'di_box'
+  | 'keyboard'
+  | 'guitar_stand'
+  | 'bass_stand'
+  | 'acoustic_guitar'
+  | 'power_outlet'
+  | 'custom_label';
+
+export const STAGE_ITEM_META: Record<StageItemType, { label: string; short: string }> = {
+  vocal_mic: { label: 'Microfone (vocal)', short: 'Mic' },
+  instrument_mic: { label: 'Microfone (instrumento)', short: 'Mic inst' },
+  drum_kit: { label: 'Bateria', short: 'Bateria' },
+  guitar_amp: { label: 'Amplificador de guitarra', short: 'Amp guit' },
+  bass_amp: { label: 'Amplificador de baixo', short: 'Amp baixo' },
+  monitor: { label: 'Monitor de chao (spot)', short: 'Spot' },
+  di_box: { label: 'DI box', short: 'DI' },
+  keyboard: { label: 'Teclado', short: 'Teclado' },
+  guitar_stand: { label: 'Guitarra (suporte)', short: 'Guitarra' },
+  bass_stand: { label: 'Baixo (suporte)', short: 'Baixo' },
+  acoustic_guitar: { label: 'Violao (suporte)', short: 'Violao' },
+  power_outlet: { label: 'Tomada 110v/220v', short: 'Tomada' },
+  custom_label: { label: 'Rotulo custom', short: 'Custom' },
+};
+
+export interface StageItem {
+  id: string;
+  type: StageItemType;
+  x: number;      // 0-1 (0=esquerda, 1=direita)
+  y: number;      // 0-1 (0=frente/publico, 1=fundo)
+  label?: string; // override do label curto
+}
+
 export interface RiderInput {
   artist_name: string;
   contact_name: string;
@@ -76,6 +115,7 @@ export interface RiderInput {
   contact_phone: string;
   stage_template: StageTemplate;
   musicians: MusicianSpec[];
+  stage_items?: StageItem[];   // layout visual do palco
   pa_minimum_watts: number;           // ex: 2000
   lighting: 'basic' | 'scenic' | 'custom';
   lighting_notes?: string;

@@ -2,8 +2,96 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import type { RiderInput, StageTemplate, MusicianSpec } from '@/lib/types/tools';
+import type { RiderInput, StageTemplate, MusicianSpec, StageItem, StageItemType } from '@/lib/types/tools';
 import { STAGE_TEMPLATES } from '@/lib/types/tools';
+import { StagePlotEditor } from '@/components/rider/StagePlotEditor';
+
+function genId(): string {
+  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+}
+
+function makeItem(type: StageItemType, x: number, y: number, label?: string): StageItem {
+  return { id: genId(), type, x, y, label };
+}
+
+// Presets de layout visual por template (posicoes {x, y} em 0-1, y=0 e frente/publico)
+const STAGE_ITEM_PRESETS: Partial<Record<StageTemplate, StageItem[]>> = {
+  solo_acoustic: [
+    makeItem('vocal_mic', 0.5, 0.35, 'Vocal'),
+    makeItem('acoustic_guitar', 0.62, 0.45, 'Violao'),
+    makeItem('monitor', 0.42, 0.22),
+    makeItem('di_box', 0.7, 0.55),
+  ],
+  solo_electric: [
+    makeItem('vocal_mic', 0.5, 0.35, 'Vocal'),
+    makeItem('guitar_stand', 0.62, 0.45, 'Guitarra'),
+    makeItem('guitar_amp', 0.7, 0.7),
+    makeItem('monitor', 0.42, 0.22),
+  ],
+  duo: [
+    makeItem('vocal_mic', 0.38, 0.35, 'Vocal 1'),
+    makeItem('vocal_mic', 0.62, 0.35, 'Vocal 2'),
+    makeItem('monitor', 0.3, 0.22),
+    makeItem('monitor', 0.7, 0.22),
+  ],
+  power_trio: [
+    makeItem('vocal_mic', 0.3, 0.4, 'Vocal guit'),
+    makeItem('guitar_stand', 0.22, 0.5, 'Guitarra'),
+    makeItem('guitar_amp', 0.15, 0.75),
+    makeItem('vocal_mic', 0.7, 0.4, 'Vocal baixo'),
+    makeItem('bass_stand', 0.78, 0.5, 'Baixo'),
+    makeItem('bass_amp', 0.85, 0.75),
+    makeItem('drum_kit', 0.5, 0.72, 'Bateria'),
+    makeItem('monitor', 0.2, 0.22),
+    makeItem('monitor', 0.5, 0.22),
+    makeItem('monitor', 0.8, 0.22),
+  ],
+  quartet: [
+    makeItem('vocal_mic', 0.5, 0.35, 'Vocal'),
+    makeItem('guitar_stand', 0.25, 0.45, 'Guitarra'),
+    makeItem('guitar_amp', 0.18, 0.72),
+    makeItem('bass_stand', 0.75, 0.45, 'Baixo'),
+    makeItem('bass_amp', 0.82, 0.72),
+    makeItem('drum_kit', 0.5, 0.7, 'Bateria'),
+    makeItem('monitor', 0.25, 0.2),
+    makeItem('monitor', 0.5, 0.2),
+    makeItem('monitor', 0.75, 0.2),
+  ],
+  five_piece: [
+    makeItem('vocal_mic', 0.5, 0.35, 'Vocal'),
+    makeItem('keyboard', 0.22, 0.45, 'Teclado'),
+    makeItem('guitar_stand', 0.38, 0.45, 'Guitarra'),
+    makeItem('guitar_amp', 0.35, 0.72),
+    makeItem('bass_stand', 0.62, 0.45, 'Baixo'),
+    makeItem('bass_amp', 0.65, 0.72),
+    makeItem('drum_kit', 0.78, 0.7, 'Bateria'),
+    makeItem('monitor', 0.2, 0.2),
+    makeItem('monitor', 0.4, 0.2),
+    makeItem('monitor', 0.6, 0.2),
+    makeItem('monitor', 0.8, 0.2),
+  ],
+  six_plus: [
+    makeItem('vocal_mic', 0.4, 0.35, 'Vocal 1'),
+    makeItem('vocal_mic', 0.6, 0.35, 'Vocal 2'),
+    makeItem('keyboard', 0.2, 0.45, 'Teclado'),
+    makeItem('guitar_stand', 0.35, 0.5, 'Guitarra'),
+    makeItem('guitar_amp', 0.3, 0.75),
+    makeItem('bass_stand', 0.62, 0.5, 'Baixo'),
+    makeItem('bass_amp', 0.68, 0.75),
+    makeItem('drum_kit', 0.5, 0.7, 'Bateria'),
+    makeItem('monitor', 0.2, 0.18),
+    makeItem('monitor', 0.4, 0.18),
+    makeItem('monitor', 0.6, 0.18),
+    makeItem('monitor', 0.8, 0.18),
+  ],
+  dj_setup: [
+    makeItem('custom_label', 0.5, 0.4, 'Setup DJ'),
+    makeItem('vocal_mic', 0.35, 0.3, 'Mic DJ'),
+    makeItem('monitor', 0.3, 0.18),
+    makeItem('monitor', 0.7, 0.18),
+    makeItem('power_outlet', 0.6, 0.5),
+  ],
+};
 
 const DEFAULT_MUSICIAN: MusicianSpec = {
   role: '',
@@ -63,6 +151,7 @@ const DEFAULT_INPUT: RiderInput = {
   contact_phone: '',
   stage_template: 'power_trio',
   musicians: TEMPLATE_PRESETS.power_trio!,
+  stage_items: STAGE_ITEM_PRESETS.power_trio ?? [],
   pa_minimum_watts: 2000,
   lighting: 'basic',
   lighting_notes: '',
@@ -88,10 +177,12 @@ export function RiderClient() {
 
   const selectTemplate = (template: StageTemplate) => {
     const preset = TEMPLATE_PRESETS[template] ?? [{ ...DEFAULT_MUSICIAN }];
+    const stagePreset = STAGE_ITEM_PRESETS[template] ?? [];
     setInput({
       ...input,
       stage_template: template,
       musicians: preset.map((m) => ({ ...m })),
+      stage_items: stagePreset.map((i) => ({ ...i, id: genId() })),
     });
   };
 
@@ -257,9 +348,21 @@ export function RiderClient() {
             ))}
           </section>
 
+          {/* ----------- MAPA DE PALCO ----------- */}
+          <section className="space-y-4 pt-4 border-t border-white/5">
+            <h2 className="text-lg font-bold text-white">4. Mapa de palco</h2>
+            <p className="text-xs text-brand-muted">
+              Posicione cada equipamento como vai ficar no palco. Clique num item da paleta pra adicionar, arraste pra reposicionar, clique pra editar o rotulo. O preset foi montado baseado no seu template — ajuste como quiser.
+            </p>
+            <StagePlotEditor
+              items={input.stage_items ?? []}
+              onChange={(items) => update('stage_items', items)}
+            />
+          </section>
+
           {/* ----------- SOM E ILUMINACAO ----------- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
-            <h2 className="text-lg font-bold text-white">4. Som e iluminacao</h2>
+            <h2 className="text-lg font-bold text-white">5. Som e iluminacao</h2>
             <Field label="Potencia minima de PA (watts)" hint="Regra geral: 10W por pessoa no publico. Ex: 200 pessoas = 2000w">
               <input
                 type="number"
@@ -314,7 +417,7 @@ export function RiderClient() {
 
           {/* ----------- RIDER PESSOAL ----------- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
-            <h2 className="text-lg font-bold text-white">5. Rider pessoal</h2>
+            <h2 className="text-lg font-bold text-white">6. Rider pessoal</h2>
             <div className="flex flex-wrap gap-6">
               <Checkbox label="Precisa de camarim" checked={input.dressing_room} onChange={(v) => update('dressing_room', v)} />
               <Checkbox label="Precisa de refeicoes" checked={input.meals_needed} onChange={(v) => update('meals_needed', v)} />
@@ -344,7 +447,7 @@ export function RiderClient() {
 
           {/* ----------- OBSERVACOES ----------- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
-            <h2 className="text-lg font-bold text-white">6. Observacoes especiais</h2>
+            <h2 className="text-lg font-bold text-white">7. Observacoes especiais</h2>
             <Field label="Qualquer coisa que nao cabe nos campos acima" hint="Sintetizadores custom, equipamento raro, protocolos especificos, etc.">
               <textarea
                 value={input.special_technical_notes ?? ''}

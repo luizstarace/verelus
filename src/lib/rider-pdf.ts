@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from 'pdf-lib';
-import type { RiderInput, MusicianSpec } from '@/lib/types/tools';
-import { STAGE_TEMPLATES } from '@/lib/types/tools';
+import type { RiderInput, MusicianSpec, StageItem, StageItemType } from '@/lib/types/tools';
+import { STAGE_TEMPLATES, STAGE_ITEM_META } from '@/lib/types/tools';
 
 // Paleta do Verelus (brand colors em rgb 0-1)
 const COLOR_ACCENT = rgb(0.0, 0.96, 0.63);    // verde brand
@@ -125,16 +125,16 @@ function drawKeyValue(ctx: DrawContext, label: string, value: string): DrawConte
   return c;
 }
 
-function drawStageDiagram(ctx: DrawContext, template: RiderInput['stage_template'], musicians: MusicianSpec[]): DrawContext {
-  let c = ensureSpace(ctx, 200);
+function drawStageDiagram(ctx: DrawContext, template: RiderInput['stage_template'], musicians: MusicianSpec[], stageItems?: StageItem[]): DrawContext {
+  let c = ensureSpace(ctx, 220);
   c = { ...c, cursorY: c.cursorY - 8 };
 
   const diagramWidth = PAGE_W - 2 * MARGIN;
-  const diagramHeight = 160;
+  const diagramHeight = 200;
   const diagramX = MARGIN;
   const diagramY = c.cursorY - diagramHeight;
 
-  // Fundo do diagrama
+  // Fundo do palco
   c.page.drawRectangle({
     x: diagramX,
     y: diagramY,
@@ -145,49 +145,190 @@ function drawStageDiagram(ctx: DrawContext, template: RiderInput['stage_template
     borderWidth: 0.5,
   });
 
-  // "PUBLICO" label
+  // Faixa do "PUBLICO" no fundo (em coordenadas PDF, frente do palco e o Y BAIXO da pagina)
+  // Items tem y=0 na "frente" (proximo do publico); no PDF, frente = bottom = diagramY (Y baixo)
+  const publicStripeHeight = 18;
+  c.page.drawRectangle({
+    x: diagramX,
+    y: diagramY,
+    width: diagramWidth,
+    height: publicStripeHeight,
+    color: rgb(0.0, 0.96, 0.63),
+    opacity: 0.08,
+  });
   c.page.drawText('PUBLICO', {
-    x: diagramX + diagramWidth / 2 - 20,
-    y: diagramY + 8,
-    size: 9,
+    x: diagramX + diagramWidth / 2 - 22,
+    y: diagramY + 6,
+    size: 10,
     font: c.fontBold,
-    color: COLOR_MUTED,
+    color: COLOR_ACCENT,
   });
 
-  // Posicionamento dos musicos — layout por template
-  const positions = computeStagePositions(template, musicians.length, diagramX, diagramY, diagramWidth, diagramHeight);
-
-  positions.forEach((pos, i) => {
-    const m = musicians[i];
-    if (!m) return;
-    // Circle representing musician
-    c.page.drawCircle({
-      x: pos.x,
-      y: pos.y,
-      size: 14,
-      color: COLOR_ACCENT,
+  // Se ha stage_items definidos, usa eles. Senao, fallback pro layout antigo por musicians.
+  if (stageItems && stageItems.length > 0) {
+    for (const item of stageItems) {
+      // x: 0=left, 1=right; y: 0=front (publico), 1=back (fundo)
+      // PDF: y=diagramY na frente, diagramY+diagramHeight no fundo
+      const px = diagramX + item.x * diagramWidth;
+      const py = diagramY + publicStripeHeight + (1 - item.y) * (diagramHeight - publicStripeHeight - 12);
+      drawStageItemIcon(c, item.type, px, py);
+      // label
+      const label = item.label || STAGE_ITEM_META[item.type].short;
+      const labelWidth = c.font.widthOfTextAtSize(label, 7);
+      c.page.drawText(label, {
+        x: px - labelWidth / 2,
+        y: py - 18,
+        size: 7,
+        font: c.font,
+        color: COLOR_TEXT,
+      });
+    }
+  } else {
+    // Fallback: layout antigo de musicos sem items posicionados
+    const positions = computeStagePositions(template, musicians.length, diagramX, diagramY + publicStripeHeight, diagramWidth, diagramHeight - publicStripeHeight);
+    positions.forEach((pos, i) => {
+      const m = musicians[i];
+      if (!m) return;
+      c.page.drawCircle({ x: pos.x, y: pos.y, size: 14, color: COLOR_ACCENT });
+      c.page.drawText(String(i + 1), {
+        x: pos.x - 3,
+        y: pos.y - 4,
+        size: 10,
+        font: c.fontBold,
+        color: rgb(0, 0, 0),
+      });
+      const label = m.role || `Musico ${i + 1}`;
+      const labelWidth = c.font.widthOfTextAtSize(label, 8);
+      c.page.drawText(label, {
+        x: pos.x - labelWidth / 2,
+        y: pos.y - 26,
+        size: 8,
+        font: c.font,
+        color: COLOR_TEXT,
+      });
     });
-    // Numero dentro
-    c.page.drawText(String(i + 1), {
-      x: pos.x - 3,
-      y: pos.y - 4,
-      size: 10,
-      font: c.fontBold,
-      color: rgb(0, 0, 0),
-    });
-    // Label do instrumento abaixo do circulo
-    const label = m.role || `Musico ${i + 1}`;
-    const labelWidth = c.font.widthOfTextAtSize(label, 8);
-    c.page.drawText(label, {
-      x: pos.x - labelWidth / 2,
-      y: pos.y - 26,
-      size: 8,
-      font: c.font,
-      color: COLOR_TEXT,
-    });
-  });
+  }
 
   return { ...c, cursorY: diagramY - 12 };
+}
+
+/**
+ * Desenha um icone simples de equipamento de palco no PDF, centrado em (cx, cy).
+ * Os icones sao versoes em primitivas geometricas dos icones SVG do editor.
+ * Cor accent verde brand.
+ */
+function drawStageItemIcon(ctx: DrawContext, type: StageItemType, cx: number, cy: number): void {
+  const accent = COLOR_ACCENT;
+  const dark = COLOR_TEXT;
+  const p = ctx.page;
+  const ICON_SIZE = 18; // raio max de cada icone
+
+  switch (type) {
+    case 'vocal_mic':
+    case 'instrument_mic': {
+      // mic stand: vertical line + circle on top + base
+      p.drawCircle({ x: cx, y: cy + 6, size: 3, color: dark });
+      p.drawLine({ start: { x: cx, y: cy + 3 }, end: { x: cx, y: cy - 6 }, thickness: 1.2, color: dark });
+      p.drawEllipse({ x: cx, y: cy - 7, xScale: 5, yScale: 1.5, color: dark });
+      break;
+    }
+    case 'drum_kit': {
+      // bass drum (large center) + snare + tom + floor tom + cymbal hints
+      p.drawCircle({ x: cx, y: cy - 1, size: 8, borderColor: dark, borderWidth: 1.2 });
+      p.drawCircle({ x: cx, y: cy - 1, size: 5, color: accent, opacity: 0.25 });
+      p.drawCircle({ x: cx - 8, y: cy + 4, size: 3, borderColor: dark, borderWidth: 1 });
+      p.drawCircle({ x: cx + 7, y: cy + 6, size: 2.5, borderColor: dark, borderWidth: 1 });
+      p.drawCircle({ x: cx + 8, y: cy - 3, size: 3, borderColor: dark, borderWidth: 1 });
+      // cymbal
+      p.drawEllipse({ x: cx - 10, y: cy + 9, xScale: 3, yScale: 0.7, color: dark });
+      p.drawEllipse({ x: cx + 11, y: cy + 9, xScale: 3, yScale: 0.7, color: dark });
+      break;
+    }
+    case 'guitar_amp': {
+      p.drawRectangle({ x: cx - 9, y: cy - 7, width: 18, height: 14, borderColor: dark, borderWidth: 1.2 });
+      p.drawLine({ start: { x: cx - 7, y: cy - 3 }, end: { x: cx + 7, y: cy - 3 }, thickness: 0.5, color: dark });
+      p.drawLine({ start: { x: cx - 7, y: cy }, end: { x: cx + 7, y: cy }, thickness: 0.5, color: dark });
+      p.drawLine({ start: { x: cx - 7, y: cy + 3 }, end: { x: cx + 7, y: cy + 3 }, thickness: 0.5, color: dark });
+      // knobs
+      p.drawCircle({ x: cx - 5, y: cy + 5, size: 0.6, color: dark });
+      p.drawCircle({ x: cx - 2, y: cy + 5, size: 0.6, color: dark });
+      p.drawCircle({ x: cx + 1, y: cy + 5, size: 0.6, color: dark });
+      break;
+    }
+    case 'bass_amp': {
+      p.drawRectangle({ x: cx - 9, y: cy - 5, width: 18, height: 12, borderColor: dark, borderWidth: 1.2 });
+      p.drawLine({ start: { x: cx - 7, y: cy }, end: { x: cx + 7, y: cy }, thickness: 0.5, color: dark });
+      p.drawLine({ start: { x: cx - 7, y: cy + 3 }, end: { x: cx + 7, y: cy + 3 }, thickness: 0.5, color: dark });
+      // segundo cabinet (base)
+      p.drawRectangle({ x: cx - 9, y: cy - 9, width: 18, height: 4, color: dark, opacity: 0.2 });
+      break;
+    }
+    case 'monitor': {
+      // wedge trapezoid (mais largo na base)
+      const points = [
+        { x: cx - 10, y: cy - 5 },
+        { x: cx + 10, y: cy - 5 },
+        { x: cx + 7, y: cy + 4 },
+        { x: cx - 7, y: cy + 4 },
+      ];
+      // Pdf-lib nao tem polygon direto, usa lines
+      for (let i = 0; i < points.length; i++) {
+        const a = points[i];
+        const b = points[(i + 1) % points.length];
+        p.drawLine({ start: a, end: b, thickness: 1.2, color: dark });
+      }
+      p.drawCircle({ x: cx, y: cy - 0.5, size: 2.5, color: accent, opacity: 0.4 });
+      break;
+    }
+    case 'di_box': {
+      p.drawRectangle({ x: cx - 6, y: cy - 4, width: 12, height: 8, borderColor: dark, borderWidth: 1.2 });
+      p.drawText('DI', { x: cx - 3.5, y: cy - 1.5, size: 5, font: ctx.fontBold, color: dark });
+      break;
+    }
+    case 'keyboard': {
+      // long thin rectangle
+      p.drawRectangle({ x: cx - 12, y: cy - 2, width: 24, height: 6, borderColor: dark, borderWidth: 1.1 });
+      // black keys
+      for (let i = -10; i <= 10; i += 4) {
+        p.drawRectangle({ x: cx + i, y: cy + 1, width: 1, height: 3, color: dark });
+      }
+      break;
+    }
+    case 'guitar_stand':
+    case 'bass_stand': {
+      // body (rounded rectangle aproximado)
+      p.drawRectangle({ x: cx - 5, y: cy - 7, width: 10, height: 8, borderColor: dark, borderWidth: 1.2 });
+      // sound hole / pickup
+      p.drawCircle({ x: cx, y: cy - 3, size: 1.2, color: dark });
+      // neck
+      p.drawRectangle({ x: cx - 1, y: cy + 1, width: 2, height: 8, color: dark });
+      // headstock
+      p.drawRectangle({ x: cx - 2.5, y: cy + 8, width: 5, height: 2, color: dark });
+      break;
+    }
+    case 'acoustic_guitar': {
+      // body oval
+      p.drawEllipse({ x: cx, y: cy - 3, xScale: 6, yScale: 5, borderColor: dark, borderWidth: 1.2 });
+      p.drawCircle({ x: cx, y: cy - 2, size: 1.3, color: dark });
+      p.drawRectangle({ x: cx - 1, y: cy + 2, width: 2, height: 8, color: dark });
+      p.drawRectangle({ x: cx - 2.5, y: cy + 9, width: 5, height: 2, color: dark });
+      break;
+    }
+    case 'power_outlet': {
+      p.drawCircle({ x: cx, y: cy, size: 7, borderColor: dark, borderWidth: 1.2 });
+      p.drawCircle({ x: cx - 2, y: cy + 1.5, size: 0.9, color: dark });
+      p.drawCircle({ x: cx + 2, y: cy + 1.5, size: 0.9, color: dark });
+      p.drawRectangle({ x: cx - 1.5, y: cy - 2.5, width: 3, height: 1, color: dark });
+      break;
+    }
+    case 'custom_label': {
+      // dashed rectangle (sem dash em pdf-lib, fazer pontilhado simples)
+      p.drawRectangle({ x: cx - 10, y: cy - 4, width: 20, height: 8, borderColor: dark, borderWidth: 1, opacity: 0.5 });
+      break;
+    }
+  }
+  // Indicador void de uso
+  void ICON_SIZE;
 }
 
 interface Position {
@@ -341,7 +482,7 @@ export async function generateRiderPDF(input: RiderInput): Promise<Uint8Array> {
 
   // ----------- DIAGRAMA DE PALCO -----------
   ctx = drawSectionHeader(ctx, 'Diagrama de palco');
-  ctx = drawStageDiagram(ctx, input.stage_template, input.musicians);
+  ctx = drawStageDiagram(ctx, input.stage_template, input.musicians, input.stage_items);
   ctx = drawDivider(ctx);
 
   // ----------- SOM E ILUMINACAO -----------

@@ -1,0 +1,326 @@
+import type { ChecklistItem, ChecklistInput, ReleaseType } from '@/lib/types/tools';
+
+/**
+ * Template base de checklist de lancamento.
+ * Curado com base em padroes de A&R / management indie BR.
+ *
+ * Filosofia:
+ * - D-56 (8 semanas antes): producao final + registro de direitos
+ * - D-28 (4 semanas): distribuidor + teaser strategy + press outreach inicial
+ * - D-14 (2 semanas): pre-save + final press outreach
+ * - D-7 (1 semana): countdown + ultimos ajustes
+ * - D-0 (lancamento): coordenacao multi-plataforma
+ * - D+14: analytics + retro + planejamento proximo
+ */
+
+const TEMPLATE: ChecklistItem[] = [
+  // ===== D-56 (8 semanas antes) — FUNDAMENTOS =====
+  {
+    id: 't56-master',
+    title: 'Finalizar masterizacao da(s) musica(s)',
+    description: 'Envie pra um mastering engineer ou use um servico online tipo LANDR. Receba os arquivos em WAV 24bit 44.1kHz.',
+    due_offset_days: -56,
+    phase: 'D-56',
+    category: 'production',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't56-artwork',
+    title: 'Finalizar artwork (capa) em alta resolucao',
+    description: 'Minimo 3000x3000px JPG/PNG. Cuide dos direitos da imagem — se usou foto de alguem, precisa ter autorizacao escrita.',
+    due_offset_days: -56,
+    phase: 'D-56',
+    category: 'production',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't56-metadata',
+    title: 'Preparar metadata completa',
+    description: 'Titulo, compositores, produtores, letra, ISRC (se ja tem), genero primario e secundario. Essa info vai pro distribuidor.',
+    due_offset_days: -56,
+    phase: 'D-56',
+    category: 'distribution',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't56-ecad',
+    title: 'Registrar obra no ECAD',
+    description: 'Essencial pra receber direitos autorais de execucao publica. Sem esse registro voce perde dinheiro de rádio, bares, shows. Gratuito.',
+    due_offset_days: -56,
+    phase: 'D-56',
+    category: 'rights',
+    link_url: 'https://www.ecad.org.br/',
+    link_label: 'Portal ECAD',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't56-producao-audiovisual',
+    title: 'Iniciar producao de video/clipe (se houver)',
+    description: 'Se planeja clipe oficial, comecar agora. Video demora mais que audio pra ficar pronto.',
+    due_offset_days: -56,
+    phase: 'D-56',
+    category: 'production',
+    applicable_for: { release_types: ['single', 'ep', 'album'], budgets: ['medio', 'pro'] },
+  },
+
+  // ===== D-28 (4 semanas antes) =====
+  {
+    id: 't28-distribuidor',
+    title: 'Submeter ao distribuidor (DistroKid / TuneCore / Onerpm)',
+    description: 'Pra lancar na data X, submeter no minimo 21 dias antes (recomendado 4 semanas). Isso garante pitch pro Spotify editorial via Spotify for Artists.',
+    due_offset_days: -28,
+    phase: 'D-28',
+    category: 'distribution',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't28-pitch-spotify',
+    title: 'Pitch pra playlist editorial do Spotify',
+    description: 'Use o Spotify for Artists -> Pitching. Submeta pelo menos 21 dias antes do lancamento. Escreva pitch especifico sobre o que a musica tem de unico.',
+    due_offset_days: -28,
+    phase: 'D-28',
+    category: 'distribution',
+    link_url: 'https://artists.spotify.com',
+    link_label: 'Spotify for Artists',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't28-pre-save',
+    title: 'Criar link de pre-save (Linkfire / Feature.fm / show.co)',
+    description: 'Pre-save antecipado conta como stream na primeira semana. Essencial pra chart e para o algoritmo do Spotify identificar momentum.',
+    due_offset_days: -28,
+    phase: 'D-28',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't28-teaser-concept',
+    title: 'Planejar estrategia de teaser (4-5 posts ate o release)',
+    description: 'Use a ferramenta Cronograma de Posts do Verelus ou monte manualmente: D-28 conceito, D-21 bastidores, D-14 trecho, D-7 countdown, D-0 release.',
+    due_offset_days: -28,
+    phase: 'D-28',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't28-press-list',
+    title: 'Montar lista de imprensa/blogs/curadores',
+    description: 'Identifique 10-20 veiculos/curadores relevantes pro seu genero. Anote email/forma de contato e tom especifico de cada um.',
+    due_offset_days: -28,
+    phase: 'D-28',
+    category: 'press',
+    applicable_for: { release_types: ['single', 'ep', 'album'], objectives: ['discovery', 'radio'] },
+  },
+
+  // ===== D-14 (2 semanas antes) =====
+  {
+    id: 't14-pitch-enviar',
+    title: 'Enviar pitch pra curadores e imprensa',
+    description: 'Use a ferramenta Pitch Kit do Verelus pra gerar email + 1-pager. Envie com link de pre-save + preview privado da musica.',
+    due_offset_days: -14,
+    phase: 'D-14',
+    category: 'press',
+    applicable_for: { release_types: ['single', 'ep', 'album'], objectives: ['discovery', 'radio'] },
+  },
+  {
+    id: 't14-pitch-playlists-independentes',
+    title: 'Submeter a playlists de curadores independentes (SubmitHub / Groover)',
+    description: 'Playlists independentes aceitam submissoes pagas. Calcule orcamento: R$15-30 por submissao no SubmitHub, 1-2 creditos Groover por curador.',
+    due_offset_days: -14,
+    phase: 'D-14',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'], objectives: ['discovery'], budgets: ['medio', 'pro'] },
+  },
+  {
+    id: 't14-confirmar-distribuidor',
+    title: 'Confirmar que o release esta "pending" e sem erros no distribuidor',
+    description: 'Checa o painel. Se ha erro de metadata (ex: genero invalido, titulo duplicado), resolve antes dos 7 dias criticos.',
+    due_offset_days: -14,
+    phase: 'D-14',
+    category: 'distribution',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't14-primeiro-teaser',
+    title: 'Postar primeiro teaser (conceitual)',
+    description: 'Revelar o mood/clima da musica. Nao mostre o audio ainda — gere curiosidade. Story + reel.',
+    due_offset_days: -14,
+    phase: 'D-14',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+
+  // ===== D-7 (1 semana antes) =====
+  {
+    id: 't7-second-teaser',
+    title: 'Postar teaser com trecho da musica (15-30s)',
+    description: 'Primeira vez que o publico ouve algo. Reel no IG, video vertical no TikTok, YouTube Shorts. Legenda com data do release.',
+    due_offset_days: -7,
+    phase: 'D-7',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't7-countdown',
+    title: 'Ativar countdown no Instagram Stories',
+    description: 'Sticker de countdown. Facil, gera lembrete automatico em quem se inscreve.',
+    due_offset_days: -7,
+    phase: 'D-7',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't7-release-party',
+    title: 'Planejar show/live ou listening party (opcional)',
+    description: 'Evento na data do release ou na semana. Pode ser show fisico, live no Instagram, ou listening party online. Cria ritual + conteudo.',
+    due_offset_days: -7,
+    phase: 'D-7',
+    category: 'live',
+    applicable_for: { release_types: ['ep', 'album'], budgets: ['medio', 'pro'] },
+  },
+  {
+    id: 't7-revalidar-links',
+    title: 'Testar todos os links do pre-save e verificar funcionamento',
+    description: 'Clica em cada link como se fosse um fa. Funciona pro Spotify? Pra Apple? Link do 1-pager abre? Resolve qualquer problema antes.',
+    due_offset_days: -7,
+    phase: 'D-7',
+    category: 'distribution',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+
+  // ===== D-0 (dia do lancamento) =====
+  {
+    id: 't0-post-launch',
+    title: 'Postar anuncio do release em todas as plataformas (8-10h)',
+    description: 'Coordenado: Reel IG, video TikTok, tweet, story. Cada um adaptado pra plataforma. Use o Pitch Kit do Verelus.',
+    due_offset_days: 0,
+    phase: 'D-0',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't0-stories-fas',
+    title: 'Compartilhar posts de fas que escutaram (ao longo do dia)',
+    description: 'Quem posta sobre sua musica, repostar nos seus stories. Cria efeito social + reciprocidade.',
+    due_offset_days: 0,
+    phase: 'D-0',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't0-pitch-now-playing',
+    title: 'Enviar musica pra playlists menores (em tempo real)',
+    description: 'Curadores de playlists pequenas frequentemente aceitam pitches no dia. Mande 5-10 DMs diretas pra contas ativas.',
+    due_offset_days: 0,
+    phase: 'D-0',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'], objectives: ['discovery'] },
+  },
+  {
+    id: 't0-live-reaction',
+    title: 'Fazer live no Instagram comemorando',
+    description: '10-15 minutos, informal. Responder perguntas, tocar trecho ao vivo, agradecer apoio. Nao precisa ser produzido.',
+    due_offset_days: 0,
+    phase: 'D-0',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't0-enviar-lista',
+    title: 'Enviar email/newsletter pra lista de fas',
+    description: 'Se voce tem mailing list, dispara anuncio. Taxa de abertura de email tende a ser muito maior que alcance organico de social.',
+    due_offset_days: 0,
+    phase: 'D-0',
+    category: 'marketing',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+
+  // ===== D+14 (2 semanas depois) =====
+  {
+    id: 't14p-analise-spotify',
+    title: 'Analisar performance no Spotify for Artists',
+    description: 'Quantos ouvintes novos? De onde vieram? Quais playlists tracionaram? Identifica padroes pra proximo release.',
+    due_offset_days: 14,
+    phase: 'D+14',
+    category: 'analytics',
+    link_url: 'https://artists.spotify.com',
+    link_label: 'Spotify for Artists',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't14p-realimentar-playlists',
+    title: 'Re-engajar com curadores que colocaram a musica',
+    description: 'Agradecer curadores com personal touch. Essa relacao vale pros proximos releases. Nao seja so transacional.',
+    due_offset_days: 14,
+    phase: 'D+14',
+    category: 'press',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't14p-retro',
+    title: 'Fazer retrospectiva do lancamento',
+    description: 'Anote: o que deu certo? O que nao funcionou? Quais canais tiveram melhor ROI? Usa isso no proximo release.',
+    due_offset_days: 14,
+    phase: 'D+14',
+    category: 'analytics',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+  {
+    id: 't14p-planejar-proximo',
+    title: 'Definir concept do proximo release',
+    description: 'O melhor momento pra planejar o proximo e logo apos um. Momentum > pausa. Define concept, datas, producao.',
+    due_offset_days: 14,
+    phase: 'D+14',
+    category: 'production',
+    applicable_for: { release_types: ['single', 'ep', 'album'] },
+  },
+];
+
+/**
+ * Filtra itens aplicaveis ao input do user.
+ * Template nao cobre 100% dos casos; user pode adicionar custom depois.
+ */
+export function buildChecklist(input: ChecklistInput): ChecklistItem[] {
+  return TEMPLATE.filter((item) => {
+    // Release type
+    if (!item.applicable_for.release_types.includes(input.release_type)) return false;
+    // Objetivo
+    if (item.applicable_for.objectives && !item.applicable_for.objectives.includes(input.objective)) return false;
+    // Budget
+    if (item.applicable_for.budgets && !item.applicable_for.budgets.includes(input.budget)) return false;
+    return true;
+  });
+}
+
+/**
+ * Calcula data absoluta de cada item a partir da release_date.
+ */
+export function calculateItemDueDate(release_date: string, offset_days: number): string {
+  const date = new Date(release_date + 'T12:00:00');
+  date.setDate(date.getDate() + offset_days);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export const PHASE_META: Record<ChecklistItem['phase'], { label: string; description: string }> = {
+  'D-56': { label: '8 semanas antes', description: 'Fundamentos: producao, artwork, registros' },
+  'D-28': { label: '4 semanas antes', description: 'Distribuidor e estrategia de teaser' },
+  'D-14': { label: '2 semanas antes', description: 'Pitches e primeiro teaser publico' },
+  'D-7': { label: '1 semana antes', description: 'Countdown e ajustes finais' },
+  'D-0': { label: 'Dia do lancamento', description: 'Coordenacao multi-plataforma' },
+  'D+14': { label: '2 semanas depois', description: 'Analise e planejamento proximo' },
+};
+
+export const CATEGORY_META: Record<ChecklistItem['category'], { label: string; color: string }> = {
+  production: { label: 'Producao', color: 'purple' },
+  distribution: { label: 'Distribuicao', color: 'blue' },
+  rights: { label: 'Direitos', color: 'yellow' },
+  marketing: { label: 'Marketing', color: 'green' },
+  press: { label: 'Imprensa', color: 'orange' },
+  live: { label: 'Ao vivo', color: 'red' },
+  analytics: { label: 'Analytics', color: 'pink' },
+};
+
+void buildChecklist;  // evitar unused warning se exported mas nao usado em um arquivo

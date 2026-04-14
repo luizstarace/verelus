@@ -416,3 +416,41 @@ export interface ReleaseTimingOutput {
   }>;
   strategy_summary: string;           // paragrafo geral
 }
+
+// ===================== CHECKLIST DE LANCAMENTO =====================
+
+export type ChecklistObjective = 'discovery' | 'monetization' | 'radio';
+export type ChecklistBudget = 'caseiro' | 'medio' | 'pro';
+
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  description: string;        // dica/explicacao
+  due_offset_days: number;    // dias relativos a release_date (negativo = antes; positivo = depois)
+  phase: 'D-56' | 'D-28' | 'D-14' | 'D-7' | 'D-0' | 'D+14';
+  link_url?: string;          // link util (ECAD, Spotify for Artists, etc)
+  link_label?: string;
+  category: 'production' | 'distribution' | 'rights' | 'marketing' | 'press' | 'live' | 'analytics';
+  applicable_for: {
+    release_types: ReleaseType[];
+    objectives?: ChecklistObjective[];
+    budgets?: ChecklistBudget[];
+  };
+}
+
+export interface ChecklistInput {
+  release_type: ReleaseType;
+  release_date: string;       // ISO YYYY-MM-DD
+  release_title: string;
+  objective: ChecklistObjective;
+  budget: ChecklistBudget;
+  platforms: Array<'spotify' | 'apple' | 'youtube_music' | 'deezer' | 'tidal' | 'soundcloud' | 'bandcamp'>;
+}
+
+export interface ChecklistInstance {
+  id: string;
+  user_id: string;
+  input: ChecklistInput;
+  items: Array<ChecklistItem & { completed: boolean; completed_at?: string; skipped?: boolean }>;
+  created_at: string;
+}

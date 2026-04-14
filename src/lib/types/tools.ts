@@ -204,3 +204,86 @@ export interface ContractOutput {
   pdf_base64: string;
   share_id: string;
 }
+
+// ===================== CACHE CALCULATOR =====================
+
+export type ArtistStage = 'seed' | 'emerging' | 'growing' | 'established' | 'reference';
+export type VenueType =
+  | 'bar_small'
+  | 'bar_medium'
+  | 'club_small'
+  | 'club_medium'
+  | 'club_large'
+  | 'theater_small'
+  | 'theater_large'
+  | 'festival_small'
+  | 'festival_large'
+  | 'corporate'
+  | 'private';
+
+export type CityTier = 'tier1' | 'tier2' | 'tier3' | 'tier4';
+
+export const STAGE_META: Record<ArtistStage, { label: string; listeners_desc: string }> = {
+  seed: { label: 'Inicial', listeners_desc: '<500 ouvintes mensais' },
+  emerging: { label: 'Emergente', listeners_desc: '500 a 5k' },
+  growing: { label: 'Consolidado', listeners_desc: '5k a 50k' },
+  established: { label: 'Estabelecido', listeners_desc: '50k a 500k' },
+  reference: { label: 'Referencia', listeners_desc: '500k+' },
+};
+
+export const VENUE_META: Record<VenueType, { label: string; capacity: string }> = {
+  bar_small: { label: 'Bar pequeno', capacity: '50-100 pessoas' },
+  bar_medium: { label: 'Bar/pub medio', capacity: '100-300 pessoas' },
+  club_small: { label: 'Casa de show pequena', capacity: '200-500 pessoas' },
+  club_medium: { label: 'Casa de show media', capacity: '500-1000 pessoas' },
+  club_large: { label: 'Casa de show grande', capacity: '1000-2000 pessoas' },
+  theater_small: { label: 'Teatro pequeno', capacity: 'ate 500 lugares' },
+  theater_large: { label: 'Teatro grande', capacity: '500+ lugares' },
+  festival_small: { label: 'Festival pequeno/local', capacity: 'ate 2000 pessoas' },
+  festival_large: { label: 'Festival grande', capacity: '2000+ pessoas' },
+  corporate: { label: 'Evento corporativo', capacity: 'variado' },
+  private: { label: 'Festa privada/casamento', capacity: 'variado' },
+};
+
+export const CITY_TIER_META: Record<CityTier, { label: string; example: string; multiplier: number }> = {
+  tier1: { label: 'Sao Paulo / Rio de Janeiro', example: 'SP, RJ', multiplier: 1.0 },
+  tier2: { label: 'Capital grande', example: 'BH, BSB, POA, Salvador, Recife, Fortaleza, Curitiba', multiplier: 0.85 },
+  tier3: { label: 'Outras capitais', example: 'Goiania, Belem, Natal, Joao Pessoa, etc.', multiplier: 0.75 },
+  tier4: { label: 'Cidade media/interior', example: 'Cidades menores', multiplier: 0.65 },
+};
+
+export interface CacheExpenses {
+  transport: number;          // ida e volta, em reais
+  accommodation: number;      // hospedagem
+  meals: number;              // alimentacao
+  hired_musicians: number;    // cache pros musicos contratados
+  equipment: number;          // equipamento extra
+  tech_crew: number;          // tecnico de som, roadie
+  commission: number;         // empresario/booking (geralmente 15-20%)
+  other: number;              // outros
+}
+
+export interface CacheInput {
+  // Perfil do artista
+  stage: ArtistStage;
+  monthly_listeners?: number;  // se conhecido
+  // Show
+  venue_type: VenueType;
+  show_city_tier: CityTier;
+  musicians_traveling: number;
+  // Despesas (em reais)
+  expenses: CacheExpenses;
+}
+
+export interface CacheResult {
+  suggested_min: number;        // cache minimo sugerido
+  suggested_median: number;     // cache mediano
+  suggested_max: number;        // cache maximo
+  total_expenses: number;       // soma das despesas
+  break_even: number;           // cache minimo pra nao dar prejuizo (= despesas)
+  profit_at_median: number;     // lucro se cobrar o median
+  margin_percent_at_median: number; // margem percentual
+  expense_breakdown: Array<{ label: string; value: number; percent: number }>;
+  alerts: string[];             // alertas inteligentes (prejuizo, cache baixo, etc.)
+  suggestions: string[];        // sugestoes de como negociar
+}

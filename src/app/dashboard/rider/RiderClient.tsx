@@ -1,0 +1,456 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import type { RiderInput, StageTemplate, MusicianSpec } from '@/lib/types/tools';
+import { STAGE_TEMPLATES } from '@/lib/types/tools';
+
+const DEFAULT_MUSICIAN: MusicianSpec = {
+  role: '',
+  instrument: '',
+  needs_mic: true,
+  needs_monitor: true,
+  needs_di: false,
+  notes: '',
+};
+
+const TEMPLATE_PRESETS: Partial<Record<StageTemplate, MusicianSpec[]>> = {
+  solo_acoustic: [
+    { role: 'Vocal + violao', instrument: 'Violao aco + voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: true },
+  ],
+  solo_electric: [
+    { role: 'Vocal + guitarra', instrument: 'Guitarra eletrica + voz', needs_mic: true, needs_monitor: true, needs_di: true },
+  ],
+  duo: [
+    { role: 'Vocal 1', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Vocal 2', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
+  ],
+  power_trio: [
+    { role: 'Guitarra + vocal', instrument: 'Guitarra eletrica + voz', needs_mic: true, needs_monitor: true, needs_di: true },
+    { role: 'Baixo', instrument: 'Baixo eletrico', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Bateria', instrument: 'Bateria 5 pecas', needs_mic: true, needs_monitor: true, needs_di: false },
+  ],
+  quartet: [
+    { role: 'Vocal', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Guitarra', instrument: 'Guitarra eletrica', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Baixo', instrument: 'Baixo eletrico', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Bateria', instrument: 'Bateria 5 pecas', needs_mic: true, needs_monitor: true, needs_di: false },
+  ],
+  five_piece: [
+    { role: 'Vocal', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Guitarra 1', instrument: 'Guitarra eletrica', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Guitarra 2 / Tecladista', instrument: 'Guitarra ou teclado', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Baixo', instrument: 'Baixo eletrico', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Bateria', instrument: 'Bateria 5 pecas', needs_mic: true, needs_monitor: true, needs_di: false },
+  ],
+  six_plus: [
+    { role: 'Vocal principal', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Vocal backing', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Guitarra', instrument: 'Guitarra eletrica', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Baixo', instrument: 'Baixo eletrico', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Teclado', instrument: 'Teclado stereo', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Bateria', instrument: 'Bateria 5 pecas', needs_mic: true, needs_monitor: true, needs_di: false },
+  ],
+  dj_setup: [
+    { role: 'DJ', instrument: 'Controladora / CDJ', needs_mic: false, needs_monitor: true, needs_di: false, notes: 'Precisa de mesa 2m minimo' },
+  ],
+};
+
+const DEFAULT_INPUT: RiderInput = {
+  artist_name: '',
+  contact_name: '',
+  contact_email: '',
+  contact_phone: '',
+  stage_template: 'power_trio',
+  musicians: TEMPLATE_PRESETS.power_trio!,
+  pa_minimum_watts: 2000,
+  lighting: 'basic',
+  lighting_notes: '',
+  soundcheck_minutes: 60,
+  dressing_room: true,
+  meals_needed: true,
+  meals_count: 3,
+  accommodation: false,
+  accommodation_details: '',
+  transport_notes: '',
+  special_technical_notes: '',
+};
+
+export function RiderClient() {
+  const [input, setInput] = useState<RiderInput>(DEFAULT_INPUT);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState<{ pdfBlob: Blob; shareId: string | null } | null>(null);
+
+  const update = <K extends keyof RiderInput>(key: K, value: RiderInput[K]) => {
+    setInput({ ...input, [key]: value });
+  };
+
+  const selectTemplate = (template: StageTemplate) => {
+    const preset = TEMPLATE_PRESETS[template] ?? [{ ...DEFAULT_MUSICIAN }];
+    setInput({
+      ...input,
+      stage_template: template,
+      musicians: preset.map((m) => ({ ...m })),
+    });
+  };
+
+  const updateMusician = (index: number, changes: Partial<MusicianSpec>) => {
+    const updated = [...input.musicians];
+    updated[index] = { ...updated[index], ...changes };
+    setInput({ ...input, musicians: updated });
+  };
+
+  const addMusician = () => {
+    setInput({ ...input, musicians: [...input.musicians, { ...DEFAULT_MUSICIAN }] });
+  };
+
+  const removeMusician = (index: number) => {
+    if (input.musicians.length <= 1) return;
+    const updated = input.musicians.filter((_, i) => i !== index);
+    setInput({ ...input, musicians: updated });
+  };
+
+  const canSubmit =
+    input.artist_name.trim().length > 0 &&
+    input.contact_name.trim().length > 0 &&
+    input.contact_email.trim().length > 0 &&
+    input.contact_phone.trim().length > 0 &&
+    input.musicians.every((m) => m.role.trim() && m.instrument.trim());
+
+  const generate = async () => {
+    setLoading(true);
+    setError('');
+    setResult(null);
+    try {
+      const res = await fetch('/api/tools/rider/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const err = (await res.json()) as { error: string };
+        throw new Error(err.error);
+      }
+      const data = (await res.json()) as { pdf_base64: string; share_id: string | null };
+      const binary = Uint8Array.from(atob(data.pdf_base64), (c) => c.charCodeAt(0));
+      const blob = new Blob([binary], { type: 'application/pdf' });
+      setResult({ pdfBlob: blob, shareId: data.share_id });
+      setTimeout(() => document.getElementById('rider-result')?.scrollIntoView({ behavior: 'smooth' }), 80);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro desconhecido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadPdf = () => {
+    if (!result) return;
+    const url = URL.createObjectURL(result.pdfBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rider-${input.artist_name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const copyShareLink = async () => {
+    if (!result?.shareId) return;
+    const url = `${window.location.origin}/api/rider/${result.shareId}`;
+    await navigator.clipboard.writeText(url);
+  };
+
+  return (
+    <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
+      <div className="max-w-3xl mx-auto">
+        <Link href="/dashboard" className="text-sm text-brand-muted hover:text-white mb-6 inline-block">
+          ← Voltar
+        </Link>
+
+        <h1 className="text-3xl font-bold mb-2">Rider Tecnico</h1>
+        <p className="text-brand-muted mb-10 leading-relaxed">
+          Responda sobre a banda e o setup. Geramos um PDF profissional com diagrama de palco, lista de instrumentos, rider pessoal e observacoes. Pronto pra enviar pra producao.
+        </p>
+
+        <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-6">
+          {/* ----------- CONTATO ----------- */}
+          <section className="space-y-4">
+            <h2 className="text-lg font-bold text-white">1. Contato da producao</h2>
+            <Field label="Nome artistico / banda" required>
+              <TextInput value={input.artist_name} onChange={(v) => update('artist_name', v)} placeholder="Ex: Ana Frango Eletrico" />
+            </Field>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Responsavel" required>
+                <TextInput value={input.contact_name} onChange={(v) => update('contact_name', v)} placeholder="Nome de quem cuida da producao" />
+              </Field>
+              <Field label="Telefone" required>
+                <TextInput value={input.contact_phone} onChange={(v) => update('contact_phone', v)} placeholder="(11) 99999-9999" />
+              </Field>
+            </div>
+            <Field label="E-mail" required>
+              <TextInput type="email" value={input.contact_email} onChange={(v) => update('contact_email', v)} placeholder="producao@seuartista.com" />
+            </Field>
+          </section>
+
+          {/* ----------- FORMATO ----------- */}
+          <section className="space-y-4 pt-4 border-t border-white/5">
+            <h2 className="text-lg font-bold text-white">2. Formato da banda</h2>
+            <p className="text-xs text-brand-muted">Escolha o formato mais proximo. Populamos os musicos automaticamente — voce ajusta depois.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {Object.entries(STAGE_TEMPLATES).map(([key, t]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => selectTemplate(key as StageTemplate)}
+                  className={`px-3 py-3 rounded-xl border text-left transition ${
+                    input.stage_template === key
+                      ? 'border-brand-green bg-brand-green/10 text-white'
+                      : 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20'
+                  }`}
+                >
+                  <div className="font-semibold text-sm">{t.label}</div>
+                  <div className="text-xs text-brand-muted mt-0.5">{t.description}</div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* ----------- MUSICOS ----------- */}
+          <section className="space-y-4 pt-4 border-t border-white/5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white">3. Musicos e instrumentacao</h2>
+              <button
+                type="button"
+                onClick={addMusician}
+                className="text-xs px-3 py-1.5 bg-brand-green/10 hover:bg-brand-green/20 text-brand-green rounded-lg"
+              >
+                + Adicionar musico
+              </button>
+            </div>
+            {input.musicians.map((m, i) => (
+              <div key={i} className="bg-white/[0.02] border border-white/10 rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs uppercase text-brand-muted font-mono">Musico {i + 1}</div>
+                  {input.musicians.length > 1 && (
+                    <button type="button" onClick={() => removeMusician(i)} className="text-xs text-red-400 hover:text-red-300">
+                      remover
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Field label="Funcao / Role">
+                    <TextInput value={m.role} onChange={(v) => updateMusician(i, { role: v })} placeholder="Ex: Vocal principal" />
+                  </Field>
+                  <Field label="Instrumento">
+                    <TextInput value={m.instrument} onChange={(v) => updateMusician(i, { instrument: v })} placeholder="Ex: Voz + SM58" />
+                  </Field>
+                </div>
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <Checkbox label="Precisa microfone" checked={m.needs_mic} onChange={(v) => updateMusician(i, { needs_mic: v })} />
+                  <Checkbox label="Precisa monitor" checked={m.needs_monitor} onChange={(v) => updateMusician(i, { needs_monitor: v })} />
+                  <Checkbox label="Precisa DI" checked={m.needs_di} onChange={(v) => updateMusician(i, { needs_di: v })} />
+                </div>
+                <Field label="Observacoes (opcional)">
+                  <TextInput value={m.notes ?? ''} onChange={(v) => updateMusician(i, { notes: v })} placeholder="Pedaleira, amp especifico, etc." />
+                </Field>
+              </div>
+            ))}
+          </section>
+
+          {/* ----------- SOM E ILUMINACAO ----------- */}
+          <section className="space-y-4 pt-4 border-t border-white/5">
+            <h2 className="text-lg font-bold text-white">4. Som e iluminacao</h2>
+            <Field label="Potencia minima de PA (watts)" hint="Regra geral: 10W por pessoa no publico. Ex: 200 pessoas = 2000w">
+              <input
+                type="number"
+                value={input.pa_minimum_watts}
+                onChange={(e) => update('pa_minimum_watts', Number(e.target.value))}
+                min={100}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-green/50"
+              />
+            </Field>
+            <Field label="Iluminacao">
+              <div className="grid grid-cols-3 gap-2">
+                {(['basic', 'scenic', 'custom'] as const).map((l) => (
+                  <button
+                    key={l}
+                    type="button"
+                    onClick={() => update('lighting', l)}
+                    className={`px-3 py-3 rounded-xl border font-semibold text-sm transition ${
+                      input.lighting === l
+                        ? 'border-brand-green bg-brand-green/10 text-white'
+                        : 'border-white/10 bg-white/[0.02] text-white/70'
+                    }`}
+                  >
+                    {l === 'basic' ? 'Basica' : l === 'scenic' ? 'Cenica' : 'Customizada'}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            {input.lighting !== 'basic' && (
+              <Field label="Detalhes da iluminacao">
+                <TextInput value={input.lighting_notes ?? ''} onChange={(v) => update('lighting_notes', v)} placeholder="Ex: 4 lights movel, nevoeiro, cores quentes" />
+              </Field>
+            )}
+            <Field label="Passagem de som minima (minutos)">
+              <div className="grid grid-cols-4 gap-2">
+                {([30, 60, 90, 120] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => update('soundcheck_minutes', m)}
+                    className={`px-3 py-3 rounded-xl border font-semibold text-sm transition ${
+                      input.soundcheck_minutes === m
+                        ? 'border-brand-green bg-brand-green/10 text-white'
+                        : 'border-white/10 bg-white/[0.02] text-white/70'
+                    }`}
+                  >
+                    {m}min
+                  </button>
+                ))}
+              </div>
+            </Field>
+          </section>
+
+          {/* ----------- RIDER PESSOAL ----------- */}
+          <section className="space-y-4 pt-4 border-t border-white/5">
+            <h2 className="text-lg font-bold text-white">5. Rider pessoal</h2>
+            <div className="flex flex-wrap gap-6">
+              <Checkbox label="Precisa de camarim" checked={input.dressing_room} onChange={(v) => update('dressing_room', v)} />
+              <Checkbox label="Precisa de refeicoes" checked={input.meals_needed} onChange={(v) => update('meals_needed', v)} />
+              <Checkbox label="Precisa de hospedagem" checked={input.accommodation} onChange={(v) => update('accommodation', v)} />
+            </div>
+            {input.meals_needed && (
+              <Field label="Quantas refeicoes?">
+                <input
+                  type="number"
+                  value={input.meals_count}
+                  onChange={(e) => update('meals_count', Number(e.target.value))}
+                  min={1}
+                  max={20}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-green/50"
+                />
+              </Field>
+            )}
+            {input.accommodation && (
+              <Field label="Detalhes da hospedagem">
+                <TextInput value={input.accommodation_details ?? ''} onChange={(v) => update('accommodation_details', v)} placeholder="Ex: 3 quartos single, check-in cedo" />
+              </Field>
+            )}
+            <Field label="Transporte (opcional)" hint="Ex: transfer aeroporto, van local">
+              <TextInput value={input.transport_notes ?? ''} onChange={(v) => update('transport_notes', v)} placeholder="Detalhes de transporte, se necessario" />
+            </Field>
+          </section>
+
+          {/* ----------- OBSERVACOES ----------- */}
+          <section className="space-y-4 pt-4 border-t border-white/5">
+            <h2 className="text-lg font-bold text-white">6. Observacoes especiais</h2>
+            <Field label="Qualquer coisa que nao cabe nos campos acima" hint="Sintetizadores custom, equipamento raro, protocolos especificos, etc.">
+              <textarea
+                value={input.special_technical_notes ?? ''}
+                onChange={(e) => update('special_technical_notes', e.target.value)}
+                rows={3}
+                placeholder="Deixe em branco se nao tiver"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 resize-none"
+              />
+            </Field>
+          </section>
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            onClick={generate}
+            disabled={!canSubmit || loading}
+            className="w-full px-6 py-4 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl disabled:opacity-50 transition"
+          >
+            {loading ? 'Gerando PDF...' : 'Gerar Rider'}
+          </button>
+          {!canSubmit && (
+            <p className="text-xs text-brand-muted text-center">
+              Preencha nome, contato e dados dos musicos pra liberar
+            </p>
+          )}
+        </div>
+
+        {result && (
+          <div id="rider-result" className="mt-12">
+            <h2 className="text-2xl font-bold text-white mb-4">Seu rider esta pronto</h2>
+            <div className="bg-brand-surface rounded-2xl border border-white/10 overflow-hidden">
+              <iframe
+                src={URL.createObjectURL(result.pdfBlob)}
+                className="w-full h-[600px] bg-white"
+                title="Preview do Rider"
+              />
+            </div>
+            <div className="flex flex-wrap gap-3 mt-4">
+              <button
+                onClick={downloadPdf}
+                className="px-5 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-semibold rounded-xl"
+              >
+                Baixar PDF
+              </button>
+              {result.shareId && (
+                <button
+                  onClick={copyShareLink}
+                  className="px-5 py-3 border border-white/10 text-white rounded-xl hover:bg-white/5"
+                >
+                  Copiar link compartilhavel
+                </button>
+              )}
+              <button
+                onClick={() => setResult(null)}
+                className="px-5 py-3 text-white/60 hover:text-white rounded-xl"
+              >
+                Editar novamente
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ----- Helpers de UI -----
+
+function Field({ label, required, hint, children }: { label: string; required?: boolean; hint?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-white mb-1">
+        {label} {required && <span className="text-brand-green">*</span>}
+      </label>
+      {hint && <p className="text-xs text-brand-muted mb-2">{hint}</p>}
+      {children}
+    </div>
+  );
+}
+
+function TextInput({ value, onChange, placeholder, type = 'text' }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+    />
+  );
+}
+
+function Checkbox({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="flex items-center gap-2 cursor-pointer select-none">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="w-4 h-4 accent-brand-green"
+      />
+      <span className="text-sm text-white/80">{label}</span>
+    </label>
+  );
+}

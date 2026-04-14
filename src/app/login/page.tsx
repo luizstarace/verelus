@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 
 function getSupabase() {
@@ -19,6 +19,20 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  // Detect errors coming back from auth callback (hash fragment or query param)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    const search = window.location.search;
+
+    if (hash.includes('otp_expired') || hash.includes('access_denied') || search.includes('auth_callback_error')) {
+      setMode('reset');
+      setError('Seu link de recuperacao expirou. Informe seu email abaixo para receber um novo.');
+      // Clean URL so reload doesn't keep the error
+      window.history.replaceState({}, '', '/login');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +53,11 @@ export default function LoginPage() {
         if (signUpError) throw signUpError;
         setMessage('Verifique seu email para confirmar o cadastro.');
       } else if (mode === 'reset') {
+        // Redirect to /auth/reset directly. The page listens for PASSWORD_RECOVERY event.
+        // If Supabase forces the Site URL, the homepage has a hash-fragment detector
+        // that forwards recovery links to /auth/reset.
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + '/auth/callback?next=/auth/reset',
+          redirectTo: window.location.origin + '/auth/reset',
         });
         if (resetError) throw resetError;
         setMessage('Email de recuperacao enviado. Verifique sua caixa de entrada.');

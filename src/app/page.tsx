@@ -3,6 +3,23 @@
 import { useState, useEffect } from "react";
 import { translations } from "@/lib/translations";
 
+// Detect Supabase Auth recovery/invite tokens in URL hash and redirect to reset page
+function useAuthRedirect() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash;
+    if (hash && (hash.includes("type=recovery") || hash.includes("type=invite"))) {
+      // Preserve the hash when redirecting so Supabase client can pick up the tokens
+      window.location.replace("/auth/reset" + hash);
+    }
+    // Also handle the case where Supabase sends tokens via query string
+    const search = window.location.search;
+    if (search && search.includes("type=recovery")) {
+      window.location.replace("/auth/reset" + search + hash);
+    }
+  }, []);
+}
+
 type Lang = "en" | "pt";
 
 function Waveform() {
@@ -122,6 +139,7 @@ function FeatureCard({ icon, title, desc, accent = "green" }: { icon: string; ti
 export default function Home() {
   const [lang, setLang] = useState<Lang>("pt");
   const t = translations[lang];
+  useAuthRedirect();
 
   return (
     <div className="relative min-h-screen">

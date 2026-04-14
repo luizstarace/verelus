@@ -14,24 +14,40 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [sessionOk, setSessionOk] = useState<boolean | null>(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Supabase sends a PASSWORD_RECOVERY event when the recovery link is clicked.
-    // The session is established automatically via the URL hash fragment.
     const supabase = getSupabase();
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
-        setReady(true);
+
+    // Parse tokens from hash fragment if present (implicit flow from Supabase recovery link)
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const params = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      if (accessToken && refreshToken) {
+        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }).then(({ error: setErr }) => {
+          if (setErr) {
+            setSessionOk(false);
+            setError('Link invalido ou expirado. Solicite um novo pela pagina de login.');
+          } else {
+            setSessionOk(true);
+            // Clean hash from URL for cleanliness
+            window.history.replaceState({}, '', '/auth/reset');
+          }
+        });
+        return;
+      }
+    }
+
+    // Fallback: check if there's already an active session (e.g., user came from /auth/callback)
+    supabase.auth.getSession().then(({ data }) => {
+      setSessionOk(!!data.session);
+      if (!data.session) {
+        setError('Nenhuma sessao de recuperacao ativa. Solicite um novo link pela pagina de login.');
       }
     });
-    // Also check current session in case event already fired
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-    });
-    return () => sub.subscription.unsubscribe();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,8 +95,11 @@ export default function ResetPasswordPage() {
         <div className="bg-brand-surface/80 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl shadow-black/20">
           <h2 className="text-xl font-semibold text-white mb-6">Definir nova senha</h2>
 
-          {!ready && !error && (
+          {sessionOk === null && !error && (
             <p className="text-white/60 text-sm mb-4">Validando link de recuperacao...</p>
+          )}
+          {sessionOk === true && (
+            <p className="text-brand-green/70 text-sm mb-4">Link valido. Defina sua nova senha abaixo.</p>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,7 +113,7 @@ export default function ResetPasswordPage() {
                 placeholder="Min. 6 caracteres"
                 required
                 minLength={6}
-                disabled={!ready}
+                disabled={sessionOk === false}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors disabled:opacity-50"
               />
             </div>
@@ -108,7 +127,7 @@ export default function ResetPasswordPage() {
                 placeholder="Repita a senha"
                 required
                 minLength={6}
-                disabled={!ready}
+                disabled={sessionOk === false}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors disabled:opacity-50"
               />
             </div>
@@ -127,7 +146,7 @@ export default function ResetPasswordPage() {
 
             <button
               type="submit"
-              disabled={loading || !ready}
+              disabled={loading || sessionOk !== true}
               className="w-full px-4 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-brand-green/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Salvando...' : 'Salvar nova senha'}

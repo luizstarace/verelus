@@ -22,7 +22,7 @@ const TOOLS: Tool[] = [
   { key: 'rider', name: 'Rider Tecnico', description: 'PDF profissional com diagrama de palco editavel', href: '/dashboard/rider', tier: 1, accent: 'green' },
   { key: 'contract', name: 'Contrato de Show', description: 'Contrato juridico BR pronto pra assinatura', href: '/dashboard/contract', tier: 1, accent: 'green' },
   // Tier 2 — em breve
-  { key: 'pitch-kit', name: 'Pitch Kit', description: 'Email + 1-pager + press release pra enviar a curador', href: null, tier: 2, accent: 'purple' },
+  { key: 'pitch-kit', name: 'Pitch Kit', description: 'Email + 1-pager + press release pra enviar a curador', href: '/dashboard/pitch-kit', tier: 2, accent: 'purple' },
   { key: 'release-timing', name: 'Quando Lancar', description: '3 datas ideais para o seu proximo lancamento', href: null, tier: 2, accent: 'purple' },
   { key: 'launch-checklist', name: 'Checklist de Lancamento', description: 'Planejamento de 8 semanas antes ao pos-release', href: null, tier: 2, accent: 'purple' },
   // Tier 3 — em breve

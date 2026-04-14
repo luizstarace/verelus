@@ -287,3 +287,98 @@ export interface CacheResult {
   alerts: string[];             // alertas inteligentes (prejuizo, cache baixo, etc.)
   suggestions: string[];        // sugestoes de como negociar
 }
+
+// ===================== PITCH KIT =====================
+
+export type PitchRecipientType =
+  | 'playlist_curator_indie'
+  | 'playlist_curator_mainstream'
+  | 'music_blog'
+  | 'radio_station'
+  | 'booker_small_venue'
+  | 'booker_festival'
+  | 'small_label'
+  | 'major_label'
+  | 'music_journalist'
+  | 'tastemaker_influencer';
+
+export const PITCH_RECIPIENT_META: Record<PitchRecipientType, { label: string; description: string }> = {
+  playlist_curator_indie: {
+    label: 'Curador de playlist indie',
+    description: 'Playlists menores, nicho, pessoal',
+  },
+  playlist_curator_mainstream: {
+    label: 'Curador de playlist mainstream',
+    description: 'Playlists grandes (50k+ followers)',
+  },
+  music_blog: {
+    label: 'Blog de musica',
+    description: 'Portal/blog editorial',
+  },
+  radio_station: {
+    label: 'Radio',
+    description: 'AM/FM, web radio, podcast musical',
+  },
+  booker_small_venue: {
+    label: 'Booker de casa de show',
+    description: 'Quem agenda shows em clubes e bares',
+  },
+  booker_festival: {
+    label: 'Booker de festival',
+    description: 'Curadoria de festival',
+  },
+  small_label: {
+    label: 'Selo independente',
+    description: 'Selo pequeno/nicho',
+  },
+  major_label: {
+    label: 'Gravadora/selo grande',
+    description: 'Major ou selo nacional',
+  },
+  music_journalist: {
+    label: 'Jornalista de musica',
+    description: 'Profissional de midia musical',
+  },
+  tastemaker_influencer: {
+    label: 'Influencer/tastemaker',
+    description: 'Perfil musical no Instagram/TikTok',
+  },
+};
+
+export type PitchTone = 'professional' | 'casual' | 'bold';
+export type PitchLanguage = 'pt' | 'en';
+
+export interface PitchInput {
+  // Sobre voce e a musica
+  artist_name: string;
+  song_spotify_url?: string;     // opcional — se informado, enriquece pitch
+  song_title: string;
+  genre_primary: string;
+  mood_keywords: string;         // ex: "melancolica, urgente, cinematica"
+  release_type: 'single' | 'ep' | 'album';
+  release_date?: string;         // ISO — 'unreleased' se ainda nao lancou
+
+  // Sobre conquistas (pra credibilidade)
+  achievements: string;          // 2-3 conquistas recentes em free text
+  similar_artists: string;       // 2-3 artistas similares pra dar referencia
+
+  // Destinatario
+  recipient_type: PitchRecipientType;
+  recipient_name: string;        // ex: "Ana Silva"
+  recipient_entity: string;      // ex: "Playlist Indie BR / Blog Tenho Mais Discos"
+
+  // Estilo
+  tone: PitchTone;
+  language: PitchLanguage;
+}
+
+export interface PitchOutput {
+  email_subject: string;
+  email_body: string;
+  one_pager: {
+    short_bio: string;           // ate 500 chars
+    highlights: string[];        // 3-4 bullets
+    hook_line: string;           // 1 frase marcante
+  };
+  press_release: string;         // texto completo
+}

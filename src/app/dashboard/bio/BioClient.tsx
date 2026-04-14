@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import type { BioInput, BioOutput, Tone, Language } from '@/lib/types/tools';
 import { BIO_CHAR_LIMITS } from '@/lib/types/tools';
+import { ToolPageHeader } from '@/components/ToolPageHeader';
+import { ToolIcon } from '@/components/ToolIcon';
 
 const TONE_OPTIONS: Array<{ value: Tone; label: string; hint: string }> = [
   { value: 'formal', label: 'Formal', hint: 'profissional, editorial' },
@@ -151,14 +152,12 @@ export function BioClient() {
   return (
     <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <Link href="/dashboard" className="text-sm text-brand-muted hover:text-white mb-6 inline-block">
-          ← Voltar
-        </Link>
-
-        <h1 className="text-3xl font-bold mb-2">Bio Adaptativa</h1>
-        <p className="text-brand-muted mb-10 leading-relaxed">
-          Responde 6 perguntas curtas e recebe 4 bios profissionais otimizadas pra Spotify, Instagram, EPK e Twitter. Cada uma no tamanho exato e tom da plataforma.
-        </p>
+        <ToolPageHeader
+          title="Bio Adaptativa"
+          description="Responde 6 perguntas curtas e recebe 4 bios profissionais otimizadas pra Spotify, Instagram, EPK e Twitter. Cada uma no tamanho exato e tom da plataforma."
+          icon={<ToolIcon tool="bio" size={22} />}
+          accent="green"
+        />
 
         <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-5">
           <Field label="Nome artistico" required>

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import type { RiderInput, StageTemplate, MusicianSpec, StageItem, StageItemType } from '@/lib/types/tools';
 import { STAGE_TEMPLATES } from '@/lib/types/tools';
 import { StagePlotEditor } from '@/components/rider/StagePlotEditor';
+import { ToolPageHeader } from '@/components/ToolPageHeader';
+import { ToolIcon } from '@/components/ToolIcon';
 
 function genId(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -254,14 +255,12 @@ export function RiderClient() {
   return (
     <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <Link href="/dashboard" className="text-sm text-brand-muted hover:text-white mb-6 inline-block">
-          ← Voltar
-        </Link>
-
-        <h1 className="text-3xl font-bold mb-2">Rider Tecnico</h1>
-        <p className="text-brand-muted mb-10 leading-relaxed">
-          Responda sobre a banda e o setup. Geramos um PDF profissional com diagrama de palco, lista de instrumentos, rider pessoal e observacoes. Pronto pra enviar pra producao.
-        </p>
+        <ToolPageHeader
+          title="Rider Tecnico"
+          description="Responda sobre a banda e o setup. Geramos um PDF profissional com diagrama de palco, lista de instrumentos, rider pessoal e observacoes. Pronto pra enviar pra producao."
+          icon={<ToolIcon tool="rider" size={22} />}
+          accent="green"
+        />
 
         <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-6">
           {/* ----------- CONTATO ----------- */}

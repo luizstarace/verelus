@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import type { ContractInput, ContractParty } from '@/lib/types/tools';
+import { ToolPageHeader } from '@/components/ToolPageHeader';
+import { ToolIcon } from '@/components/ToolIcon';
 
 const DEFAULT_PARTY: ContractParty = {
   type: 'pf',
@@ -156,14 +157,12 @@ export function ContractClient() {
   return (
     <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <Link href="/dashboard" className="text-sm text-brand-muted hover:text-white mb-6 inline-block">
-          ← Voltar
-        </Link>
-
-        <h1 className="text-3xl font-bold mb-2">Contrato de Show</h1>
-        <p className="text-brand-muted mb-6 leading-relaxed">
-          6 passos rapidos. Geramos um contrato juridico BR profissional pronto pra assinatura, com disclaimer legal claro.
-        </p>
+        <ToolPageHeader
+          title="Contrato de Show"
+          description="6 passos rapidos. Geramos um contrato juridico BR profissional pronto pra assinatura, com disclaimer legal claro."
+          icon={<ToolIcon tool="contract" size={22} />}
+          accent="green"
+        />
 
         {/* Stepper */}
         <div className="flex items-center gap-1 mb-8 overflow-x-auto">

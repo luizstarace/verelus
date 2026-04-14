@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 import type {
   CacheInput,
   ArtistStage,
@@ -11,6 +10,8 @@ import type {
 } from '@/lib/types/tools';
 import { STAGE_META, VENUE_META, CITY_TIER_META } from '@/lib/types/tools';
 import { calculateCache, inferStageFromListeners } from '@/lib/cache-reference-table';
+import { ToolPageHeader } from '@/components/ToolPageHeader';
+import { ToolIcon } from '@/components/ToolIcon';
 
 const DEFAULT_EXPENSES: CacheExpenses = {
   transport: 0,
@@ -88,14 +89,12 @@ export function CacheClient() {
   return (
     <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
       <div className="max-w-5xl mx-auto">
-        <Link href="/dashboard" className="text-sm text-brand-muted hover:text-white mb-6 inline-block">
-          ← Voltar
-        </Link>
-
-        <h1 className="text-3xl font-bold mb-2">Calculadora de Cache</h1>
-        <p className="text-brand-muted mb-10 leading-relaxed">
-          Em 2 minutos voce sabe <strong className="text-white">quanto cobrar</strong> e <strong className="text-white">quanto sobra no bolso</strong>. Baseado em dados reais do mercado indie BR.
-        </p>
+        <ToolPageHeader
+          title="Calculadora de Cache"
+          description="Em 2 minutos voce sabe quanto cobrar e quanto sobra no bolso. Baseado em dados reais do mercado indie BR."
+          icon={<ToolIcon tool="cache" size={22} />}
+          accent="green"
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* ===================== INPUTS ===================== */}

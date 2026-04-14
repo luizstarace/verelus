@@ -6,7 +6,7 @@ export function ToolRestructuring({ name }: { name: string }) {
       <div className="max-w-md text-center">
         <h1 className="text-3xl font-bold mb-4">{name} esta em reestruturacao</h1>
         <p className="text-brand-muted mb-8">
-          Estamos refocando o Verulus em inteligencia de carreira. Essa ferramenta volta em breve, muito melhor e contextualizada com o seu diagnostico.
+          Estamos refocando o Verelus em inteligencia de carreira. Essa ferramenta volta em breve, muito melhor e contextualizada com o seu diagnostico.
         </p>
         <Link
           href="/dashboard"

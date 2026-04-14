@@ -1,5 +1,7 @@
 # Phase 1 — MVP Diagnostico Funcional — Implementation Plan
 
+> **STATUS: SUPERSEDED** — este plano foi substituido pelo pivot Toolbox R$29/mes. Arquivado como historico. A direcao atual esta em `/Users/luizsfap/.claude/plans/dynamic-knitting-adleman.md` e a implementacao executada sera uma Toolbox de 11 ferramentas + 2 bonus, nao o diagnostico descrito abaixo.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Entregar o MVP funcional do pivot — usuario faz onboarding (Spotify URL + survey), recebe estagio calculado, diagnostico personalizado e plano de 90 dias num dashboard simples mas completo.
@@ -70,7 +72,7 @@ Todos os modulos atuais em `src/app/dashboard/(tools)/*` ou sub-rotas equivalent
 - [ ] **Step 1: Criar app no Spotify Developer Dashboard**
 
 Manual: acessa https://developer.spotify.com/dashboard, clica em "Create app", preenche:
-- Name: `Verulus`
+- Name: `Verelus`
 - Description: `Career intelligence platform for independent artists`
 - Redirect URI: `https://verelus.com/api/auth/spotify/callback` (ainda nao usamos mas preenche)
 - APIs: selecionar "Web API"
@@ -152,7 +154,7 @@ git commit -m "chore: adicionar variaveis Spotify ao .env.example"
 Criar `supabase/migrations/002_career_intelligence.sql` com:
 
 ```sql
--- Verulus Career Intelligence Schema
+-- Verelus Career Intelligence Schema
 -- Phase 1 MVP: artist_data, artist_survey, diagnostics, action_progress
 
 -- Dados do artista capturados do Spotify
@@ -291,7 +293,7 @@ Criar `src/lib/types/career.ts` com:
 
 ```typescript
 /**
- * Tipos do sistema de Career Intelligence do Verulus.
+ * Tipos do sistema de Career Intelligence do Verelus.
  * Define estrutura de estagios, dimensoes, survey, e diagnostic.
  */
 
@@ -2481,7 +2483,7 @@ export default async function DashboardHome() {
   return (
     <div className="min-h-screen bg-brand-dark text-white px-4 py-12">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Bem-vindo ao Verulus</h1>
+        <h1 className="text-4xl font-bold mb-8">Bem-vindo ao Verelus</h1>
         {latest ? (
           <div className="bg-brand-surface rounded-2xl p-8 border border-white/10">
             <p className="text-brand-muted text-sm mb-2">Seu diagnostico mais recente</p>
@@ -2543,7 +2545,7 @@ export function ToolRestructuring({ name }: { name: string }) {
       <div className="max-w-md text-center">
         <h1 className="text-3xl font-bold mb-4">{name} esta em reestruturacao</h1>
         <p className="text-brand-muted mb-8">
-          Estamos refocando o Verulus em inteligencia de carreira. Essa ferramenta volta em breve, muito melhor e contextualizada com o seu diagnostico.
+          Estamos refocando o Verelus em inteligencia de carreira. Essa ferramenta volta em breve, muito melhor e contextualizada com o seu diagnostico.
         </p>
         <Link href="/dashboard" className="inline-block px-6 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl">
           Voltar ao dashboard

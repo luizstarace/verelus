@@ -1,5 +1,5 @@
 /**
- * Tipos do sistema de Career Intelligence do Verulus.
+ * Tipos do sistema de Career Intelligence do Verelus.
  * Define estrutura de estagios, dimensoes, survey, e diagnostic.
  */
 

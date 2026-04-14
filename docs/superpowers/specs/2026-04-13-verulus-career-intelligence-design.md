@@ -1,14 +1,14 @@
-# Verulus — Career Intelligence Platform (Pivot)
+# Verelus — Career Intelligence Platform (Pivot)
 
 **Date:** 2026-04-13
-**Status:** Design approved, ready for implementation plan
+**Status:** SUPERSEDED — substituido pelo pivot Toolbox R$29/mes. Este documento fica arquivado como historico da direcao anterior (Career Intelligence premium R$197-1997/mes). A direcao atual esta no plano `/Users/luizsfap/.claude/plans/dynamic-knitting-adleman.md`.
 **Owner:** @luizsfap
 
 ---
 
 ## Context
 
-O Verulus foi construido como um conjunto de 11 ferramentas geradoras de conteudo com IA (press release, setlist, social posts, contratos, etc). Em producao ja existe:
+O Verelus foi construido como um conjunto de 11 ferramentas geradoras de conteudo com IA (press release, setlist, social posts, contratos, etc). Em producao ja existe:
 - Stripe live mode processando pagamentos (R$97 Pro / R$297 Business)
 - Supabase Auth (Google + email/senha)
 - Deploy no Cloudflare Pages (verelus.com)
@@ -26,11 +26,11 @@ As ferramentas existem mas sao genericas — geram conteudo sem contexto do arti
 
 ## Visao e Posicionamento
 
-**Verulus e:** Inteligencia de carreira para artistas independentes em portugues brasileiro/LATAM.
+**Verelus e:** Inteligencia de carreira para artistas independentes em portugues brasileiro/LATAM.
 
 **Tagline de trabalho:** "Descubra em que estagio sua carreira esta — e exatamente o que fazer a seguir."
 
-**O que Verulus nao e:**
+**O que Verelus nao e:**
 - Nao e distribuidor (DistroKid, TuneCore)
 - Nao e plataforma de pitch (SubmitHub, Groover)
 - Nao e analytics puro (Chartmetric, Soundcharts)

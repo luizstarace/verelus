@@ -38,7 +38,7 @@ export default async function DashboardHome() {
   return (
     <div className="min-h-screen bg-brand-dark text-white px-4 py-12">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Bem-vindo ao Verulus</h1>
+        <h1 className="text-4xl font-bold mb-8">Bem-vindo ao Verelus</h1>
         {latest ? (
           <div className="bg-brand-surface rounded-2xl p-8 border border-white/10">
             <p className="text-brand-muted text-sm mb-2">Seu diagnostico mais recente</p>

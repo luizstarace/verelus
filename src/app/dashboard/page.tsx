@@ -27,9 +27,9 @@ const TOOLS: Tool[] = [
   { key: 'launch-checklist', name: 'Checklist de Lancamento', description: 'Planejamento de 8 semanas antes ao pos-release', href: '/dashboard/launch-checklist', tier: 2, accent: 'purple' },
   // Tier 3 — em breve
   { key: 'growth', name: 'Growth Tracker', description: 'Painel semanal do seu crescimento real nas plataformas', href: '/dashboard/growth', tier: 3, accent: 'orange' },
-  { key: 'competitors', name: 'Comparador de Concorrentes', description: 'Voce vs 3 artistas similares, ao longo do tempo', href: null, tier: 3, accent: 'orange' },
-  { key: 'goals', name: 'Meta Tracker', description: 'Defina e acompanhe metas concretas de carreira', href: null, tier: 3, accent: 'orange' },
-  { key: 'content-calendar', name: 'Cronograma de Posts', description: '30 dias de posts sugeridos pro seu lancamento', href: null, tier: 3, accent: 'orange' },
+  { key: 'competitors', name: 'Comparador de Concorrentes', description: 'Voce vs 3 artistas similares, ao longo do tempo', href: '/dashboard/competitors', tier: 3, accent: 'orange' },
+  { key: 'goals', name: 'Meta Tracker', description: 'Defina e acompanhe metas concretas de carreira', href: '/dashboard/goals', tier: 3, accent: 'orange' },
+  { key: 'content-calendar', name: 'Cronograma de Posts', description: '30 dias de posts sugeridos pro seu lancamento', href: '/dashboard/content-calendar', tier: 3, accent: 'orange' },
 ];
 
 const ACCENT_BG: Record<Tool['accent'], string> = {

@@ -500,3 +500,118 @@ export interface GrowthDashboardData {
   last_updated: Record<GrowthSource, string | null>;
   weekly_insight?: string;            // gerado IA, atualizado no cron
 }
+
+// ===================== COMPARADOR DE CONCORRENTES =====================
+
+export interface Competitor {
+  id: string;
+  user_id: string;
+  spotify_artist_url: string;
+  spotify_artist_id?: string;
+  youtube_channel_url?: string;
+  youtube_channel_id?: string;
+  display_name: string;
+  created_at: string;
+}
+
+export interface CompetitorSnapshot {
+  id: string;
+  competitor_id: string;
+  source: 'spotify' | 'youtube';
+  metric_value: number;
+  snapshot_date: string;
+  created_at: string;
+}
+
+export interface CompetitorWithData extends Competitor {
+  current: { spotify: number | null; youtube: number | null };
+  history: Array<{ date: string; spotify?: number; youtube?: number }>;
+  last_updated: string | null;
+}
+
+export interface ComparisonDashboard {
+  you: {
+    display_name: string;
+    current: { spotify: number | null; youtube: number | null };
+    history: Array<{ date: string; spotify?: number; youtube?: number }>;
+  };
+  competitors: CompetitorWithData[];
+  insight?: string;
+}
+
+// ===================== META TRACKER =====================
+
+export type GoalMetric = 'spotify_listeners' | 'youtube_subscribers' | 'instagram_followers' | 'tiktok_followers';
+
+export const GOAL_METRIC_META: Record<GoalMetric, { label: string; source: GrowthSource }> = {
+  spotify_listeners: { label: 'Ouvintes Spotify', source: 'spotify' },
+  youtube_subscribers: { label: 'Inscritos YouTube', source: 'youtube' },
+  instagram_followers: { label: 'Seguidores Instagram', source: 'instagram' },
+  tiktok_followers: { label: 'Seguidores TikTok', source: 'tiktok' },
+};
+
+export interface Goal {
+  id: string;
+  user_id: string;
+  title: string;              // ex: "10k ouvintes ate julho"
+  metric: GoalMetric;
+  target_value: number;
+  start_value: number;        // valor no dia da criacao
+  target_date: string;        // ISO YYYY-MM-DD
+  status: 'active' | 'achieved' | 'abandoned';
+  achieved_at?: string;
+  created_at: string;
+}
+
+export interface GoalProgress {
+  goal: Goal;
+  current_value: number | null;
+  progress_pct: number;                  // 0-100 (pode exceder 100 se bateu meta)
+  days_elapsed: number;
+  days_remaining: number;
+  required_per_week: number;             // quanto precisa crescer por semana
+  actual_per_week: number | null;        // ritmo atual (ultimas 4 semanas)
+  projected_eta: string | null;          // ISO date — onde vai chegar no ritmo atual
+  status: 'on_track' | 'tight' | 'behind' | 'achieved';
+  recommendation: string;
+}
+
+// ===================== CRONOGRAMA DE POSTS =====================
+
+export type PostPlatform = 'instagram_reel' | 'instagram_feed' | 'instagram_story' | 'tiktok' | 'twitter' | 'youtube_shorts';
+
+export const POST_PLATFORM_META: Record<PostPlatform, { label: string; format: string }> = {
+  instagram_reel: { label: 'Instagram Reel', format: 'Video vertical 9:16, ate 60s' },
+  instagram_feed: { label: 'Instagram Feed', format: 'Foto/carrossel 4:5 ou 1:1' },
+  instagram_story: { label: 'Instagram Story', format: 'Vertical efemero 24h' },
+  tiktok: { label: 'TikTok', format: 'Video vertical 9:16' },
+  twitter: { label: 'Twitter/X', format: 'Texto + midia' },
+  youtube_shorts: { label: 'YouTube Shorts', format: 'Video vertical ate 60s' },
+};
+
+export interface ContentCalendarInput {
+  release_date: string;       // ISO YYYY-MM-DD
+  release_type: ReleaseType;
+  song_title: string;
+  mood: string;               // ex: "melancolica, urgente"
+  genre: string;
+  platforms: PostPlatform[];
+  artist_name: string;
+}
+
+export interface PostSuggestion {
+  day_offset: number;         // dias relativos ao lancamento (-30 a +7)
+  suggested_date: string;     // ISO
+  platform: PostPlatform;
+  post_type: string;          // ex: "Teaser conceitual", "Bastidores", "Countdown"
+  caption_draft: string;      // texto sugerido
+  hashtags: string[];
+  image_prompt?: string;      // prompt pra gerar visual (DALL-E/Midjourney/Flux)
+  best_time?: string;         // ex: "20h-22h"
+  notes?: string;             // dicas especificas
+}
+
+export interface ContentCalendarOutput {
+  summary: string;            // paragrafo contextual
+  posts: PostSuggestion[];
+}

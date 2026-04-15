@@ -454,3 +454,49 @@ export interface ChecklistInstance {
   items: Array<ChecklistItem & { completed: boolean; completed_at?: string; skipped?: boolean }>;
   created_at: string;
 }
+
+// ===================== GROWTH TRACKER =====================
+
+export type GrowthSource = 'spotify' | 'youtube' | 'instagram' | 'tiktok';
+
+export const GROWTH_SOURCE_META: Record<GrowthSource, { label: string; metric_label: string }> = {
+  spotify: { label: 'Spotify', metric_label: 'ouvintes mensais' },
+  youtube: { label: 'YouTube', metric_label: 'inscritos' },
+  instagram: { label: 'Instagram', metric_label: 'seguidores' },
+  tiktok: { label: 'TikTok', metric_label: 'seguidores' },
+};
+
+export interface GrowthProfile {
+  user_id: string;
+  spotify_artist_url?: string;       // URL do Spotify do artista
+  youtube_channel_id?: string;        // ID ou handle do canal YouTube
+  youtube_channel_url?: string;
+  instagram_handle?: string;          // @handle
+  tiktok_handle?: string;             // @handle
+  enabled: boolean;                   // true = participando do cron semanal
+}
+
+export interface GrowthSnapshot {
+  id: string;
+  user_id: string;
+  source: GrowthSource;
+  metric_value: number;
+  snapshot_date: string;              // ISO date (YYYY-MM-DD)
+  created_at: string;
+}
+
+export interface GrowthHistoryEntry {
+  source: GrowthSource;
+  value: number;
+  date: string;
+}
+
+export interface GrowthDashboardData {
+  profile: GrowthProfile;
+  current: Record<GrowthSource, number | null>;
+  previous_week: Record<GrowthSource, number | null>;
+  delta_pct: Record<GrowthSource, number | null>;
+  history: Record<GrowthSource, Array<{ date: string; value: number }>>;
+  last_updated: Record<GrowthSource, string | null>;
+  weekly_insight?: string;            // gerado IA, atualizado no cron
+}

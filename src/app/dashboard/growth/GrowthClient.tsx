@@ -5,6 +5,9 @@ import type { GrowthDashboardData, GrowthSource } from '@/lib/types/tools';
 import { GROWTH_SOURCE_META } from '@/lib/types/tools';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { InputModal } from '@/components/ui/InputModal';
 
 type View = 'dashboard' | 'setup';
 
@@ -35,20 +38,27 @@ export function GrowthClient() {
     tiktok_handle: string;
   }>({ spotify_artist_url: '', youtube_channel_url: '', instagram_handle: '', tiktok_handle: '' });
   const [saving, setSaving] = useState(false);
+  const [manualModal, setManualModal] = useState<{ source: 'instagram' | 'tiktok'; label: string; current: number } | null>(null);
 
   const loadDashboard = async () => {
-    const res = await fetch('/api/tools/growth/dashboard');
-    const body = await res.json() as { data?: GrowthDashboardData; error?: string };
-    if (body.data) {
-      setData(body.data);
-      setProfileForm({
-        spotify_artist_url: body.data.profile.spotify_artist_url ?? '',
-        youtube_channel_url: body.data.profile.youtube_channel_url ?? '',
-        instagram_handle: body.data.profile.instagram_handle ?? '',
-        tiktok_handle: body.data.profile.tiktok_handle ?? '',
-      });
+    try {
+      const res = await fetch('/api/tools/growth/dashboard');
+      const body = await res.json() as { data?: GrowthDashboardData; error?: string };
+      if (body.error) throw new Error(body.error);
+      if (body.data) {
+        setData(body.data);
+        setProfileForm({
+          spotify_artist_url: body.data.profile.spotify_artist_url ?? '',
+          youtube_channel_url: body.data.profile.youtube_channel_url ?? '',
+          instagram_handle: body.data.profile.instagram_handle ?? '',
+          tiktok_handle: body.data.profile.tiktok_handle ?? '',
+        });
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro ao carregar dashboard');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => { loadDashboard(); }, []);
@@ -103,12 +113,20 @@ export function GrowthClient() {
   };
 
   const updateManual = async (source: 'instagram' | 'tiktok', value: number) => {
-    await fetch('/api/tools/growth/manual-update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ source, value }),
-    });
-    await loadDashboard();
+    try {
+      const res = await fetch('/api/tools/growth/manual-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source, value }),
+      });
+      if (!res.ok) {
+        const err = await res.json() as { error?: string };
+        throw new Error(err.error ?? 'Erro ao atualizar');
+      }
+      await loadDashboard();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro ao atualizar manualmente');
+    }
   };
 
   // ========= LOADING =========
@@ -122,7 +140,7 @@ export function GrowthClient() {
             icon={<ToolIcon tool="growth" size={22} />}
             accent="orange"
           />
-          <p className="text-brand-muted">Carregando...</p>
+          <LoadingSpinner label="Carregando..." />
         </div>
       </div>
     );
@@ -160,9 +178,7 @@ export function GrowthClient() {
               <TextInput value={profileForm.tiktok_handle} onChange={(v) => setProfileForm({ ...profileForm, tiktok_handle: v })} placeholder="@seuhandle" />
             </Field>
 
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">{error}</div>
-            )}
+            {error && <ErrorMessage message={error} />}
 
             <div className="flex gap-3 pt-4 border-t border-white/5">
               {hasProfile && (
@@ -231,7 +247,7 @@ export function GrowthClient() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-300 text-sm mb-6">{error}</div>
+          <div className="mb-6"><ErrorMessage message={error} /></div>
         )}
 
         {/* 4 Metric cards */}
@@ -252,13 +268,7 @@ export function GrowthClient() {
                   <span className="text-xs font-mono uppercase tracking-wider text-brand-muted">{meta.label}</span>
                   {isManual && hasConfig && (
                     <button
-                      onClick={() => {
-                        const input = prompt(`Quantos seguidores no ${meta.label} hoje?`, String(value ?? 0));
-                        if (input !== null) {
-                          const n = Number(input);
-                          if (Number.isFinite(n) && n >= 0) updateManual(source as 'instagram' | 'tiktok', n);
-                        }
-                      }}
+                      onClick={() => setManualModal({ source: source as 'instagram' | 'tiktok', label: meta.label, current: value ?? 0 })}
                       className="text-[10px] text-brand-orange hover:underline"
                     >
                       atualizar
@@ -289,6 +299,23 @@ export function GrowthClient() {
           Instagram e TikTok via input manual (OAuth dessas plataformas exige aprovacao burocratica).
         </p>
       </div>
+
+      <InputModal
+        open={!!manualModal}
+        title={`Atualizar ${manualModal?.label ?? ''}`}
+        message={`Quantos seguidores no ${manualModal?.label ?? ''} hoje?`}
+        placeholder={String(manualModal?.current ?? 0)}
+        inputType="number"
+        confirmLabel="Salvar"
+        onConfirm={(val) => {
+          const n = Number(val);
+          if (manualModal && Number.isFinite(n) && n >= 0) {
+            updateManual(manualModal.source, n);
+          }
+          setManualModal(null);
+        }}
+        onCancel={() => setManualModal(null)}
+      />
     </div>
   );
 }
@@ -397,7 +424,7 @@ function TextInput({ value, onChange, placeholder }: { value: string; onChange: 
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
     />
   );
 }

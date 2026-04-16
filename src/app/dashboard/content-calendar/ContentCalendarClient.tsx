@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { POST_PLATFORM_META } from '@/lib/types/tools';
 import type { ContentCalendarInput, ContentCalendarOutput, PostPlatform, PostSuggestion } from '@/lib/types/tools';
 
@@ -171,12 +172,16 @@ export function ContentCalendarClient() {
               </div>
             </div>
 
-            {error && <div className="text-sm text-red-400">{error}</div>}
+            {form.platforms.length === 0 && (
+              <p className="text-sm text-yellow-400">Selecione pelo menos uma plataforma para gerar o cronograma.</p>
+            )}
+
+            {error && <ErrorMessage message={error} />}
 
             <button
               type="submit"
               disabled={loading || form.platforms.length === 0}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-brand-orange text-black font-bold hover:bg-brand-orange/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-3 rounded-lg bg-brand-orange text-black font-bold hover:bg-brand-orange/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Gerando cronograma...' : 'Gerar cronograma de 30 dias'}
             </button>

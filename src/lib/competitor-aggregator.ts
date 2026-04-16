@@ -111,21 +111,29 @@ export async function getComparisonDashboard(
     .order('created_at', { ascending: true });
 
   const competitorsWithData: CompetitorWithData[] = [];
-  if (competitors) {
-    for (const comp of competitors) {
-      const { data: snapshots } = await supabase
-        .from('competitor_snapshots')
-        .select('*')
-        .eq('competitor_id', comp.id)
-        .gte('snapshot_date', twelveWeeksAgoISO)
-        .order('snapshot_date', { ascending: true });
+  if (competitors && competitors.length > 0) {
+    const compIds = competitors.map((c) => c.id);
+    const { data: allSnapshots } = await supabase
+      .from('competitor_snapshots')
+      .select('*')
+      .in('competitor_id', compIds)
+      .gte('snapshot_date', twelveWeeksAgoISO)
+      .order('snapshot_date', { ascending: true });
 
+    const snapshotsByComp: Record<string, typeof allSnapshots> = {};
+    for (const s of allSnapshots ?? []) {
+      if (!snapshotsByComp[s.competitor_id]) snapshotsByComp[s.competitor_id] = [];
+      snapshotsByComp[s.competitor_id]!.push(s);
+    }
+
+    for (const comp of competitors) {
+      const snapshots = snapshotsByComp[comp.id] ?? [];
       const historyMap: Record<string, { date: string; spotify?: number; youtube?: number }> = {};
       let lastUpdated: string | null = null;
       let currentSpotify: number | null = null;
       let currentYoutube: number | null = null;
 
-      for (const s of snapshots ?? []) {
+      for (const s of snapshots) {
         if (!historyMap[s.snapshot_date]) historyMap[s.snapshot_date] = { date: s.snapshot_date };
         if (s.source === 'spotify') {
           historyMap[s.snapshot_date].spotify = s.metric_value;

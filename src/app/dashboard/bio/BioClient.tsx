@@ -5,6 +5,7 @@ import type { BioInput, BioOutput, Tone, Language } from '@/lib/types/tools';
 import { BIO_CHAR_LIMITS } from '@/lib/types/tools';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 
 const TONE_OPTIONS: Array<{ value: Tone; label: string; hint: string }> = [
   { value: 'formal', label: 'Formal', hint: 'profissional, editorial' },
@@ -166,7 +167,7 @@ export function BioClient() {
               value={input.artist_name}
               onChange={(e) => update('artist_name', e.target.value)}
               placeholder="Ex: Ana Frango Eletrico"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
             />
           </Field>
 
@@ -176,7 +177,7 @@ export function BioClient() {
               onChange={(e) => update('differentiator', e.target.value)}
               rows={3}
               placeholder="Ex: Combino samba-funk dos anos 70 com producao eletronica. Letras sobre periferia de BH com humor."
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 resize-none"
             />
           </Field>
 
@@ -186,7 +187,7 @@ export function BioClient() {
               value={input.main_achievement}
               onChange={(e) => update('main_achievement', e.target.value)}
               placeholder="Ex: Abri show do Tulipa Ruiz no Sesc Pompeia em 2024"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
             />
           </Field>
 
@@ -196,7 +197,7 @@ export function BioClient() {
               value={input.mood_three_words}
               onChange={(e) => update('mood_three_words', e.target.value)}
               placeholder="Ex: melancolica, urgente, cinematica"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
             />
           </Field>
 
@@ -206,7 +207,7 @@ export function BioClient() {
               value={input.unusual_influence}
               onChange={(e) => update('unusual_influence', e.target.value)}
               placeholder="Ex: Wong Kar-wai / Clarice Lispector / Arvo Part"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
             />
           </Field>
 
@@ -216,7 +217,7 @@ export function BioClient() {
               value={input.direct_influences}
               onChange={(e) => update('direct_influences', e.target.value)}
               placeholder="Ex: Juçara Marçal, Sessa, Tim Bernardes"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
             />
           </Field>
 
@@ -227,7 +228,7 @@ export function BioClient() {
                 value={input.genre ?? ''}
                 onChange={(e) => update('genre', e.target.value)}
                 placeholder="Ex: indie rock, MPB"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
               />
             </Field>
             <Field label="Cidade (opcional)">
@@ -236,7 +237,7 @@ export function BioClient() {
                 value={input.city ?? ''}
                 onChange={(e) => update('city', e.target.value)}
                 placeholder="Ex: Belo Horizonte"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
               />
             </Field>
           </div>
@@ -248,7 +249,7 @@ export function BioClient() {
                   key={opt.value}
                   type="button"
                   onClick={() => update('tone', opt.value)}
-                  className={`px-3 py-3 rounded-xl border text-left transition ${
+                  className={`px-3 py-3 rounded-lg border text-left transition ${
                     input.tone === opt.value
                       ? 'border-brand-green bg-brand-green/10 text-white'
                       : 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20'
@@ -268,7 +269,7 @@ export function BioClient() {
                   key={lang}
                   type="button"
                   onClick={() => update('language', lang)}
-                  className={`px-3 py-3 rounded-xl border font-semibold transition ${
+                  className={`px-3 py-3 rounded-lg border font-semibold transition ${
                     input.language === lang
                       ? 'border-brand-green bg-brand-green/10 text-white'
                       : 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20'
@@ -280,16 +281,12 @@ export function BioClient() {
             </div>
           </Field>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
+          {error && <ErrorMessage message={error} />}
 
           <button
             onClick={generate}
             disabled={!canSubmit || loading}
-            className="w-full px-6 py-4 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl disabled:opacity-50 transition"
+            className="w-full px-6 py-4 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-lg disabled:opacity-50 transition"
           >
             {loading ? 'Gerando suas 4 bios...' : 'Gerar bios'}
           </button>
@@ -302,7 +299,15 @@ export function BioClient() {
 
         {output && (
           <div id="bio-results" className="mt-12 space-y-4">
-            <h2 className="text-2xl font-bold text-white mb-2">Suas bios</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white mb-2">Suas bios</h2>
+              <button
+                onClick={() => setOutput(null)}
+                className="text-xs font-mono uppercase tracking-wider text-brand-muted hover:text-white transition-colors"
+              >
+                + Novo
+              </button>
+            </div>
             <p className="text-brand-muted mb-6 text-sm">
               Cada uma foi escrita especificamente pra sua plataforma. Regera individualmente se nao gostou de alguma.
             </p>

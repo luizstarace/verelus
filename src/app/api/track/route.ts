@@ -19,6 +19,12 @@ const RATE_WINDOW_MS = 60_000;
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+  // Cleanup expired entries every 100 checks
+  if (rateLimitMap.size > 100) {
+    Array.from(rateLimitMap.entries()).forEach(([k, v]) => {
+      if (now > v.resetAt) rateLimitMap.delete(k);
+    });
+  }
   const entry = rateLimitMap.get(ip);
 
   if (!entry || now > entry.resetAt) {

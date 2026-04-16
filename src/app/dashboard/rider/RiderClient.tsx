@@ -6,6 +6,7 @@ import { STAGE_TEMPLATES } from '@/lib/types/tools';
 import { StagePlotEditor } from '@/components/rider/StagePlotEditor';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 
 function genId(): string {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -458,11 +459,7 @@ export function RiderClient() {
             </Field>
           </section>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
+          {error && <ErrorMessage message={error} />}
 
           <button
             onClick={generate}
@@ -484,7 +481,7 @@ export function RiderClient() {
             <div className="bg-brand-surface rounded-2xl border border-white/10 overflow-hidden">
               <iframe
                 src={URL.createObjectURL(result.pdfBlob)}
-                className="w-full h-[600px] bg-white"
+                className="w-full min-h-[50vh] h-[600px] bg-white"
                 title="Preview do Rider"
               />
             </div>

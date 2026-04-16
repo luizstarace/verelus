@@ -5,6 +5,7 @@ import type { PitchInput, PitchOutput, PitchRecipientType, PitchTone, PitchLangu
 import { PITCH_RECIPIENT_META } from '@/lib/types/tools';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 
 const DEFAULT_INPUT: PitchInput = {
   artist_name: '',
@@ -259,9 +260,7 @@ export function PitchKitClient() {
             </Field>
           </section>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">{error}</div>
-          )}
+          {error && <ErrorMessage message={error} />}
 
           <button
             onClick={generate}
@@ -286,7 +285,7 @@ export function PitchKitClient() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 p-1 bg-white/[0.03] border border-white/10 rounded-xl">
+            <div role="tablist" className="flex gap-1 p-1 bg-white/[0.03] border border-white/10 rounded-xl">
               {([
                 { v: 'email', label: 'Email frio' },
                 { v: 'one-pager', label: '1-Pager' },
@@ -295,6 +294,8 @@ export function PitchKitClient() {
                 <button
                   key={t.v}
                   type="button"
+                  role="tab"
+                  aria-selected={activeTab === t.v}
                   onClick={() => setActiveTab(t.v)}
                   className={`flex-1 px-3 py-2.5 rounded-lg text-sm font-semibold transition ${
                     activeTab === t.v ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white'

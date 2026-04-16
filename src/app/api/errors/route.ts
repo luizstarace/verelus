@@ -10,9 +10,12 @@ const RATE_WINDOW_MS = 60 * 1000; // 1 minute
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+  if (rateLimitMap.size > 100) {
+    Array.from(rateLimitMap.entries()).forEach(([k, v]) => {
+      if (v.every((t: number) => now - t >= RATE_WINDOW_MS)) rateLimitMap.delete(k);
+    });
+  }
   const timestamps = rateLimitMap.get(ip) || [];
-
-  // Remove entries outside the window
   const recent = timestamps.filter((t) => now - t < RATE_WINDOW_MS);
 
   if (recent.length >= RATE_LIMIT) {

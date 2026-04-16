@@ -11,6 +11,8 @@ import type {
 import { PHASE_META, CATEGORY_META, calculateItemDueDate } from '@/lib/checklist-template';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 type ChecklistItemWithState = ChecklistItem & { completed: boolean; completed_at?: string; skipped?: boolean };
 
@@ -65,15 +67,22 @@ export function ChecklistClient() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetch('/api/tools/checklist/list')
-      .then((r) => r.json())
-      .then((data: { checklists?: StoredChecklist[] }) => {
-        setChecklists(data.checklists ?? []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+  const loadChecklists = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/tools/checklist/list');
+      if (!res.ok) throw new Error('Falha ao carregar checklists');
+      const data = (await res.json()) as { checklists?: StoredChecklist[] };
+      setChecklists(data.checklists ?? []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro ao carregar checklists');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadChecklists(); }, []);
 
   const createChecklist = async () => {
     setCreating(true);
@@ -101,15 +110,22 @@ export function ChecklistClient() {
 
   const toggleItem = async (itemId: string, completed: boolean) => {
     if (!activeChecklist) return;
+    const previousItems = activeChecklist.items;
     const updatedItems = activeChecklist.items.map((it) =>
       it.id === itemId ? { ...it, completed, completed_at: completed ? new Date().toISOString() : undefined } : it
     );
     setActiveChecklist({ ...activeChecklist, items: updatedItems });
-    await fetch('/api/tools/checklist/update-item', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ checklist_id: activeChecklist.id, item_id: itemId, completed }),
-    });
+    try {
+      const res = await fetch('/api/tools/checklist/update-item', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checklist_id: activeChecklist.id, item_id: itemId, completed }),
+      });
+      if (!res.ok) throw new Error('Falha ao atualizar item');
+    } catch {
+      setActiveChecklist({ ...activeChecklist, items: previousItems });
+      setError('Erro ao salvar. Tente novamente.');
+    }
   };
 
   const skipItem = async (itemId: string) => {
@@ -152,7 +168,9 @@ export function ChecklistClient() {
           </div>
 
           {loading ? (
-            <p className="text-brand-muted">Carregando...</p>
+            <LoadingSpinner label="Carregando..." />
+          ) : error ? (
+            <ErrorMessage message={error} onRetry={loadChecklists} />
           ) : checklists.length === 0 ? (
             <div className="bg-brand-surface rounded-2xl p-12 border border-white/10 text-center">
               <p className="text-white/60 mb-4">Voce ainda nao tem nenhuma checklist.</p>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { ContractInput, ContractParty } from '@/lib/types/tools';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
 
 const DEFAULT_PARTY: ContractParty = {
   type: 'pf',
@@ -198,11 +199,7 @@ export function ContractClient() {
             <StepReview input={input} update={update} />
           )}
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
+          {error && <ErrorMessage message={error} />}
 
           <div className="flex gap-3 pt-4 border-t border-white/5">
             {step > 0 && (
@@ -241,7 +238,7 @@ export function ContractClient() {
             <div className="bg-brand-surface rounded-2xl border border-white/10 overflow-hidden">
               <iframe
                 src={URL.createObjectURL(result.pdfBlob)}
-                className="w-full h-[700px] bg-white"
+                className="w-full min-h-[50vh] h-[700px] bg-white"
                 title="Preview do Contrato"
               />
             </div>
@@ -372,6 +369,7 @@ function StepShow({ input, update }: { input: ContractInput; update: <K extends 
           <input
             type="date"
             value={input.show_date}
+            min={new Date().toISOString().slice(0, 10)}
             onChange={(e) => update('show_date', e.target.value)}
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-green/50"
           />

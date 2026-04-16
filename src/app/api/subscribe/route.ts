@@ -17,6 +17,11 @@ const RATE_WINDOW = 60_000;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
+  if (rateLimitMap.size > 100) {
+    Array.from(rateLimitMap.entries()).forEach(([k, v]) => {
+      if (now > v.resetAt) rateLimitMap.delete(k);
+    });
+  }
   const entry = rateLimitMap.get(ip);
   if (!entry || now > entry.resetAt) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW });

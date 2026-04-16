@@ -1,4 +1,13 @@
-import type { SpotifyArtistData } from '@/lib/types/career';
+export interface SpotifyArtistData {
+  spotify_artist_id: string;
+  spotify_url: string;
+  name: string;
+  genres: string[];
+  followers: number;
+  popularity: number;
+  monthly_listeners?: number;
+  top_tracks: { id: string; name: string; popularity: number }[];
+}
 
 /**
  * Extrai o ID do artista do Spotify a partir de uma URL ou URI.

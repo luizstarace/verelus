@@ -158,7 +158,7 @@ export default function Home() {
             <span className="text-xl font-bold">
               <span className="gradient-text">{t.nav.logo}</span>
             </span>
-            <p className="text-xs text-brand-muted">Music Intelligence</p>
+            <p className="text-xs text-brand-muted">Ferramentas para musicos</p>
           </div>
         </div>
         <div className="flex items-center gap-6">
@@ -193,7 +193,7 @@ export default function Home() {
       <section className="relative z-10 flex flex-col items-center text-center px-6 pt-20 pb-16 max-w-5xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-green/10 border border-brand-green/20 rounded-full text-brand-green text-xs font-mono mb-8">
           <span className="w-1.5 h-1.5 bg-brand-green rounded-full animate-pulse" />
-          {lang === "pt" ? "Plataforma de Inteligência Musical" : "Music Intelligence Platform"}
+          {lang === "pt" ? "11 ferramentas — R$29/mes" : "11 tools — R$29/month"}
         </div>
 
         <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl tracking-tight leading-none mb-6">
@@ -264,11 +264,11 @@ export default function Home() {
           </h2>
           <p className="text-brand-muted max-w-2xl mx-auto">{t.management.description}</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Object.values(t.management.features).map((feature, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Object.values(t.management.features).filter((f) => f.title).map((feature, i) => (
             <FeatureCard
               key={i}
-              icon={["📋", "📰", "📱", "🎵", "💰", "🗺️", "📝", "📈"][i]}
+              icon={["📋", "📊", "🏆", "🎯", "📅", "🔮"][i]}
               title={feature.title}
               desc={feature.description}
               accent="purple"
@@ -329,7 +329,7 @@ export default function Home() {
           <h2 className="font-display text-3xl sm:text-5xl mb-4">{t.pricing.title}</h2>
           <p className="text-brand-muted">{t.pricing.subtitle}</p>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {/* Free */}
           <div className="gradient-border p-8 bg-brand-card">
             <h3 className="text-lg font-bold text-white mb-1">{t.pricing.plans.free.name}</h3>
@@ -387,36 +387,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Business */}
-          <div className="gradient-border p-8 bg-brand-card">
-            <h3 className="text-lg font-bold text-white mb-1">{t.pricing.plans.business.name}</h3>
-            <p className="text-sm text-brand-muted mb-4">{t.pricing.plans.business.description}</p>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-black text-white">R${t.pricing.plans.business.price}</span>
-              <span className="text-sm text-brand-muted">{t.pricing.plans.business.period}</span>
-            </div>
-            <ul className="space-y-3 mb-8">
-              {t.pricing.plans.business.features.map((f, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                  <span className="text-brand-purple mt-0.5">✓</span> {f}
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={async () => {
-                const res = await fetch("/api/checkout", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ priceId: "business" }),
-                });
-                const data = await res.json() as { url?: string };
-                if (data.url) window.location.href = data.url;
-              }}
-              className="block w-full py-3 text-center border border-brand-purple/50 text-brand-purple font-semibold rounded-lg hover:bg-brand-purple/10 transition-colors text-sm"
-            >
-              {t.pricing.plans.business.cta}
-            </button>
-          </div>
         </div>
       </section>
 
@@ -436,15 +406,15 @@ export default function Home() {
       <section className="relative z-10 px-6 py-20 max-w-4xl mx-auto text-center">
         <h2 className="font-display text-4xl sm:text-5xl mb-4">
           {lang === "pt" ? (
-            <>Pronto para transformar sua <span className="gradient-text">carreira musical</span>?</>
+            <>Pronto pra levar sua <span className="gradient-text">carreira musical</span> a serio?</>
           ) : (
-            <>Ready to transform your <span className="gradient-text">music career</span>?</>
+            <>Ready to take your <span className="gradient-text">music career</span> seriously?</>
           )}
         </h2>
         <p className="text-brand-muted mb-8 max-w-xl mx-auto">
           {lang === "pt"
-            ? "Junte-se a artistas que já estão usando inteligência de mercado para alavancar suas carreiras."
-            : "Join artists who are already using market intelligence to level up their careers."}
+            ? "11 ferramentas profissionais por R$29/mes. Teste gratis, sem cartao."
+            : "11 professional tools for R$29/month. Free to try, no credit card."}
         </p>
         <div className="flex justify-center">
           <SignUpForm t={t} lang={lang} />

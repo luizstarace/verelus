@@ -1,5 +1,6 @@
--- Verulus Career Intelligence Schema
--- Phase 1 MVP: artist_data, artist_survey, diagnostics, action_progress
+-- SUPERSEDED: Career Intelligence foi removido no pivot para toolbox (abril 2026).
+-- Tabelas abaixo nao sao usadas pelo Verelus atual mas foram aplicadas em prod.
+-- Mantido no repo apenas pra historico de migrations.
 
 -- Dados do artista capturados do Spotify
 CREATE TABLE IF NOT EXISTS artist_data (

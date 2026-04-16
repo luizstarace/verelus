@@ -62,12 +62,12 @@ async function sendPurchaseEmail(email: string, plan: string) {
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #e5e5e5; padding: 40px 30px; border-radius: 12px;">
             <div style="text-align: center; margin-bottom: 30px;">
               <h1 style="color: #f5f5f5; font-size: 28px; margin: 0;">Verelus</h1>
-              <p style="color: #00f5a0; font-size: 14px; margin: 4px 0 0;">Music Intelligence Platform</p>
+              <p style="color: #00f5a0; font-size: 14px; margin: 4px 0 0;">Ferramentas para musicos</p>
             </div>
             <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 30px; margin-bottom: 24px; border: 1px solid #262626;">
               <h2 style="color: #00f5a0; margin: 0 0 16px; font-size: 22px;">Parabens! Seu plano ${planLabel} esta ativo.</h2>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0 0 16px;">
-                Agora voce tem acesso completo a todas as ferramentas de inteligencia musical do Verelus.
+                Agora voce tem acesso ilimitado a todas as 11 ferramentas do Verelus.
               </p>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0;">
                 Aqui esta o que voce pode fazer agora:
@@ -75,19 +75,17 @@ async function sendPurchaseEmail(email: string, plan: string) {
             </div>
             <div style="margin-bottom: 24px;">
               <div style="margin-bottom: 12px;">
-                <strong style="color: #f5f5f5;">Geracao ilimitada com IA</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Press releases, posts sociais, contratos e mais</p>
+                <strong style="color: #f5f5f5;">Bio, Rider, Contrato, Cache</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Ferramentas profissionais com PDF, ilimitadas</p>
               </div>
               <div style="margin-bottom: 12px;">
-                <strong style="color: #f5f5f5;">Setlists e Relatorios</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Planejamento musical inteligente</p>
+                <strong style="color: #f5f5f5;">Growth Tracker + Metas</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Email semanal com dados reais + projecoes</p>
               </div>
-              ${plan === "business" ? `
               <div style="margin-bottom: 12px;">
-                <strong style="color: #e040fb;">Planejamento de Turnes</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Exclusivo Business — planeje turnes com IA</p>
+                <strong style="color: #f5f5f5;">Pitch Kit + Cronograma</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Pitches coordenados + 30 dias de posts</p>
               </div>
-              ` : ""}
             </div>
             <div style="text-align: center; margin-bottom: 24px;">
               <a href="${appUrl}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #00f5a0, #00d9f5); color: #000; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 15px;">
@@ -96,7 +94,7 @@ async function sendPurchaseEmail(email: string, plan: string) {
             </div>
             <div style="text-align: center; border-top: 1px solid #262626; padding-top: 20px;">
               <p style="color: #737373; font-size: 13px; margin: 0;">
-                <strong style="color: #a3a3a3;">Verelus</strong> — Music Intelligence Platform
+                <strong style="color: #a3a3a3;">Verelus</strong> — Ferramentas para musicos
               </p>
               <p style="color: #525252; font-size: 12px; margin: 8px 0 0;">
                 &copy; 2026 Verelus. Todos os direitos reservados.

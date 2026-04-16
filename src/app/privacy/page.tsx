@@ -1,6 +1,6 @@
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#080a0f] text-white">
+    <div className="min-h-screen bg-brand-dark text-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto border-b border-white/5">
         <a href="/" className="text-xl font-bold font-display tracking-wider">VERELUS</a>
       </nav>
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
             <li>Revogar consentimento para o uso dos dados</li>
             <li>Solicitar a portabilidade dos seus dados</li>
           </ul>
-          <p>Para exercer esses direitos, envie um email para <a href="mailto:privacidade@verelus.com" className="text-[#00f5a0]">privacidade@verelus.com</a>.</p>
+          <p>Para exercer esses direitos, envie um email para <a href="mailto:privacidade@verelus.com" className="text-brand-green">privacidade@verelus.com</a>.</p>
 
           <h2 className="text-xl font-semibold text-white mt-8">6. Cookies</h2>
           <p>Utilizamos cookies essenciais para autenticacao e sessao. Nao utilizamos cookies de rastreamento de terceiros.</p>
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
           <p>Seus dados sao mantidos enquanto sua conta estiver ativa. Apos exclusao da conta, os dados sao removidos em ate 30 dias.</p>
 
           <h2 className="text-xl font-semibold text-white mt-8">8. Contato</h2>
-          <p>Para questoes de privacidade: <a href="mailto:privacidade@verelus.com" className="text-[#00f5a0]">privacidade@verelus.com</a></p>
+          <p>Para questoes de privacidade: <a href="mailto:privacidade@verelus.com" className="text-brand-green">privacidade@verelus.com</a></p>
         </div>
       </div>
     </div>

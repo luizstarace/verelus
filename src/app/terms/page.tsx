@@ -1,6 +1,6 @@
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-[#080a0f] text-white">
+    <div className="min-h-screen bg-brand-dark text-white">
       <nav className="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto border-b border-white/5">
         <a href="/" className="text-xl font-bold font-display tracking-wider">VERELUS</a>
       </nav>
@@ -36,7 +36,7 @@ export default function TermsPage() {
           <p>Podemos atualizar estes termos a qualquer momento. Alteracoes significativas serao comunicadas por email.</p>
 
           <h2 className="text-xl font-semibold text-white mt-8">9. Contato</h2>
-          <p>Para duvidas sobre estes termos, entre em contato: <a href="mailto:contato@verelus.com" className="text-[#00f5a0]">contato@verelus.com</a></p>
+          <p>Para duvidas sobre estes termos, entre em contato: <a href="mailto:contato@verelus.com" className="text-brand-green">contato@verelus.com</a></p>
         </div>
       </div>
     </div>

@@ -2,21 +2,21 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Verelus — Music Intelligence Platform",
+  title: "Verelus — 11 ferramentas para musicos independentes",
   description:
-    "Plataforma de inteligencia musical com IA para musicos independentes. Pitching de playlists, gestao de carreira e ferramentas profissionais.",
+    "Bio, rider, contrato, cache, pitch kit, growth tracker e mais. Ferramentas profissionais por R$29/mes, feitas pro musico independente brasileiro.",
   openGraph: {
-    title: "Verelus — Music Intelligence Platform",
+    title: "Verelus — 11 ferramentas para musicos independentes",
     description:
-      "Plataforma de inteligencia musical com IA. Pitching de playlists, press releases, contratos, turnes e muito mais.",
+      "Bio adaptativa, rider tecnico, contrato de show, calculadora de cache, pitch kit, growth tracker. R$29/mes.",
     type: "website",
     url: "https://verelus.com",
     siteName: "Verelus",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verelus — Music Intelligence Platform",
-    description: "Inteligencia musical com IA para musicos independentes.",
+    title: "Verelus — 11 ferramentas para musicos independentes",
+    description: "Ferramentas profissionais por R$29/mes. Feito pro mercado BR.",
   },
   robots: "index, follow",
 };

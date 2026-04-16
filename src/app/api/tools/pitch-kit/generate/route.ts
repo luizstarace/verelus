@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { createClient } from '@supabase/supabase-js';
+import { requireUser, errorResponse } from '@/lib/api-auth';
 import { buildPitchPrompt, getPitchSystemPrompt, parsePitchResponse } from '@/lib/pitch-kit-prompt';
 import type { PitchInput } from '@/lib/types/tools';
 import { PITCH_RECIPIENT_META } from '@/lib/types/tools';
@@ -49,21 +47,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: validated.error }, { status: 400 });
     }
 
-    const cookieStore = cookies();
-    const supabaseAuth = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { get(name: string) { return cookieStore.get(name)?.value; } } }
-    );
-    const { data: { user } } = await supabaseAuth.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Nao autenticado' }, { status: 401 });
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-    const { data: dbUser } = await supabase.from('users').select('id').eq('email', user.email!.toLowerCase().trim()).single();
-    if (!dbUser) return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
+    const { userId, supabase } = await requireUser();
 
     const userPrompt = buildPitchPrompt(validated);
     const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -98,7 +82,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data: generation } = await supabase.from('tool_generations').insert({
-      user_id: dbUser.id,
+      user_id: userId,
       tool_key: 'pitch_kit',
       input: validated,
       output,
@@ -110,7 +94,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error('pitch kit error:', err);
-    const msg = err instanceof Error ? err.message : 'erro desconhecido';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    const { error, status } = errorResponse(err);
+    return NextResponse.json({ error }, { status });
   }
 }

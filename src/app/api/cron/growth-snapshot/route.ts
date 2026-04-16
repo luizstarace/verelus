@@ -128,7 +128,7 @@ async function sendWeeklyEmail(args: {
 
 export async function POST(req: NextRequest) {
   // Autenticacao via secret
-  const providedSecret = req.headers.get('x-cron-secret') || new URL(req.url).searchParams.get('secret');
+  const providedSecret = req.headers.get('x-cron-secret');
   const expectedSecret = process.env.CRON_SECRET;
   if (!expectedSecret || providedSecret !== expectedSecret) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

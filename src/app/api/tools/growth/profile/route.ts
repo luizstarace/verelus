@@ -1,39 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { createClient } from '@supabase/supabase-js';
+import { requireUser, errorResponse } from '@/lib/api-auth';
 
 export const runtime = 'edge';
 
-async function getUserId(): Promise<{ userId: string } | { error: string; status: number }> {
-  const cookieStore = cookies();
-  const supabaseAuth = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { get(name: string) { return cookieStore.get(name)?.value; } } }
-  );
-  const { data: { user } } = await supabaseAuth.auth.getUser();
-  if (!user) return { error: 'Nao autenticado', status: 401 };
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-  const { data: dbUser } = await supabase.from('users').select('id').eq('email', user.email!.toLowerCase().trim()).single();
-  if (!dbUser) return { error: 'Usuario nao encontrado', status: 404 };
-  return { userId: dbUser.id };
-}
-
 export async function GET() {
-  const auth = await getUserId();
-  if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-  const { data } = await supabase.from('growth_profiles').select('*').eq('user_id', auth.userId).maybeSingle();
-  return NextResponse.json({ profile: data });
+  try {
+    const { userId, supabase } = await requireUser();
+    const { data } = await supabase.from('growth_profiles').select('*').eq('user_id', userId).maybeSingle();
+    return NextResponse.json({ profile: data });
+  } catch (err) {
+    console.error('growth profile GET error:', err);
+    const { error, status } = errorResponse(err);
+    return NextResponse.json({ error }, { status });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -46,16 +25,10 @@ export async function POST(req: NextRequest) {
       enabled?: boolean;
     };
 
-    const auth = await getUserId();
-    if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const { userId, supabase } = await requireUser();
 
     const payload = {
-      user_id: auth.userId,
+      user_id: userId,
       spotify_artist_url: body.spotify_artist_url?.trim() || null,
       youtube_channel_url: body.youtube_channel_url?.trim() || null,
       youtube_channel_id: null as string | null,
@@ -77,6 +50,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('growth profile error:', err);
-    return NextResponse.json({ error: 'erro' }, { status: 500 });
+    const { error, status } = errorResponse(err);
+    return NextResponse.json({ error }, { status });
   }
 }

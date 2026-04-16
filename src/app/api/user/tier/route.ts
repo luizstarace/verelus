@@ -56,7 +56,7 @@ export async function GET() {
       return NextResponse.json({ tier: "free" });
     }
 
-    const tier = subscription.product === "business" ? "business" : subscription.product === "pro" ? "pro" : "free";
+    const tier = (subscription.product === "business" || subscription.product === "pro") ? "pro" : "free";
     return NextResponse.json({ tier });
   } catch {
     return NextResponse.json({ tier: "free" });

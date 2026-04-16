@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { createClient } from '@supabase/supabase-js';
+import { requireUser, errorResponse } from '@/lib/api-auth';
 import { getCurrentMetricValue } from '@/lib/goal-calculator';
 import type { GoalMetric } from '@/lib/types/tools';
 
@@ -34,29 +32,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'target_date deve ser no futuro' }, { status: 400 });
     }
 
-    const cookieStore = cookies();
-    const supabaseAuth = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { get(name: string) { return cookieStore.get(name)?.value; } } }
-    );
-    const { data: { user } } = await supabaseAuth.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Nao autenticado' }, { status: 401 });
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-    const { data: dbUser } = await supabase.from('users').select('id').eq('email', user.email!.toLowerCase().trim()).single();
-    if (!dbUser) return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
+    const { userId, supabase } = await requireUser();
 
     // Valor atual para registrar start_value
-    const startValue = await getCurrentMetricValue(dbUser.id, body.metric as GoalMetric, supabase);
+    const startValue = await getCurrentMetricValue(userId, body.metric as GoalMetric, supabase);
 
     const { data: goal, error: insErr } = await supabase
       .from('goals')
       .insert({
-        user_id: dbUser.id,
+        user_id: userId,
         title: body.title.trim(),
         metric: body.metric,
         target_value: Math.round(target),
@@ -71,6 +55,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ goal });
   } catch (err) {
     console.error('goal create error:', err);
-    return NextResponse.json({ error: 'erro' }, { status: 500 });
+    const { error, status } = errorResponse(err);
+    return NextResponse.json({ error }, { status });
   }
 }

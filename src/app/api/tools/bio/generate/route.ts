@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { createClient } from '@supabase/supabase-js';
+import { requireUser, errorResponse } from '@/lib/api-auth';
 import { buildBioPrompt, getBioSystemPrompt, parseBioResponse } from '@/lib/bio-prompt';
 import type { BioInput } from '@/lib/types/tools';
 
@@ -44,21 +42,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Auth
-    const cookieStore = cookies();
-    const supabaseAuth = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { get(name: string) { return cookieStore.get(name)?.value; } } }
-    );
-    const { data: { user } } = await supabaseAuth.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Nao autenticado' }, { status: 401 });
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-    const { data: dbUser } = await supabase.from('users').select('id').eq('email', user.email!.toLowerCase().trim()).single();
-    if (!dbUser) return NextResponse.json({ error: 'Usuario nao encontrado' }, { status: 404 });
+    const { userId, supabase } = await requireUser();
 
     // Call Claude
     const userPrompt = buildBioPrompt(validated);
@@ -95,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     // Salvar no historico
     await supabase.from('tool_generations').insert({
-      user_id: dbUser.id,
+      user_id: userId,
       tool_key: 'bio',
       input: validated,
       output,
@@ -104,7 +88,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ output });
   } catch (err) {
     console.error('bio generate error:', err);
-    const msg = err instanceof Error ? err.message : 'erro desconhecido';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    const { error, status } = errorResponse(err);
+    return NextResponse.json({ error }, { status });
   }
 }

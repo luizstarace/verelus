@@ -168,9 +168,6 @@ export default function Home() {
           <a href="#pricing" className="text-sm text-brand-muted hover:text-white transition-colors hidden sm:block">
             {t.nav.pricing}
           </a>
-          <a href="/archive" className="text-sm text-brand-muted hover:text-white transition-colors hidden sm:block">
-            {lang === "pt" ? "Arquivo" : "Archive"}
-          </a>
           <a href="/dashboard" className="text-sm text-brand-muted hover:text-white transition-colors hidden sm:block">
             Dashboard
           </a>
@@ -213,15 +210,15 @@ export default function Home() {
         <p className="text-xs text-brand-muted/50 mt-4">{t.hero.trust}</p>
       </section>
 
-      {/* Social Proof Logos */}
+      {/* Integrations */}
       <section className="relative z-10 px-6 py-10 max-w-4xl mx-auto">
         <div className="text-center mb-6">
           <p className="text-xs text-brand-muted/50 uppercase tracking-wider font-mono">
-            {lang === "pt" ? "Feito para quem vive de música" : "Built for music professionals"}
+            {lang === "pt" ? "Integrado com" : "Integrated with"}
           </p>
         </div>
         <div className="flex flex-wrap justify-center items-center gap-8 opacity-30">
-          {["Spotify", "Apple Music", "Deezer", "YouTube Music", "SoundCloud", "Bandcamp"].map((name) => (
+          {["Spotify API", "YouTube API", "Claude AI", "Stripe", "Resend"].map((name) => (
             <span key={name} className="text-sm font-mono text-brand-muted tracking-widest">
               {name}
             </span>
@@ -229,7 +226,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Promotion Section — Playlist Pitching */}
+      {/* Toolbox Section */}
       <section id="promotion" className="relative z-10 px-6 py-20 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-green/10 border border-brand-green/20 rounded-full text-brand-green text-xs font-mono mb-6">
@@ -253,7 +250,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Management Section — Career Tools */}
+      {/* Growth & Strategy Section */}
       <section id="management" className="relative z-10 px-6 py-20 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-purple/10 border border-brand-purple/20 rounded-full text-brand-purple text-xs font-mono mb-6">
@@ -435,9 +432,6 @@ export default function Home() {
               </a>
               <a href="#pricing" className="text-xs text-brand-muted hover:text-white transition-colors">
                 {t.nav.pricing}
-              </a>
-              <a href="/archive" className="text-xs text-brand-muted hover:text-white transition-colors">
-                {lang === "pt" ? "Arquivo" : "Archive"}
               </a>
               <a href="/dashboard" className="text-xs text-brand-muted hover:text-white transition-colors">
                 Dashboard

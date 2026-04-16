@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext, useContext } from "react";
 
-export type PlanTier = "free" | "pro" | "business";
+export type PlanTier = "free" | "pro";
 
 interface TierContext {
   tier: PlanTier;
@@ -23,7 +23,8 @@ export function useUserTierFetch(): TierContext {
     fetch("/api/user/tier")
       .then((res) => res.json())
       .then((data) => {
-        setTier(data.tier || "free");
+        const t = data.tier || "free";
+        setTier(t === "business" ? "pro" : t);
         setLoading(false);
       })
       .catch(() => {
@@ -35,25 +36,6 @@ export function useUserTierFetch(): TierContext {
   return { tier, loading };
 }
 
-// Module to tier mapping — which modules require which plan
-export const MODULE_TIER_REQUIREMENT: Record<string, PlanTier> = {
-  // Free modules
-  analysis: "free",
-  pitching: "free",
-  epk: "free",
-  // Pro modules
-  social: "pro",
-  press: "pro",
-  setlist: "pro",
-  budget: "pro",
-  contracts: "pro",
-  reports: "pro",
-  // Business modules
-  tours: "business",
-};
-
-export function canAccess(userTier: PlanTier, module: string): boolean {
-  const required = MODULE_TIER_REQUIREMENT[module] || "free";
-  const tierLevel: Record<PlanTier, number> = { free: 0, pro: 1, business: 2 };
-  return tierLevel[userTier] >= tierLevel[required];
+export function isPro(tier: PlanTier): boolean {
+  return tier === "pro";
 }

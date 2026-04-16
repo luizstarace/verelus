@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import type { User } from '@supabase/supabase-js';
-import { UserTierContext, useUserTierFetch, canAccess, MODULE_TIER_REQUIREMENT } from '@/lib/use-user-tier';
-import type { PlanTier } from '@/lib/use-user-tier';
+import { UserTierContext, useUserTierFetch } from '@/lib/use-user-tier';
 import { ArtistProfileCtx, useArtistProfileFetch } from '@/lib/use-artist-profile';
 import ChatWidget from '@/components/chat-widget';
 
@@ -15,33 +14,32 @@ function getSupabase() {
   );
 }
 
-const NAV_ITEMS: { href: string; label: string; icon: string; module: string }[] = [
-  { href: '/dashboard', label: 'Painel', icon: '\u{1F3AF}', module: 'dashboard' },
-  { href: '/dashboard/analysis', label: 'Analise', icon: '\u{1F4CA}', module: 'analysis' },
-  { href: '/dashboard/social', label: 'Social', icon: '\u{1F4F1}', module: 'social' },
-  { href: '/dashboard/press', label: 'Imprensa', icon: '\u{1F4F0}', module: 'press' },
-  { href: '/dashboard/setlist', label: 'Setlists', icon: '\u{1F3B5}', module: 'setlist' },
-  { href: '/dashboard/budget', label: 'Financeiro', icon: '\u{1F4B0}', module: 'budget' },
-  { href: '/dashboard/contracts', label: 'Contratos', icon: '\u{1F4DD}', module: 'contracts' },
-  { href: '/dashboard/tours', label: 'Turnes', icon: '\u{1F30D}', module: 'tours' },
-  { href: '/dashboard/reports', label: 'Relatorios', icon: '\u{1F4C8}', module: 'reports' },
-  { href: '/dashboard/epk', label: 'EPK', icon: '\u{1F4BC}', module: 'epk' },
-  { href: '/dashboard/pitching', label: 'Pitching', icon: '\u{1F3A4}', module: 'pitching' },
-  { href: '/dashboard/profile', label: 'Perfil', icon: '\u{1F464}', module: 'profile' },
-];
-
-function TierBadge({ required }: { required: PlanTier }) {
-  if (required === 'free') return null;
-  return (
-    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full ${
-      required === 'business'
-        ? 'bg-brand-purple/20 text-brand-purple'
-        : 'bg-brand-green/20 text-brand-green'
-    }`}>
-      {required}
-    </span>
-  );
+interface NavItem {
+  href: string;
+  label: string;
+  icon: string;
+  tier: 1 | 2 | 3;
 }
+
+const NAV_ITEMS: NavItem[] = [
+  { href: '/dashboard', label: 'Painel', icon: '\u{1F3AF}', tier: 1 },
+  // Tier 1
+  { href: '/dashboard/bio', label: 'Bio Adaptativa', icon: '\u{270D}\u{FE0F}', tier: 1 },
+  { href: '/dashboard/cache-calculator', label: 'Calculadora de Cache', icon: '\u{1F4B0}', tier: 1 },
+  { href: '/dashboard/rider', label: 'Rider Tecnico', icon: '\u{1F3B8}', tier: 1 },
+  { href: '/dashboard/contract', label: 'Contrato de Show', icon: '\u{1F4DD}', tier: 1 },
+  // Tier 2
+  { href: '/dashboard/pitch-kit', label: 'Pitch Kit', icon: '\u{1F4E8}', tier: 2 },
+  { href: '/dashboard/release-timing', label: 'Quando Lancar', icon: '\u{1F4C5}', tier: 2 },
+  { href: '/dashboard/launch-checklist', label: 'Checklist', icon: '\u{2705}', tier: 2 },
+  // Tier 3
+  { href: '/dashboard/growth', label: 'Growth Tracker', icon: '\u{1F4C8}', tier: 3 },
+  { href: '/dashboard/competitors', label: 'Concorrentes', icon: '\u{1F3C6}', tier: 3 },
+  { href: '/dashboard/goals', label: 'Meta Tracker', icon: '\u{1F3AF}', tier: 3 },
+  { href: '/dashboard/content-calendar', label: 'Cronograma', icon: '\u{1F4C5}', tier: 3 },
+  // Profile
+  { href: '/dashboard/profile', label: 'Perfil', icon: '\u{1F464}', tier: 1 },
+];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -53,7 +51,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     setCurrentPath(window.location.pathname);
-    // Open sidebar by default on desktop
     if (window.innerWidth >= 1024) setSidebarOpen(true);
 
     const checkUser = async () => {
@@ -101,7 +98,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <UserTierContext.Provider value={tierData}>
     <ArtistProfileCtx.Provider value={profileData}>
       <div className="min-h-screen bg-brand-dark flex">
-        {/* Mobile overlay */}
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-30 lg:hidden"
@@ -109,14 +105,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           />
         )}
 
-        {/* Sidebar */}
         <aside className={`
           fixed lg:sticky top-0 left-0 z-40 h-screen
           ${sidebarOpen ? 'w-60 translate-x-0' : 'w-0 -translate-x-full lg:w-16 lg:translate-x-0'}
           bg-brand-card border-r border-white/5 flex flex-col
           transition-all duration-200 overflow-hidden shrink-0
         `}>
-          {/* Logo */}
           <div className="p-4 border-b border-white/5">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-full text-left">
               {sidebarOpen ? (
@@ -125,10 +119,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <h1 className="text-xl font-bold font-display text-white tracking-wider">VERELUS</h1>
                     {!tierData.loading && (
                       <span className={`text-[10px] font-mono uppercase ${
-                        tierData.tier === 'business' ? 'text-brand-purple' :
                         tierData.tier === 'pro' ? 'text-brand-green' : 'text-white/30'
                       }`}>
-                        {tierData.tier === 'free' ? 'Free' : tierData.tier}
+                        {tierData.tier === 'free' ? 'Free' : 'Pro'}
                       </span>
                     )}
                   </div>
@@ -140,44 +133,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </button>
           </div>
 
-          {/* Nav */}
           <nav className="flex-1 py-3 overflow-y-auto">
             {NAV_ITEMS.map((item) => {
               const isActive = currentPath === item.href || (item.href !== '/dashboard' && currentPath.startsWith(item.href));
-              const required = MODULE_TIER_REQUIREMENT[item.module] || 'free';
-              const hasAccess = item.module === 'dashboard' || item.module === 'profile' || canAccess(tierData.tier, item.module);
 
               return (
                 <a
                   key={item.href}
-                  href={hasAccess ? item.href : '#'}
-                  onClick={(e) => {
-                    if (!hasAccess) { e.preventDefault(); return; }
-                    // Close sidebar on mobile after navigation
+                  href={item.href}
+                  onClick={() => {
                     if (window.innerWidth < 1024) setSidebarOpen(false);
                   }}
                   className={`flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm transition-colors ${
-                    !hasAccess
-                      ? 'text-white/20 cursor-not-allowed'
-                      : isActive
-                        ? 'bg-brand-green/10 text-brand-green'
-                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                    isActive
+                      ? 'bg-brand-green/10 text-brand-green'
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
                   }`}
-                  title={hasAccess ? item.label : `${item.label} (Plano ${required})`}
                 >
                   <span className="text-base shrink-0">{item.icon}</span>
-                  {sidebarOpen && (
-                    <span className="flex-1 flex items-center justify-between">
-                      <span>{item.label}</span>
-                      {!hasAccess && <TierBadge required={required as PlanTier} />}
-                    </span>
-                  )}
+                  {sidebarOpen && <span>{item.label}</span>}
                 </a>
               );
             })}
           </nav>
 
-          {/* User */}
           <div className="p-4 border-t border-white/5">
             {sidebarOpen ? (
               <div className="flex items-center gap-3">
@@ -206,9 +185,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-auto min-w-0">
-          {/* Mobile top bar */}
           <div className="sticky top-0 z-20 bg-brand-dark/80 backdrop-blur-md border-b border-white/5 px-4 py-3 flex items-center gap-3 lg:hidden">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -219,12 +196,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </svg>
             </button>
             <h1 className="text-sm font-display text-white tracking-wider">VERELUS</h1>
-            {!tierData.loading && tierData.tier !== 'free' && (
-              <span className={`text-[9px] font-mono uppercase ml-auto ${
-                tierData.tier === 'business' ? 'text-brand-purple' : 'text-brand-green'
-              }`}>
-                {tierData.tier}
-              </span>
+            {!tierData.loading && tierData.tier === 'pro' && (
+              <span className="text-[9px] font-mono uppercase ml-auto text-brand-green">Pro</span>
             )}
           </div>
           {children}

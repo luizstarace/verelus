@@ -6,6 +6,7 @@ import type { User } from '@supabase/supabase-js';
 import { UserTierContext, useUserTierFetch } from '@/lib/use-user-tier';
 import { ArtistProfileCtx, useArtistProfileFetch } from '@/lib/use-artist-profile';
 import ChatWidget from '@/components/chat-widget';
+import { ToastContainer } from '@/components/ui/Toast';
 
 function getSupabase() {
   return createBrowserClient(
@@ -204,6 +205,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
     <ChatWidget />
+    <ToastContainer />
     </ArtistProfileCtx.Provider>
     </UserTierContext.Provider>
   );

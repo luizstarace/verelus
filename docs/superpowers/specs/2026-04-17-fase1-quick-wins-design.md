@@ -85,9 +85,9 @@ toast.success('Bio copiada!');
 - Toggles pra remover clausulas opcionais (exclusividade, gravacao)
 
 ### 5. Pitch Kit
-- **Novo campo no output:** `email_subject` (gerado pelo Claude)
+- **(`email_subject` ja existe)** — nao ha mudanca no tipo nem no prompt
 - Preview do recipient type ANTES de gerar ("Pitch pra curador vai enfatizar: streams, playlist fits. Pitch pra jornalista: storytelling, contexto")
-- **Toast** ao copiar cada peca
+- **Toast** ao copiar cada peca (ja tem copy, trocar alert/div por Toast)
 
 ### 6. Quando Lancar
 - Renomear goal types:
@@ -171,11 +171,9 @@ export const CLAUSE_HELP = {
 
 ### Mudancas de estado por ferramenta
 
-**Pitch Kit** — `email_subject` novo campo no `PitchOutput`:
-- Atualizar `src/lib/types/tools.ts`
-- Atualizar prompt em `src/lib/pitch-kit-prompt.ts` pra pedir o campo
-- Atualizar parser pra validar
-- Atualizar `PitchKitClient.tsx` pra mostrar no output
+**Pitch Kit** — preview de recipient type:
+- Adicionar estado local `showPreview: boolean` no `PitchKitClient`
+- Renderizar card explicativo baseado em `form.recipient_type` antes de submit
 
 **Cronograma** — caption editing local:
 - Novo state `editedCaptions: Record<number, string>` no `ContentCalendarClient`
@@ -226,7 +224,7 @@ Esta fase esta completa quando:
    - 1 `<Toast>` em acao relevante (copy/save)
    - Pelo menos 1 `<HelpTooltip>` em termo tecnico (exceto as que nao tem termos tecnicos)
    - As mudancas especificas listadas na secao "Mudancas por Ferramenta"
-4. Pitch Kit tem `email_subject` gerado e exibido no output
+4. Pitch Kit mostra preview do recipient type antes de gerar
 5. Rider tem undo/redo funcional no StagePlotEditor
 6. Cronograma permite editar caption inline
 7. 0 erros TypeScript, >= 71 testes passando (67 atuais + 4 novos)
@@ -258,6 +256,3 @@ Esta fase esta completa quando:
 ### Modificar (layout pra Toast container)
 - `src/app/dashboard/layout.tsx` (adicionar `<ToastContainer />`)
 
-### Modificar (Pitch Kit backend)
-- `src/lib/types/tools.ts` (adicionar `email_subject` em `PitchOutput`)
-- `src/lib/pitch-kit-prompt.ts` (prompt + parser)

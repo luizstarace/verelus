@@ -12,6 +12,9 @@ import { STAGE_META, VENUE_META, CITY_TIER_META } from '@/lib/types/tools';
 import { calculateCache, inferStageFromListeners } from '@/lib/cache-reference-table';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
+import { HelpTooltip } from '@/components/ui/HelpTooltip';
+import { PresetSelector } from '@/components/ui/PresetSelector';
+import { HELP_TEXTS, CACHE_PRESETS } from '@/lib/tool-content';
 
 const DEFAULT_EXPENSES: CacheExpenses = {
   transport: 0,
@@ -99,6 +102,26 @@ export function CacheClient() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* ===================== INPUTS ===================== */}
           <div className="space-y-6">
+            {/* Presets */}
+            <div className="bg-brand-surface rounded-2xl p-4 border border-white/10">
+              <PresetSelector
+                presets={CACHE_PRESETS}
+                onSelect={(v) =>
+                  setInput((prev) => ({
+                    ...prev,
+                    musicians_traveling: v.band_size,
+                    expenses: {
+                      ...prev.expenses,
+                      transport: v.gear_transport_cost,
+                      meals: v.food_cost,
+                      tech_crew: v.sound_tech_cost,
+                    },
+                  }))
+                }
+                label="Preencher automaticamente"
+              />
+            </div>
+
             {/* Perfil */}
             <div className="bg-brand-surface rounded-2xl p-6 border border-white/10 space-y-4">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider">1. Seu perfil</h2>
@@ -172,7 +195,12 @@ export function CacheClient() {
                 </select>
               </Field>
 
-              <Field label="Cidade do show">
+              <Field
+                label="Cidade do show"
+                tooltip={
+                  <HelpTooltip content="Tier 1: SP, RJ, BH, POA, BSB. Tier 2: outras capitais e grandes cidades do interior. Tier 3: cidades menores. Afeta a referencia de cache do mercado." />
+                }
+              >
                 <div className="grid grid-cols-1 gap-2">
                   {(Object.keys(CITY_TIER_META) as CityTier[]).map((t) => (
                     <button
@@ -244,7 +272,12 @@ export function CacheClient() {
           <div className="lg:sticky lg:top-6 lg:self-start space-y-4">
             {/* Cards principais */}
             <div className="bg-gradient-to-br from-brand-green/10 to-brand-green/5 rounded-2xl p-6 border border-brand-green/30">
-              <p className="text-xs uppercase tracking-wider text-brand-green font-mono mb-2">Cache sugerido</p>
+              <p className="text-xs uppercase tracking-wider text-brand-green font-mono mb-2">
+                Cache sugerido
+                <span className="ml-1.5 align-middle normal-case">
+                  <HelpTooltip content={HELP_TEXTS.cache} />
+                </span>
+              </p>
               <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-4xl font-black text-white">{formatBRLCompact(result.suggested_median)}</span>
                 <span className="text-sm text-brand-muted">mediana</span>
@@ -263,9 +296,20 @@ export function CacheClient() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-brand-surface rounded-2xl p-4 border border-white/10">
-                <p className="text-[11px] uppercase tracking-wider text-brand-muted font-mono mb-1">Break-even</p>
+                <p className="text-[11px] uppercase tracking-wider text-brand-muted font-mono mb-1">
+                  Break-even
+                  <span className="ml-1.5 align-middle normal-case">
+                    <HelpTooltip content={HELP_TEXTS.breakEven} />
+                  </span>
+                </p>
                 <div className="text-xl font-bold text-white">{formatBRLCompact(result.break_even)}</div>
                 <div className="text-xs text-brand-muted mt-1">Seu piso pra nao dar prejuizo</div>
+                <details className="mt-2">
+                  <summary className="text-xs text-brand-muted cursor-pointer hover:text-white">Como calculamos?</summary>
+                  <p className="text-xs text-brand-muted mt-2 leading-relaxed">
+                    Break-even = total de despesas dividido por (1 − margem de imposto/taxa). Abaixo desse valor voce paga pra tocar; acima, entra lucro liquido.
+                  </p>
+                </details>
               </div>
               <div className={`rounded-2xl p-4 border ${
                 result.profit_at_median < 0
@@ -354,10 +398,23 @@ export function CacheClient() {
 
 // ================ Helpers UI ================
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+  tooltip,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+  tooltip?: React.ReactNode;
+}) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-white mb-1">{label}</label>
+      <label className="block text-sm font-semibold text-white mb-1">
+        {label}
+        {tooltip && <span className="ml-1.5 align-middle">{tooltip}</span>}
+      </label>
       {hint && <p className="text-xs text-brand-muted mb-2">{hint}</p>}
       {children}
     </div>

@@ -37,6 +37,7 @@ const config: Config = {
         "pulse-slow": "pulse 3s ease-in-out infinite",
         "glow": "glow 2s ease-in-out infinite alternate",
         "float": "float 6s ease-in-out infinite",
+        "slide-in-right": "slide-in-right 150ms ease-out",
       },
       keyframes: {
         glow: {
@@ -46,6 +47,10 @@ const config: Config = {
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" },
+        },
+        "slide-in-right": {
+          from: { transform: "translateX(10px)", opacity: "0" },
+          to: { transform: "translateX(0)", opacity: "1" },
         },
       },
     },

@@ -17,12 +17,16 @@ export function ToastContainer() {
   if (items.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+    <div
+      aria-live="polite"
+      aria-atomic="false"
+      className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"
+    >
       {items.map((t) => (
         <div
           key={t.id}
           role="status"
-          className={`pointer-events-auto px-4 py-3 rounded-lg border text-sm shadow-lg backdrop-blur-sm animate-in ${VARIANT_CLASS[t.variant]}`}
+          className={`pointer-events-auto px-4 py-3 rounded-lg border text-sm shadow-lg backdrop-blur-sm animate-slide-in-right ${VARIANT_CLASS[t.variant]}`}
         >
           {t.message}
         </div>

@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import type { BioInput, BioOutput, Tone, Language } from '@/lib/types/tools';
 import { BIO_CHAR_LIMITS } from '@/lib/types/tools';
+import { useToast } from '@/lib/use-toast';
+import { HelpTooltip } from '@/components/ui/HelpTooltip';
+import { CharCounter } from '@/components/ui/CharCounter';
+import { TONE_DESCRIPTIONS } from '@/lib/tool-content';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
@@ -37,15 +41,12 @@ interface BioCardProps {
 }
 
 function BioCard({ platform, label, text, limit, onRegenerate, regenerating }: BioCardProps) {
-  const [copied, setCopied] = useState(false);
+  const toast = useToast();
   const charCount = text.length;
-  const pct = (charCount / limit) * 100;
-  const charColor = pct > 95 ? 'text-orange-400' : pct > 85 ? 'text-yellow-400' : 'text-brand-muted';
 
   const copy = async () => {
     await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+    toast.success(`Bio ${label} copiada!`);
   };
 
   return (
@@ -53,16 +54,16 @@ function BioCard({ platform, label, text, limit, onRegenerate, regenerating }: B
       <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-lg font-bold text-white">{label}</h3>
-          <p className={`text-xs ${charColor} font-mono mt-0.5`}>
-            {charCount}/{limit} caracteres
-          </p>
+          <div className="mt-0.5">
+            <CharCounter current={charCount} max={limit} />
+          </div>
         </div>
         <div className="flex gap-2">
           <button
             onClick={copy}
             className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 text-white rounded-lg transition"
           >
-            {copied ? 'copiado!' : 'copiar'}
+            copiar
           </button>
           <button
             onClick={onRegenerate}
@@ -201,7 +202,7 @@ export function BioClient() {
             />
           </Field>
 
-          <Field label="Uma influencia nao-obvia que te inspira" required hint="Um artista, cineasta, autor ou referencia fora do seu genero obvio">
+          <Field label="Uma influencia nao-obvia que te inspira" required hint="Um artista, cineasta, autor, arquiteto — qualquer referencia fora do seu genero obvio. Ex: Wong Kar-wai, Clarice Lispector, Arvo Part">
             <input
               type="text"
               value={input.unusual_influence}
@@ -255,7 +256,10 @@ export function BioClient() {
                       : 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20'
                   }`}
                 >
-                  <div className="font-semibold text-sm">{opt.label}</div>
+                  <div className="font-semibold text-sm flex items-center gap-1.5">
+                    {opt.label}
+                    <HelpTooltip content={TONE_DESCRIPTIONS[opt.value]} />
+                  </div>
                   <div className="text-xs text-brand-muted mt-0.5">{opt.hint}</div>
                 </button>
               ))}

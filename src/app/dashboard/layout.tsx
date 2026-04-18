@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import type { User } from '@supabase/supabase-js';
 import { UserTierContext, useUserTierFetch } from '@/lib/use-user-tier';
-import { ArtistProfileCtx, useArtistProfileFetch } from '@/lib/use-artist-profile';
 import ChatWidget from '@/components/chat-widget';
 import { ToastContainer } from '@/components/ui/Toast';
 
@@ -35,7 +34,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
   const tierData = useUserTierFetch();
-  const profileData = useArtistProfileFetch();
 
   useEffect(() => {
     setCurrentPath(window.location.pathname);
@@ -84,7 +82,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <UserTierContext.Provider value={tierData}>
-    <ArtistProfileCtx.Provider value={profileData}>
       <div className="min-h-screen bg-brand-dark flex">
         {sidebarOpen && (
           <div
@@ -193,7 +190,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     <ChatWidget />
     <ToastContainer />
-    </ArtistProfileCtx.Provider>
     </UserTierContext.Provider>
   );
 }

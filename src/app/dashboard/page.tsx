@@ -16,19 +16,17 @@ interface Tool {
 }
 
 const TOOLS: Tool[] = [
-  // Tier 1 — disponíveis
+  // Tier 1 — gratuitas
   { key: 'bio', name: 'Bio Adaptativa', description: '4 bios profissionais nos tamanhos de Spotify, Instagram, EPK e Twitter', href: '/dashboard/bio', tier: 1, accent: 'green' },
   { key: 'cache', name: 'Calculadora de Cachê', description: 'Quanto cobrar por show e quanto sobra no bolso de verdade', href: '/dashboard/cache-calculator', tier: 1, accent: 'green' },
   { key: 'rider', name: 'Rider Técnico', description: 'PDF profissional com diagrama de palco editável', href: '/dashboard/rider', tier: 1, accent: 'green' },
   { key: 'contract', name: 'Contrato de Show', description: 'Contrato jurídico BR pronto pra assinatura', href: '/dashboard/contract', tier: 1, accent: 'green' },
-  // Tier 2 — em breve
+  // Tier 2 — Pro
   { key: 'pitch-kit', name: 'Pitch Kit', description: 'Email + 1-pager + press release pra enviar a curador', href: '/dashboard/pitch-kit', tier: 2, accent: 'purple' },
   { key: 'release-timing', name: 'Quando Lançar', description: '3 datas ideais para o seu próximo lançamento', href: '/dashboard/release-timing', tier: 2, accent: 'purple' },
   { key: 'launch-checklist', name: 'Checklist de Lançamento', description: 'Planejamento de 8 semanas antes ao pós-release', href: '/dashboard/launch-checklist', tier: 2, accent: 'purple' },
-  // Tier 3 — em breve
-  { key: 'growth', name: 'Growth Tracker', description: 'Painel semanal do seu crescimento real nas plataformas', href: '/dashboard/growth', tier: 3, accent: 'orange' },
-  { key: 'competitors', name: 'Comparador de Concorrentes', description: 'Você vs 3 artistas similares, ao longo do tempo', href: '/dashboard/competitors', tier: 3, accent: 'orange' },
-  { key: 'goals', name: 'Meta Tracker', description: 'Defina e acompanhe metas concretas de carreira', href: '/dashboard/goals', tier: 3, accent: 'orange' },
+  // Tier 3 — Pro
+  { key: 'growth', name: 'Painel de Crescimento', description: 'Crescimento real, metas e comparação com concorrentes', href: '/dashboard/growth', tier: 3, accent: 'orange' },
   { key: 'content-calendar', name: 'Cronograma de Posts', description: '30 dias de posts sugeridos pro seu lançamento', href: '/dashboard/content-calendar', tier: 3, accent: 'orange' },
 ];
 
@@ -83,20 +81,40 @@ export default async function DashboardHome() {
           </p>
         </header>
 
+        {/* Onboarding banner */}
+        <div className="bg-gradient-to-r from-brand-green/10 to-brand-green/5 rounded-2xl p-6 border border-brand-green/20 mb-10">
+          <h2 className="text-lg font-bold text-white mb-2">Comece por aqui</h2>
+          <p className="text-sm text-brand-muted leading-relaxed mb-4">
+            As 4 ferramentas gratuitas já resolvem problemas reais. Teste uma agora — leva menos de 2 minutos.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/dashboard/bio" className="px-4 py-2 bg-brand-green/15 text-brand-green text-sm font-semibold rounded-lg hover:bg-brand-green/25 transition">
+              Gerar Bio
+            </Link>
+            <Link href="/dashboard/cache-calculator" className="px-4 py-2 bg-white/5 text-white/70 text-sm rounded-lg hover:bg-white/10 transition">
+              Calcular Cachê
+            </Link>
+            <Link href="/dashboard/rider" className="px-4 py-2 bg-white/5 text-white/70 text-sm rounded-lg hover:bg-white/10 transition">
+              Criar Rider
+            </Link>
+          </div>
+        </div>
+
         {/* Grid */}
         <div className="space-y-10">
           {([1, 2, 3] as const).map((tier) => {
             const tools = TOOLS.filter((t) => t.tier === tier);
             const tierLabels: Record<typeof tier, string> = {
-              1: 'Disponíveis',
-              2: 'Tier 2 — em breve',
-              3: 'Tier 3 — em breve',
+              1: 'Gratuitas',
+              2: 'Lançamento — Pro',
+              3: 'Crescimento — Pro',
             };
             return (
               <section key={tier}>
                 <h2 className="text-xs font-mono uppercase tracking-wider text-brand-muted mb-4 flex items-center gap-2">
                   {tierLabels[tier]}
-                  {tier === 1 && <span className="px-1.5 py-0.5 bg-brand-green/10 text-brand-green rounded text-[10px] font-bold">{tools.filter((t) => t.href).length}</span>}
+                  {tier === 1 && <span className="px-1.5 py-0.5 bg-brand-green/10 text-brand-green rounded text-[10px] font-bold">grátis</span>}
+                  {tier > 1 && <span className="px-1.5 py-0.5 bg-brand-orange/10 text-brand-orange rounded text-[10px] font-bold">R$29/mês</span>}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {tools.map((tool) => {
@@ -113,7 +131,7 @@ export default async function DashboardHome() {
                           </div>
                           {!available && (
                             <span className="text-[9px] uppercase tracking-wider bg-white/5 text-brand-muted px-2 py-0.5 rounded-full font-mono">
-                              em breve
+                              Pro
                             </span>
                           )}
                           {available && (
@@ -140,7 +158,7 @@ export default async function DashboardHome() {
 
         <footer className="mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-brand-muted/60">
           <span>Conta: {user.email}</span>
-          <span>Mais ferramentas semana a semana.</span>
+          <span>{TOOLS.length} ferramentas. 4 gratuitas, {TOOLS.length - 4} no Pro.</span>
         </footer>
       </div>
     </div>

@@ -86,8 +86,8 @@ export function GrowthClient({ embedded }: { embedded?: boolean } = {}) {
       }
       await loadDashboard();
       setView('dashboard');
-      // Trigger primeiro refresh automatico
-      refresh();
+      // Trigger primeiro refresh automatico (await pra garantir que profile ja salvou)
+      await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erro');
     } finally {

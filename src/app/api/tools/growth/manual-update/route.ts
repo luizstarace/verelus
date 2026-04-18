@@ -14,8 +14,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'source deve ser instagram ou tiktok' }, { status: 400 });
     }
     const value = Number(body.value);
-    if (!Number.isFinite(value) || value < 0) {
-      return NextResponse.json({ error: 'value invalido' }, { status: 400 });
+    if (!Number.isFinite(value) || value < 0 || value > 1_000_000_000) {
+      return NextResponse.json({ error: 'Valor inválido (deve ser entre 0 e 1 bilhão)' }, { status: 400 });
     }
 
     const { userId, supabase } = await requireUser();

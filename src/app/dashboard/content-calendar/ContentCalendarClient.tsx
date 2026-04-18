@@ -289,9 +289,7 @@ export function ContentCalendarClient() {
               </div>
             </details>
 
-            {(() => {
-              let globalIdx = 0;
-              return postsByPhase.map(({ phase, posts }, phaseIdx) => (
+            {postsByPhase.map(({ phase, posts }, phaseIdx) => (
               <details key={phase} open={phaseIdx === 0}>
                 <summary className="text-xs font-mono uppercase tracking-wider text-brand-muted mb-3 cursor-pointer hover:text-white transition-colors list-none flex items-center gap-2">
                   <span className="text-[10px] select-none">▸</span>
@@ -300,7 +298,7 @@ export function ContentCalendarClient() {
                 </summary>
                 <div className="space-y-3 mb-6">
                   {posts.map((p) => {
-                    const postIdx = globalIdx++;
+                    const postIdx = result!.posts.indexOf(p);
                     return (
                     <div key={postIdx} className="bg-brand-surface rounded-xl p-5 border border-white/10">
                       <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
@@ -363,8 +361,7 @@ export function ContentCalendarClient() {
                   })}
                 </div>
               </details>
-              ));
-            })()}
+            ))}
           </div>
         )}
       </div>

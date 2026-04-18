@@ -77,7 +77,7 @@ export async function calculateGoalProgress(goal: Goal, supabase: SupabaseClient
 
   const weeksRemaining = Math.max(0.1, daysRemaining / 7);
   const remainingNeeded = current !== null ? Math.max(0, goal.target_value - current) : totalNeeded;
-  const requiredPerWeek = remainingNeeded / weeksRemaining;
+  const requiredPerWeek = Math.min(remainingNeeded / weeksRemaining, 1e9); // cap to avoid Infinity
 
   let projectedEta: string | null = null;
   if (actualPerWeek !== null && actualPerWeek > 0 && current !== null && current < goal.target_value) {

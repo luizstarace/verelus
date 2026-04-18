@@ -20,11 +20,11 @@ const DEFAULT_INPUT: ReleaseTimingInput = {
 };
 
 const GOAL_OPTIONS: Array<{ v: ReleaseTimingInput['goal']; label: string; desc: string }> = [
-  { v: 'discovery', label: 'Ser descoberto', desc: 'Algoritmo, playlists editoriais' },
-  { v: 'grow_base', label: 'Crescer minha base', desc: 'Converter em fas reais' },
-  { v: 'monetize', label: 'Monetizar', desc: 'Playlists e streams consistentes' },
-  { v: 'playlist_placement', label: 'Placement em playlists', desc: 'Foco especifico em curadorias' },
-  { v: 'press', label: 'Cobertura de imprensa', desc: 'Blogs, revistas, jornalistas' },
+  { v: 'discovery', label: 'Entrar em playlists editoriais', desc: 'Algoritmos, Release Radar, crescer streams rapido' },
+  { v: 'grow_base', label: 'Construir fanbase leal', desc: 'Crescimento organico, engajamento profundo, longo prazo' },
+  { v: 'monetize', label: 'Gerar renda consistente', desc: 'Playlists pagas, streams recorrentes, royalties' },
+  { v: 'playlist_placement', label: 'Placement em curadorias', desc: 'Foco em playlists editoriais e independentes' },
+  { v: 'press', label: 'Expandir territorio/alcance', desc: 'Chegar em novos mercados, blogs e jornalistas' },
 ];
 
 function formatDateBR(iso: string): string {
@@ -41,6 +41,10 @@ export function ReleaseTimingClient() {
   const [input, setInput] = useState<ReleaseTimingInput>(DEFAULT_INPUT);
 
   const result = useMemo(() => suggestReleaseDates(input), [input]);
+  const recommendedDates = useMemo(
+    () => new Set(result.suggestions.map((s) => s.iso_date)),
+    [result.suggestions],
+  );
 
   const update = <K extends keyof ReleaseTimingInput>(key: K, value: ReleaseTimingInput[K]) => {
     setInput({ ...input, [key]: value });
@@ -248,25 +252,36 @@ export function ReleaseTimingClient() {
                   <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-400" /> bom</span>
                   <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-400" /> mediano</span>
                   <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400" /> evitar</span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-brand-purple ring-1 ring-brand-purple/60" /> top 3</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                {result.calendar_candidates.map((c) => (
-                  <div
-                    key={c.iso_date}
-                    className={`flex-1 min-w-[70px] px-2 py-2.5 rounded-lg border text-center ${
-                      c.color === 'green'
-                        ? 'border-green-400/40 bg-green-400/10'
-                        : c.color === 'yellow'
-                        ? 'border-yellow-400/40 bg-yellow-400/10'
-                        : 'border-red-400/40 bg-red-400/10'
-                    }`}
-                  >
-                    <div className="text-[10px] text-brand-muted font-mono uppercase mb-0.5">{monthLabelFull(c.iso_date)}</div>
-                    <div className="text-sm font-bold text-white">{formatDateBR(c.iso_date).slice(0, 2)}</div>
-                    <div className="text-[10px] text-brand-muted font-mono mt-0.5">{c.score}</div>
-                  </div>
-                ))}
+                {result.calendar_candidates.map((c) => {
+                  const isRecommended = recommendedDates.has(c.iso_date);
+                  return (
+                    <div
+                      key={c.iso_date}
+                      className={`flex-1 min-w-[70px] px-2 py-2.5 rounded-lg border text-center relative ${
+                        isRecommended
+                          ? 'border-brand-purple/70 bg-brand-purple/15 ring-2 ring-brand-purple/50 shadow-[0_0_14px_-2px_rgba(168,85,247,0.35)]'
+                          : c.color === 'green'
+                          ? 'border-green-400/40 bg-green-400/10'
+                          : c.color === 'yellow'
+                          ? 'border-yellow-400/40 bg-yellow-400/10'
+                          : 'border-red-400/40 bg-red-400/10'
+                      }`}
+                    >
+                      {isRecommended && (
+                        <span className="absolute -top-1.5 -right-1.5 text-[8px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-brand-purple text-black font-bold">
+                          top
+                        </span>
+                      )}
+                      <div className="text-[10px] text-brand-muted font-mono uppercase mb-0.5">{monthLabelFull(c.iso_date)}</div>
+                      <div className={`text-sm font-bold ${isRecommended ? 'text-white' : 'text-white'}`}>{formatDateBR(c.iso_date).slice(0, 2)}</div>
+                      <div className="text-[10px] text-brand-muted font-mono mt-0.5">{c.score}</div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

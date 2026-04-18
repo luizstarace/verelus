@@ -158,7 +158,7 @@ export default function Home() {
             <span className="text-xl font-bold">
               <span className="gradient-text">{t.nav.logo}</span>
             </span>
-            <p className="text-xs text-brand-muted">Ferramentas para músicos</p>
+            <p className="text-xs text-brand-muted">Propostas para freelancers</p>
           </div>
         </div>
         <div className="flex items-center gap-6">
@@ -190,7 +190,7 @@ export default function Home() {
       <section className="relative z-10 flex flex-col items-center text-center px-6 pt-20 pb-16 max-w-5xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-green/10 border border-brand-green/20 rounded-full text-brand-green text-xs font-mono mb-8">
           <span className="w-1.5 h-1.5 bg-brand-green rounded-full animate-pulse" />
-          {lang === "pt" ? "11 ferramentas — R$29/mês" : "11 tools — R$29/month"}
+          {lang === "pt" ? "Propostas profissionais para freelancers" : "Professional proposals for freelancers"}
         </div>
 
         <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl tracking-tight leading-none mb-6">
@@ -231,7 +231,7 @@ export default function Home() {
           </p>
         </div>
         <div className="flex flex-wrap justify-center items-center gap-8 opacity-30">
-          {["Spotify API", "YouTube API", "Claude AI", "Stripe", "Resend"].map((name) => (
+          {["Claude AI", "Stripe", "Supabase", "Resend"].map((name) => (
             <span key={name} className="text-sm font-mono text-brand-muted tracking-widest">
               {name}
             </span>
@@ -254,7 +254,7 @@ export default function Home() {
           {Object.values(t.promotion.features).map((feature, i) => (
             <FeatureCard
               key={i}
-              icon={["🎵", "🤖", "✨", "🚀", "📊", "🎯"][i]}
+              icon={["👁️", "✅", "📄", "🤖", "🔗", "📋"][i]}
               title={feature.title}
               desc={feature.description}
               accent="green"
@@ -416,15 +416,15 @@ export default function Home() {
       <section className="relative z-10 px-6 py-20 max-w-4xl mx-auto text-center">
         <h2 className="font-display text-4xl sm:text-5xl mb-4">
           {lang === "pt" ? (
-            <>Pronto pra levar sua <span className="gradient-text">carreira musical</span> a sério?</>
+            <>Pronto pra parar de perder <span className="gradient-text">propostas</span>?</>
           ) : (
-            <>Ready to take your <span className="gradient-text">music career</span> seriously?</>
+            <>Ready to stop losing <span className="gradient-text">proposals</span>?</>
           )}
         </h2>
         <p className="text-brand-muted mb-8 max-w-xl mx-auto">
           {lang === "pt"
-            ? "11 ferramentas profissionais por R$29/mês. Teste grátis, sem cartão."
-            : "11 professional tools for R$29/month. Free to try, no credit card."}
+            ? "Crie propostas profissionais em minutos. Grátis pra começar, sem cartão."
+            : "Create professional proposals in minutes. Free to start, no credit card."}
         </p>
         <div className="flex justify-center">
           <SignUpForm t={t} lang={lang} />

@@ -31,7 +31,7 @@ function isValidSpotifyUrl(url: string): boolean {
     || /^[a-zA-Z0-9]{22}$/.test(url.trim());
 }
 
-export function CompetitorsClient() {
+export function CompetitorsClient({ embedded }: { embedded?: boolean } = {}) {
   const [dashboard, setDashboard] = useState<ComparisonDashboard | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -115,16 +115,8 @@ export function CompetitorsClient() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
-      <div className="max-w-5xl mx-auto">
-        <ToolPageHeader
-          title="Comparador de Concorrentes"
-          description="Adicione ate 10 artistas similares. Acompanhamos os numeros deles junto com os seus ao longo do tempo."
-          icon={<ToolIcon tool="competitors" size={22} />}
-          accent="orange"
-        />
-
+  const competitorsContent = (
+    <>
         {loading ? (
           <div className="py-20"><LoadingSpinner size="lg" label="Carregando concorrentes..." /></div>
         ) : loadError ? (
@@ -273,7 +265,6 @@ export function CompetitorsClient() {
           Os snapshots dos competidores sao capturados quando voce adiciona e em cada refresh manual.
           Spotify via scraping publico, YouTube via API oficial.
         </p>
-      </div>
 
       <ConfirmModal
         open={deleteTarget !== null}
@@ -284,6 +275,21 @@ export function CompetitorsClient() {
         onConfirm={() => { if (deleteTarget) { deleteCompetitor(deleteTarget); setDeleteTarget(null); } }}
         onCancel={() => setDeleteTarget(null)}
       />
+    </>
+  );
+
+  if (embedded) return competitorsContent;
+  return (
+    <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
+      <div className="max-w-5xl mx-auto">
+        <ToolPageHeader
+          title="Comparador de Concorrentes"
+          description="Adicione ate 10 artistas similares. Acompanhamos os numeros deles junto com os seus ao longo do tempo."
+          icon={<ToolIcon tool="competitors" size={22} />}
+          accent="orange"
+        />
+        {competitorsContent}
+      </div>
     </div>
   );
 }

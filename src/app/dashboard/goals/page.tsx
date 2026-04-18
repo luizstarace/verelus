@@ -1,7 +1,7 @@
-import { GoalsClient } from './GoalsClient';
+import { GrowthTabs } from '../growth/GrowthTabs';
 
 export const runtime = 'edge';
 
 export default function GoalsPage() {
-  return <GoalsClient />;
+  return <GrowthTabs initialTab="goals" />;
 }

@@ -25,7 +25,7 @@ function formatDelta(pct: number | null): { label: string; color: string } {
   return { label: s, color };
 }
 
-export function GrowthClient() {
+export function GrowthClient({ embedded }: { embedded?: boolean } = {}) {
   const [view, setView] = useState<View>('dashboard');
   const [data, setData] = useState<GrowthDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -132,6 +132,7 @@ export function GrowthClient() {
 
   // ========= LOADING =========
   if (loading) {
+    if (embedded) return <LoadingSpinner label="Carregando..." />;
     return (
       <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
         <div className="max-w-5xl mx-auto">
@@ -149,16 +150,7 @@ export function GrowthClient() {
 
   // ========= SETUP =========
   if (view === 'setup' || !hasProfile) {
-    return (
-      <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
-        <div className="max-w-3xl mx-auto">
-          <ToolPageHeader
-            title="Growth Tracker"
-            description="Configure suas plataformas. Toda segunda atualizamos automatico. Voce tambem pode clicar 'atualizar agora' quando quiser."
-            icon={<ToolIcon tool="growth" size={22} />}
-            accent="orange"
-          />
-
+    const setupContent = (
           <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-5">
             <h2 className="text-sm font-bold text-white uppercase tracking-wider">Suas plataformas</h2>
             <p className="text-xs text-brand-muted">Pelo menos uma. Spotify e YouTube sao automaticos. Instagram e TikTok voce atualiza manualmente (leva 10s por semana).</p>
@@ -196,6 +188,18 @@ export function GrowthClient() {
               </button>
             </div>
           </div>
+    );
+    if (embedded) return setupContent;
+    return (
+      <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          <ToolPageHeader
+            title="Growth Tracker"
+            description="Configure suas plataformas."
+            icon={<ToolIcon tool="growth" size={22} />}
+            accent="orange"
+          />
+          {setupContent}
         </div>
       </div>
     );
@@ -204,17 +208,9 @@ export function GrowthClient() {
   // ========= DASHBOARD =========
   if (!data) return null;
 
-  return (
-    <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
-      <div className="max-w-5xl mx-auto">
-        <ToolPageHeader
-          title="Growth Tracker"
-          description="Seu crescimento real na semana. Atualizado toda segunda 8h + quando voce pedir."
-          icon={<ToolIcon tool="growth" size={22} />}
-          accent="orange"
-        />
-
-        {/* Top actions */}
+  const dashboardContent = (
+    <>
+      {/* Top actions */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div className="text-xs text-brand-muted font-mono">
             {Object.values(data.last_updated).find((d) => d) && (
@@ -321,7 +317,6 @@ export function GrowthClient() {
           Dados do Spotify (ouvintes mensais via pagina publica) e YouTube (inscritos via API oficial) atualizados automaticamente.
           Instagram e TikTok via input manual (OAuth dessas plataformas exige aprovacao burocratica).
         </p>
-      </div>
 
       <InputModal
         open={!!manualModal}
@@ -339,6 +334,21 @@ export function GrowthClient() {
         }}
         onCancel={() => setManualModal(null)}
       />
+    </>
+  );
+
+  if (embedded) return dashboardContent;
+  return (
+    <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
+      <div className="max-w-5xl mx-auto">
+        <ToolPageHeader
+          title="Growth Tracker"
+          description="Seu crescimento real na semana. Atualizado toda segunda 8h + quando voce pedir."
+          icon={<ToolIcon tool="growth" size={22} />}
+          accent="orange"
+        />
+        {dashboardContent}
+      </div>
     </div>
   );
 }

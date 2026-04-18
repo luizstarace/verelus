@@ -38,7 +38,7 @@ const GOAL_PRESETS = [
   { label: '5k seguidores IG', values: { metric: 'instagram_followers' as GoalMetric, target_value: 5000, title: '5k seguidores Instagram em 3 meses' } },
 ];
 
-export function GoalsClient() {
+export function GoalsClient({ embedded }: { embedded?: boolean } = {}) {
   const [goals, setGoals] = useState<GoalProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -119,16 +119,8 @@ export function GoalsClient() {
     return 'atrasado';
   };
 
-  return (
-    <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <ToolPageHeader
-          title="Meta Tracker"
-          description="Defina metas concretas e acompanhe se esta no ritmo certo pra bater. Usa dados do Growth Tracker."
-          icon={<ToolIcon tool="goals" size={22} />}
-          accent="orange"
-        />
-
+  const goalsContent = (
+    <>
         {loading ? (
           <div className="py-20"><LoadingSpinner size="lg" label="Carregando metas..." /></div>
         ) : loadError ? (
@@ -317,7 +309,6 @@ export function GoalsClient() {
           Metas comparam o ritmo das ultimas 4 semanas de snapshots (Growth Tracker) com o crescimento necessario pra bater no prazo.
           Precisa de pelo menos 2 snapshots pra calcular ritmo.
         </p>
-      </div>
 
       <ConfirmModal
         open={deleteTarget !== null}
@@ -328,6 +319,21 @@ export function GoalsClient() {
         onConfirm={() => { if (deleteTarget) { updateGoal(deleteTarget, { action: 'delete' }); setDeleteTarget(null); } }}
         onCancel={() => setDeleteTarget(null)}
       />
+    </>
+  );
+
+  if (embedded) return goalsContent;
+  return (
+    <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
+      <div className="max-w-3xl mx-auto">
+        <ToolPageHeader
+          title="Meta Tracker"
+          description="Defina metas concretas e acompanhe se esta no ritmo certo pra bater. Usa dados do Growth Tracker."
+          icon={<ToolIcon tool="goals" size={22} />}
+          accent="orange"
+        />
+        {goalsContent}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
-import { GrowthClient } from './GrowthClient';
+import { GrowthTabs } from './GrowthTabs';
 
 export const runtime = 'edge';
 
 export default function GrowthPage() {
-  return <GrowthClient />;
+  return <GrowthTabs />;
 }

@@ -34,9 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/release-timing', label: 'Quando Lancar', icon: '\u{1F4C5}', tier: 2 },
   { href: '/dashboard/launch-checklist', label: 'Checklist', icon: '\u{2705}', tier: 2 },
   // Tier 3
-  { href: '/dashboard/growth', label: 'Growth Tracker', icon: '\u{1F4C8}', tier: 3 },
-  { href: '/dashboard/competitors', label: 'Concorrentes', icon: '\u{1F3C6}', tier: 3 },
-  { href: '/dashboard/goals', label: 'Meta Tracker', icon: '\u{1F3AF}', tier: 3 },
+  { href: '/dashboard/growth', label: 'Crescimento', icon: '\u{1F4C8}', tier: 3 },
   { href: '/dashboard/content-calendar', label: 'Cronograma', icon: '\u{1F4C5}', tier: 3 },
   // Profile
   { href: '/dashboard/profile', label: 'Perfil', icon: '\u{1F464}', tier: 1 },
@@ -136,7 +134,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <nav className="flex-1 py-3 overflow-y-auto">
             {NAV_ITEMS.map((item) => {
-              const isActive = currentPath === item.href || (item.href !== '/dashboard' && currentPath.startsWith(item.href));
+              const growthPaths = ['/dashboard/growth', '/dashboard/goals', '/dashboard/competitors'];
+              const isActive = item.href === '/dashboard/growth'
+                ? growthPaths.some((p) => currentPath === p || currentPath.startsWith(p + '/'))
+                : currentPath === item.href || (item.href !== '/dashboard' && currentPath.startsWith(item.href));
 
               return (
                 <a

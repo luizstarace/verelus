@@ -69,6 +69,30 @@ export async function getSpotifyAccessToken(): Promise<string> {
  * Retorna undefined se nao conseguir extrair.
  */
 export async function scrapeSpotifyMonthlyListeners(artistId: string): Promise<number | undefined> {
+  // Tentativa 1: scraping da pagina publica
+  const scraped = await scrapeFromPage(artistId);
+  if (scraped !== undefined) return scraped;
+
+  // Tentativa 2: Spotify Web API (funciona pra apps antigos, retorna followers como proxy)
+  try {
+    const token = await getSpotifyAccessToken();
+    const res = await fetch(`https://api.spotify.com/v1/artists/${artistId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { followers?: { total: number } };
+      if (data.followers?.total && data.followers.total > 0) {
+        return data.followers.total;
+      }
+    }
+  } catch {
+    // API fallback falhou, retorna undefined
+  }
+
+  return undefined;
+}
+
+async function scrapeFromPage(artistId: string): Promise<number | undefined> {
   try {
     const res = await fetch(`https://open.spotify.com/artist/${artistId}`, {
       headers: {

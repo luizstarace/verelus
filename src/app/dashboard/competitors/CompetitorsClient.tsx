@@ -64,7 +64,7 @@ export function CompetitorsClient({ embedded }: { embedded?: boolean } = {}) {
 
   const addCompetitor = async () => {
     if (!isValidSpotifyUrl(form.spotify_artist_url)) {
-      setError('URL do Spotify invalida. Ex: https://open.spotify.com/artist/...');
+      setError('URL do Spotify inválida. Ex: https://open.spotify.com/artist/...');
       return;
     }
     setAdding(true);
@@ -151,7 +151,7 @@ export function CompetitorsClient({ embedded }: { embedded?: boolean } = {}) {
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider">Adicionar competidor</h3>
                 <div className="bg-white/5 rounded-lg p-3 border border-white/10 mb-2">
                   <p className="text-xs text-white/80 leading-relaxed">
-                    <strong className="text-brand-orange">Dica:</strong> escolha artistas 2-5x seu tamanho no seu genero. Evite superestrelas — olhe pra quem chegou no proximo nivel que voce quer. 3-5 concorrentes bons &gt; 10 aleatorios.
+                    <strong className="text-brand-orange">Dica:</strong> escolha artistas 2-5x seu tamanho no seu gênero. Evite superestrelas — olhe pra quem chegou no próximo nível que você quer. 3-5 concorrentes bons &gt; 10 aleatórios.
                   </p>
                 </div>
                 <Field label="URL do Spotify do artista" required>
@@ -161,7 +161,7 @@ export function CompetitorsClient({ embedded }: { embedded?: boolean } = {}) {
                   <TextInput value={form.youtube_channel_url} onChange={(v) => setForm({ ...form, youtube_channel_url: v })} placeholder="https://youtube.com/@canal" />
                 </Field>
                 <Field label="Nome pra exibir (opcional)" hint="Se vazio, buscamos do Spotify">
-                  <TextInput value={form.display_name} onChange={(v) => setForm({ ...form, display_name: v })} placeholder="Ex: Ana Frango Eletrico" />
+                  <TextInput value={form.display_name} onChange={(v) => setForm({ ...form, display_name: v })} placeholder="Ex: Ana Frango Elétrico" />
                 </Field>
                 {error && <ErrorMessage message={error} />}
                 <div className="flex gap-2">
@@ -188,7 +188,7 @@ export function CompetitorsClient({ embedded }: { embedded?: boolean } = {}) {
               <EmptyState
                 icon="🏆"
                 title="Nenhum concorrente ainda"
-                description="Comece com 1-3 artistas similares do seu genero e estagio. Ate 10 no total."
+                description="Comece com 1-3 artistas similares do seu gênero e estágio. Até 10 no total."
                 action={{ label: '+ Adicionar', onClick: () => setShowAdd(true) }}
               />
             ) : (
@@ -209,7 +209,7 @@ export function CompetitorsClient({ embedded }: { embedded?: boolean } = {}) {
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-brand-orange" />
-                            <span className="font-bold text-white">Voce</span>
+                            <span className="font-bold text-white">Você</span>
                           </div>
                         </td>
                         <td className="text-right py-4 px-4 font-bold text-white">{formatNum(dashboard!.you.current.spotify)}</td>
@@ -262,14 +262,14 @@ export function CompetitorsClient({ embedded }: { embedded?: boolean } = {}) {
         )}
 
         <p className="text-xs text-brand-muted/60 mt-10 leading-relaxed">
-          Os snapshots dos competidores sao capturados quando voce adiciona e em cada refresh manual.
-          Spotify via scraping publico, YouTube via API oficial.
+          Os snapshots dos competidores são capturados quando você adiciona e em cada refresh manual.
+          Spotify via scraping público, YouTube via API oficial.
         </p>
 
       <ConfirmModal
         open={deleteTarget !== null}
         title="Remover competidor"
-        message="Tem certeza? O historico de snapshots sera perdido."
+        message="Tem certeza? O histórico de snapshots será perdido."
         confirmLabel="Remover"
         danger
         onConfirm={() => { if (deleteTarget) { deleteCompetitor(deleteTarget); setDeleteTarget(null); } }}
@@ -284,7 +284,7 @@ export function CompetitorsClient({ embedded }: { embedded?: boolean } = {}) {
       <div className="max-w-5xl mx-auto">
         <ToolPageHeader
           title="Comparador de Concorrentes"
-          description="Adicione ate 10 artistas similares. Acompanhamos os numeros deles junto com os seus ao longo do tempo."
+          description="Adicione até 10 artistas similares. Acompanhamos os números deles junto com os seus ao longo do tempo."
           icon={<ToolIcon tool="competitors" size={22} />}
           accent="orange"
         />
@@ -310,7 +310,7 @@ function ComparisonChart({ dashboard }: { dashboard: ComparisonDashboard }) {
 
     const series: Series[] = [];
     if (youPoints.length >= 2) {
-      series.push({ label: 'Voce', color: '#ffa500', isYou: true, points: youPoints });
+      series.push({ label: 'Você', color: '#ffa500', isYou: true, points: youPoints });
     }
 
     dashboard.competitors.forEach((c, i) => {
@@ -330,7 +330,7 @@ function ComparisonChart({ dashboard }: { dashboard: ComparisonDashboard }) {
       return (
         <div className="bg-brand-surface rounded-2xl p-6 border border-white/10">
           <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2">{title}</h4>
-          <p className="text-sm text-brand-muted">Sem dados historicos suficientes (precisa 2+ snapshots).</p>
+          <p className="text-sm text-brand-muted">Sem dados históricos suficientes (precisa 2+ snapshots).</p>
         </div>
       );
     }

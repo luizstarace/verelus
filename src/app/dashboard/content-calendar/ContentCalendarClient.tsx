@@ -25,7 +25,7 @@ function formatDate(iso: string): string {
 }
 
 function dayLabel(offset: number): string {
-  if (offset === 0) return 'D-0 (lancamento)';
+  if (offset === 0) return 'D-0 (lançamento)';
   if (offset < 0) return `D${offset}`;
   return `D+${offset}`;
 }
@@ -106,7 +106,7 @@ export function ContentCalendarClient() {
       <div className="max-w-6xl mx-auto px-4 py-12 lg:py-16">
         <ToolPageHeader
           title="Cronograma de Posts"
-          description={`${form.window_days} dias de posts coordenados para o lancamento. Captions, hashtags e prompts de imagem prontos.`}
+          description={`${form.window_days} dias de posts coordenados para o lançamento. Captions, hashtags e prompts de imagem prontos.`}
           accent="orange"
         />
 
@@ -122,7 +122,7 @@ export function ContentCalendarClient() {
                   placeholder="Ex: Clara Moretti"
                 />
               </Field>
-              <Field label="Titulo da musica/release">
+              <Field label="Título da música/release">
                 <input
                   required
                   value={form.song_title}
@@ -139,10 +139,10 @@ export function ContentCalendarClient() {
                 >
                   <option value="single">Single</option>
                   <option value="ep">EP</option>
-                  <option value="album">Album</option>
+                  <option value="album">Álbum</option>
                 </select>
               </Field>
-              <Field label="Data de lancamento">
+              <Field label="Data de lançamento">
                 <input
                   required
                   type="date"
@@ -151,7 +151,7 @@ export function ContentCalendarClient() {
                   className={inputClass}
                 />
               </Field>
-              <Field label="Genero">
+              <Field label="Gênero">
                 <input
                   required
                   value={form.genre}
@@ -166,7 +166,7 @@ export function ContentCalendarClient() {
                   value={form.mood}
                   onChange={(e) => setForm({ ...form, mood: e.target.value })}
                   className={inputClass}
-                  placeholder="Ex: melancolica, noturna, urgente"
+                  placeholder="Ex: melancólica, noturna, urgente"
                 />
               </Field>
             </div>
@@ -243,7 +243,7 @@ export function ContentCalendarClient() {
           <div className="space-y-8">
             <div className="bg-brand-surface rounded-2xl p-6 border border-white/10">
               <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
-                <h2 className="text-lg font-bold text-white">Estrategia</h2>
+                <h2 className="text-lg font-bold text-white">Estratégia</h2>
                 <button
                   onClick={() => { setResult(null); setEditedCaptions({}); }}
                   className="text-xs font-mono uppercase tracking-wider text-brand-muted hover:text-white transition-colors"
@@ -277,13 +277,13 @@ export function ContentCalendarClient() {
             </div>
 
             <details className="bg-brand-surface rounded-xl p-4 border border-white/10">
-              <summary className="text-sm font-semibold text-white cursor-pointer">Por que essa estrategia de {form.window_days} dias funciona?</summary>
+              <summary className="text-sm font-semibold text-white cursor-pointer">Por que essa estratégia de {form.window_days} dias funciona?</summary>
               <div className="mt-3 space-y-2 text-sm text-brand-muted leading-relaxed">
                 {(Object.keys(PHASE_STRATEGY) as PhaseKey[]).map((key) => (
                   <div key={key}>
                     <p className="text-white font-semibold">{PHASE_STRATEGY[key].title}</p>
                     <p className="text-xs">Meta: {PHASE_STRATEGY[key].goal}</p>
-                    <p className="text-xs">Tatica: {PHASE_STRATEGY[key].tactics}</p>
+                    <p className="text-xs">Tática: {PHASE_STRATEGY[key].tactics}</p>
                   </div>
                 ))}
               </div>
@@ -381,8 +381,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const inputClass = 'w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-orange/40 transition-colors';
 
 const LOADING_STEPS = [
-  'Analisando genero e mood...',
-  'Planejando fases do lancamento...',
+  'Analisando gênero e mood...',
+  'Planejando fases do lançamento...',
   'Escrevendo captions e hashtags...',
   'Gerando prompts de imagem...',
   'Finalizando cronograma...',
@@ -419,8 +419,8 @@ function groupByPhase(posts: PostSuggestion[], windowDays: number): Array<{ phas
       ? [
           { phase: `Teaser + Curiosidade (D-${windowDays} a D-8)`, range: [-windowDays, -8] },
           { phase: 'Preview + Countdown (D-7 a D-1)', range: [-7, -1] },
-          { phase: 'Lancamento (D-0)', range: [0, 0] },
-          { phase: 'Pos-lancamento (D+1 a D+7)', range: [1, 7] },
+          { phase: 'Lançamento (D-0)', range: [0, 0] },
+          { phase: 'Pós-lançamento (D+1 a D+7)', range: [1, 7] },
         ]
       : windowDays === 60
       ? [
@@ -429,16 +429,16 @@ function groupByPhase(posts: PostSuggestion[], windowDays: number): Array<{ phas
           { phase: 'Construindo curiosidade (D-29 a D-15)', range: [-29, -15] },
           { phase: 'Preview (D-14 a D-7)', range: [-14, -7] },
           { phase: 'Countdown (D-6 a D-1)', range: [-6, -1] },
-          { phase: 'Lancamento (D-0)', range: [0, 0] },
-          { phase: 'Pos-lancamento (D+1 a D+7)', range: [1, 7] },
+          { phase: 'Lançamento (D-0)', range: [0, 0] },
+          { phase: 'Pós-lançamento (D+1 a D+7)', range: [1, 7] },
         ]
       : [
           { phase: 'Teaser (D-30 a D-22)', range: [-30, -22] },
           { phase: 'Construindo curiosidade (D-21 a D-14)', range: [-21, -14] },
           { phase: 'Preview (D-13 a D-7)', range: [-13, -7] },
           { phase: 'Countdown (D-6 a D-1)', range: [-6, -1] },
-          { phase: 'Lancamento (D-0)', range: [0, 0] },
-          { phase: 'Pos-lancamento (D+1 a D+7)', range: [1, 7] },
+          { phase: 'Lançamento (D-0)', range: [0, 0] },
+          { phase: 'Pós-lançamento (D+1 a D+7)', range: [1, 7] },
         ];
   return phases
     .map(({ phase, range }) => ({

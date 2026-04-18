@@ -127,31 +127,31 @@ export const REENGAGEMENT_EMAILS: Record<string, { subject: string; body: string
   inactive_7d: {
     subject: 'Sentimos sua falta no Verelus!',
     body: `
-      <h2 style="color: #00f5a0;">Faz uma semana que voce nao aparece!</h2>
-      <p>Sua carreira musical nao para, e o Verelus esta aqui para ajudar.</p>
-      <p>Que tal gerar um novo conteudo hoje?</p>
+      <h2 style="color: #00f5a0;">Faz uma semana que você não aparece!</h2>
+      <p>Sua carreira musical não para, e o Verelus está aqui para ajudar.</p>
+      <p>Que tal gerar um novo conteúdo hoje?</p>
       <ul>
         <li>Crie um post para suas redes sociais</li>
-        <li>Gere um press release para seu proximo lancamento</li>
-        <li>Planeje sua proxima setlist</li>
+        <li>Gere um press release para seu próximo lançamento</li>
+        <li>Planeje sua próxima setlist</li>
       </ul>
       <a href="{{appUrl}}/dashboard" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Voltar ao Dashboard</a>
     `,
   },
   inactive_14d: {
-    subject: 'Sua carreira musical esta esperando por voce',
+    subject: 'Sua carreira musical está esperando por você',
     body: `
-      <h2 style="color: #00f5a0;">Ja se passaram 2 semanas...</h2>
-      <p>Sabemos que a vida de artista e corrida, mas 5 minutos no Verelus podem fazer a diferenca.</p>
-      <p>Nossos artistas mais ativos geram em media 3x mais oportunidades de playlist.</p>
+      <h2 style="color: #00f5a0;">Já se passaram 2 semanas...</h2>
+      <p>Sabemos que a vida de artista é corrida, mas 5 minutos no Verelus podem fazer a diferença.</p>
+      <p>Nossos artistas mais ativos geram em média 3x mais oportunidades de playlist.</p>
       <a href="{{appUrl}}/dashboard" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Retomar Minha Jornada</a>
     `,
   },
   past_due: {
-    subject: 'Acao necessaria: problema com seu pagamento no Verelus',
+    subject: 'Ação necessária: problema com seu pagamento no Verelus',
     body: `
       <h2 style="color: #f5a623;">Detectamos um problema com seu pagamento</h2>
-      <p>Sua assinatura do Verelus esta com pagamento pendente. Para evitar a interrupcao dos seus servicos, por favor atualize seus dados de pagamento.</p>
+      <p>Sua assinatura do Verelus está com pagamento pendente. Para evitar a interrupção dos seus serviços, por favor atualize seus dados de pagamento.</p>
       <p>Se precisar de ajuda, estamos aqui: suporte@verelus.com</p>
       <a href="{{appUrl}}/dashboard" style="display:inline-block;background:#f5a623;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Atualizar Pagamento</a>
     `,

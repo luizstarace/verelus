@@ -20,7 +20,7 @@ function makeItem(type: StageItemType, x: number, y: number, label?: string): St
 const STAGE_ITEM_PRESETS: Partial<Record<StageTemplate, StageItem[]>> = {
   solo_acoustic: [
     makeItem('vocal_mic', 0.5, 0.35, 'Vocal'),
-    makeItem('acoustic_guitar', 0.62, 0.45, 'Violao'),
+    makeItem('acoustic_guitar', 0.62, 0.45, 'Violão'),
     makeItem('monitor', 0.42, 0.22),
     makeItem('di_box', 0.7, 0.55),
   ],
@@ -106,43 +106,43 @@ const DEFAULT_MUSICIAN: MusicianSpec = {
 
 const TEMPLATE_PRESETS: Partial<Record<StageTemplate, MusicianSpec[]>> = {
   solo_acoustic: [
-    { role: 'Vocal + violao', instrument: 'Violao aco + voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: true },
+    { role: 'Vocal + violão', instrument: 'Violão aço + voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: true },
   ],
   solo_electric: [
-    { role: 'Vocal + guitarra', instrument: 'Guitarra eletrica + voz', needs_mic: true, needs_monitor: true, needs_di: true },
+    { role: 'Vocal + guitarra', instrument: 'Guitarra elétrica + voz', needs_mic: true, needs_monitor: true, needs_di: true },
   ],
   duo: [
     { role: 'Vocal 1', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
     { role: 'Vocal 2', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
   ],
   power_trio: [
-    { role: 'Guitarra + vocal', instrument: 'Guitarra eletrica + voz', needs_mic: true, needs_monitor: true, needs_di: true },
-    { role: 'Baixo', instrument: 'Baixo eletrico', needs_mic: false, needs_monitor: true, needs_di: true },
-    { role: 'Bateria', instrument: 'Bateria 5 pecas', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Guitarra + vocal', instrument: 'Guitarra elétrica + voz', needs_mic: true, needs_monitor: true, needs_di: true },
+    { role: 'Baixo', instrument: 'Baixo elétrico', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Bateria', instrument: 'Bateria 5 peças', needs_mic: true, needs_monitor: true, needs_di: false },
   ],
   quartet: [
     { role: 'Vocal', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
-    { role: 'Guitarra', instrument: 'Guitarra eletrica', needs_mic: false, needs_monitor: true, needs_di: true },
-    { role: 'Baixo', instrument: 'Baixo eletrico', needs_mic: false, needs_monitor: true, needs_di: true },
-    { role: 'Bateria', instrument: 'Bateria 5 pecas', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Guitarra', instrument: 'Guitarra elétrica', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Baixo', instrument: 'Baixo elétrico', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Bateria', instrument: 'Bateria 5 peças', needs_mic: true, needs_monitor: true, needs_di: false },
   ],
   five_piece: [
     { role: 'Vocal', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
-    { role: 'Guitarra 1', instrument: 'Guitarra eletrica', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Guitarra 1', instrument: 'Guitarra elétrica', needs_mic: false, needs_monitor: true, needs_di: true },
     { role: 'Guitarra 2 / Tecladista', instrument: 'Guitarra ou teclado', needs_mic: false, needs_monitor: true, needs_di: true },
-    { role: 'Baixo', instrument: 'Baixo eletrico', needs_mic: false, needs_monitor: true, needs_di: true },
-    { role: 'Bateria', instrument: 'Bateria 5 pecas', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Baixo', instrument: 'Baixo elétrico', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Bateria', instrument: 'Bateria 5 peças', needs_mic: true, needs_monitor: true, needs_di: false },
   ],
   six_plus: [
     { role: 'Vocal principal', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
     { role: 'Vocal backing', instrument: 'Voz (SM58)', needs_mic: true, needs_monitor: true, needs_di: false },
-    { role: 'Guitarra', instrument: 'Guitarra eletrica', needs_mic: false, needs_monitor: true, needs_di: true },
-    { role: 'Baixo', instrument: 'Baixo eletrico', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Guitarra', instrument: 'Guitarra elétrica', needs_mic: false, needs_monitor: true, needs_di: true },
+    { role: 'Baixo', instrument: 'Baixo elétrico', needs_mic: false, needs_monitor: true, needs_di: true },
     { role: 'Teclado', instrument: 'Teclado stereo', needs_mic: false, needs_monitor: true, needs_di: true },
-    { role: 'Bateria', instrument: 'Bateria 5 pecas', needs_mic: true, needs_monitor: true, needs_di: false },
+    { role: 'Bateria', instrument: 'Bateria 5 peças', needs_mic: true, needs_monitor: true, needs_di: false },
   ],
   dj_setup: [
-    { role: 'DJ', instrument: 'Controladora / CDJ', needs_mic: false, needs_monitor: true, needs_di: false, notes: 'Precisa de mesa 2m minimo' },
+    { role: 'DJ', instrument: 'Controladora / CDJ', needs_mic: false, needs_monitor: true, needs_di: false, notes: 'Precisa de mesa 2m mínimo' },
   ],
 };
 
@@ -258,8 +258,8 @@ export function RiderClient() {
     <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <ToolPageHeader
-          title="Rider Tecnico"
-          description="Responda sobre a banda e o setup. Geramos um PDF profissional com diagrama de palco, lista de instrumentos, rider pessoal e observacoes. Pronto pra enviar pra producao."
+          title="Rider Técnico"
+          description="Responda sobre a banda e o setup. Geramos um PDF profissional com diagrama de palco, lista de instrumentos, rider pessoal e observações. Pronto pra enviar pra produção."
           icon={<ToolIcon tool="rider" size={22} />}
           accent="green"
         />
@@ -267,13 +267,13 @@ export function RiderClient() {
         <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-6">
           {/* ----------- CONTATO ----------- */}
           <section className="space-y-4">
-            <h2 className="text-lg font-bold text-white">1. Contato da producao</h2>
-            <Field label="Nome artistico / banda" required>
-              <TextInput value={input.artist_name} onChange={(v) => update('artist_name', v)} placeholder="Ex: Ana Frango Eletrico" />
+            <h2 className="text-lg font-bold text-white">1. Contato da produção</h2>
+            <Field label="Nome artístico / banda" required>
+              <TextInput value={input.artist_name} onChange={(v) => update('artist_name', v)} placeholder="Ex: Ana Frango Elétrico" />
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Responsavel" required>
-                <TextInput value={input.contact_name} onChange={(v) => update('contact_name', v)} placeholder="Nome de quem cuida da producao" />
+              <Field label="Responsável" required>
+                <TextInput value={input.contact_name} onChange={(v) => update('contact_name', v)} placeholder="Nome de quem cuida da produção" />
               </Field>
               <Field label="Telefone" required>
                 <TextInput value={input.contact_phone} onChange={(v) => update('contact_phone', v)} placeholder="(11) 99999-9999" />
@@ -287,7 +287,7 @@ export function RiderClient() {
           {/* ----------- FORMATO ----------- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
             <h2 className="text-lg font-bold text-white">2. Formato da banda</h2>
-            <p className="text-xs text-brand-muted">Escolha o formato mais proximo. Populamos os musicos automaticamente — voce ajusta depois.</p>
+            <p className="text-xs text-brand-muted">Escolha o formato mais próximo. Populamos os músicos automaticamente — você ajusta depois.</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {Object.entries(STAGE_TEMPLATES).map(([key, t]) => (
                 <button
@@ -310,19 +310,19 @@ export function RiderClient() {
           {/* ----------- MUSICOS ----------- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white">3. Musicos e instrumentacao</h2>
+              <h2 className="text-lg font-bold text-white">3. Músicos e instrumentação</h2>
               <button
                 type="button"
                 onClick={addMusician}
                 className="text-xs px-3 py-1.5 bg-brand-green/10 hover:bg-brand-green/20 text-brand-green rounded-lg"
               >
-                + Adicionar musico
+                + Adicionar músico
               </button>
             </div>
             {input.musicians.map((m, i) => (
               <div key={i} className="bg-white/[0.02] border border-white/10 rounded-xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs uppercase text-brand-muted font-mono">Musico {i + 1}</div>
+                  <div className="text-xs uppercase text-brand-muted font-mono">Músico {i + 1}</div>
                   {input.musicians.length > 1 && (
                     <button type="button" onClick={() => removeMusician(i)} className="text-xs text-red-400 hover:text-red-300">
                       remover
@@ -330,7 +330,7 @@ export function RiderClient() {
                   )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Field label="Funcao / Role">
+                  <Field label="Função / Role">
                     <TextInput value={m.role} onChange={(v) => updateMusician(i, { role: v })} placeholder="Ex: Vocal principal" />
                   </Field>
                   <Field label="Instrumento">
@@ -342,8 +342,8 @@ export function RiderClient() {
                   <Checkbox label="Precisa monitor" checked={m.needs_monitor} onChange={(v) => updateMusician(i, { needs_monitor: v })} />
                   <Checkbox label="Precisa DI" checked={m.needs_di} onChange={(v) => updateMusician(i, { needs_di: v })} />
                 </div>
-                <Field label="Observacoes (opcional)">
-                  <TextInput value={m.notes ?? ''} onChange={(v) => updateMusician(i, { notes: v })} placeholder="Pedaleira, amp especifico, etc." />
+                <Field label="Observações (opcional)">
+                  <TextInput value={m.notes ?? ''} onChange={(v) => updateMusician(i, { notes: v })} placeholder="Pedaleira, amp específico, etc." />
                 </Field>
               </div>
             ))}
@@ -353,7 +353,7 @@ export function RiderClient() {
           <section className="space-y-4 pt-4 border-t border-white/5">
             <h2 className="text-lg font-bold text-white">4. Mapa de palco</h2>
             <p className="text-xs text-brand-muted">
-              Posicione cada equipamento como vai ficar no palco. Clique num item da paleta pra adicionar, arraste pra reposicionar, clique pra editar o rotulo. O preset foi montado baseado no seu template — ajuste como quiser.
+              Posicione cada equipamento como vai ficar no palco. Clique num item da paleta pra adicionar, arraste pra reposicionar, clique pra editar o rótulo. O preset foi montado baseado no seu template — ajuste como quiser.
             </p>
             <StagePlotEditor
               items={input.stage_items ?? []}
@@ -363,8 +363,8 @@ export function RiderClient() {
 
           {/* ----------- SOM E ILUMINACAO ----------- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
-            <h2 className="text-lg font-bold text-white">5. Som e iluminacao</h2>
-            <Field label="Potencia minima de PA (watts)" hint="Regra geral: 10W por pessoa no publico. Ex: 200 pessoas = 2000w">
+            <h2 className="text-lg font-bold text-white">5. Som e iluminação</h2>
+            <Field label="Potência mínima de PA (watts)" hint="Regra geral: 10W por pessoa no público. Ex: 200 pessoas = 2000w">
               <input
                 type="number"
                 value={input.pa_minimum_watts}
@@ -373,7 +373,7 @@ export function RiderClient() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-green/50"
               />
             </Field>
-            <Field label="Iluminacao">
+            <Field label="Iluminação">
               <div className="grid grid-cols-3 gap-2">
                 {(['basic', 'scenic', 'custom'] as const).map((l) => (
                   <button
@@ -386,17 +386,17 @@ export function RiderClient() {
                         : 'border-white/10 bg-white/[0.02] text-white/70'
                     }`}
                   >
-                    {l === 'basic' ? 'Basica' : l === 'scenic' ? 'Cenica' : 'Customizada'}
+                    {l === 'basic' ? 'Básica' : l === 'scenic' ? 'Cênica' : 'Customizada'}
                   </button>
                 ))}
               </div>
             </Field>
             {input.lighting !== 'basic' && (
-              <Field label="Detalhes da iluminacao">
-                <TextInput value={input.lighting_notes ?? ''} onChange={(v) => update('lighting_notes', v)} placeholder="Ex: 4 lights movel, nevoeiro, cores quentes" />
+              <Field label="Detalhes da iluminação">
+                <TextInput value={input.lighting_notes ?? ''} onChange={(v) => update('lighting_notes', v)} placeholder="Ex: 4 lights móvel, nevoeiro, cores quentes" />
               </Field>
             )}
-            <Field label="Passagem de som minima (minutos)">
+            <Field label="Passagem de som mínima (minutos)">
               <div className="grid grid-cols-4 gap-2">
                 {([30, 60, 90, 120] as const).map((m) => (
                   <button
@@ -421,11 +421,11 @@ export function RiderClient() {
             <h2 className="text-lg font-bold text-white">6. Rider pessoal</h2>
             <div className="flex flex-wrap gap-6">
               <Checkbox label="Precisa de camarim" checked={input.dressing_room} onChange={(v) => update('dressing_room', v)} />
-              <Checkbox label="Precisa de refeicoes" checked={input.meals_needed} onChange={(v) => update('meals_needed', v)} />
+              <Checkbox label="Precisa de refeições" checked={input.meals_needed} onChange={(v) => update('meals_needed', v)} />
               <Checkbox label="Precisa de hospedagem" checked={input.accommodation} onChange={(v) => update('accommodation', v)} />
             </div>
             {input.meals_needed && (
-              <Field label="Quantas refeicoes?">
+              <Field label="Quantas refeições?">
                 <input
                   type="number"
                   value={input.meals_count}
@@ -442,19 +442,19 @@ export function RiderClient() {
               </Field>
             )}
             <Field label="Transporte (opcional)" hint="Ex: transfer aeroporto, van local">
-              <TextInput value={input.transport_notes ?? ''} onChange={(v) => update('transport_notes', v)} placeholder="Detalhes de transporte, se necessario" />
+              <TextInput value={input.transport_notes ?? ''} onChange={(v) => update('transport_notes', v)} placeholder="Detalhes de transporte, se necessário" />
             </Field>
           </section>
 
           {/* ----------- OBSERVACOES ----------- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
-            <h2 className="text-lg font-bold text-white">7. Observacoes especiais</h2>
-            <Field label="Qualquer coisa que nao cabe nos campos acima" hint="Sintetizadores custom, equipamento raro, protocolos especificos, etc.">
+            <h2 className="text-lg font-bold text-white">7. Observações especiais</h2>
+            <Field label="Qualquer coisa que não cabe nos campos acima" hint="Sintetizadores custom, equipamento raro, protocolos específicos, etc.">
               <textarea
                 value={input.special_technical_notes ?? ''}
                 onChange={(e) => update('special_technical_notes', e.target.value)}
                 rows={3}
-                placeholder="Deixe em branco se nao tiver"
+                placeholder="Deixe em branco se não tiver"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 resize-none"
               />
             </Field>
@@ -471,7 +471,7 @@ export function RiderClient() {
           </button>
           {!canSubmit && (
             <p className="text-xs text-brand-muted text-center">
-              Preencha nome, contato e dados dos musicos pra liberar
+              Preencha nome, contato e dados dos músicos pra liberar
             </p>
           )}
         </div>
@@ -482,19 +482,19 @@ export function RiderClient() {
             <div className="relative bg-brand-surface border border-white/10 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-bold mb-4">Preview do Rider</h3>
               <p className="text-sm text-brand-muted mb-4">
-                Revise as informacoes antes de gerar o PDF. Depois de gerado, alteracoes exigem um novo arquivo.
+                Revise as informações antes de gerar o PDF. Depois de gerado, alterações exigem um novo arquivo.
               </p>
               <div className="text-sm text-white/80 space-y-2 mb-6 bg-black/30 rounded-lg p-4">
                 <p><strong>Artista:</strong> {input.artist_name || '—'}</p>
                 <p><strong>Contato:</strong> {input.contact_name || '—'} ({input.contact_email || '—'}, {input.contact_phone || '—'})</p>
                 <p><strong>Formato:</strong> {STAGE_TEMPLATES[input.stage_template].label}</p>
-                <p><strong>Musicos:</strong> {input.musicians?.length ?? 0}</p>
+                <p><strong>Músicos:</strong> {input.musicians?.length ?? 0}</p>
                 <p><strong>Equipamentos no palco:</strong> {input.stage_items?.length ?? 0}</p>
-                <p><strong>PA minimo:</strong> {input.pa_minimum_watts}w</p>
-                <p><strong>Iluminacao:</strong> {input.lighting === 'basic' ? 'Basica' : input.lighting === 'scenic' ? 'Cenica' : 'Customizada'}</p>
+                <p><strong>PA mínimo:</strong> {input.pa_minimum_watts}w</p>
+                <p><strong>Iluminação:</strong> {input.lighting === 'basic' ? 'Básica' : input.lighting === 'scenic' ? 'Cênica' : 'Customizada'}</p>
                 <p><strong>Passagem de som:</strong> {input.soundcheck_minutes} min</p>
-                <p><strong>Camarim:</strong> {input.dressing_room ? 'Sim' : 'Nao'} | <strong>Refeicoes:</strong> {input.meals_needed ? `Sim (${input.meals_count})` : 'Nao'} | <strong>Hospedagem:</strong> {input.accommodation ? 'Sim' : 'Nao'}</p>
-                {input.special_technical_notes && <p><strong>Observacoes:</strong> {input.special_technical_notes}</p>}
+                <p><strong>Camarim:</strong> {input.dressing_room ? 'Sim' : 'Não'} | <strong>Refeições:</strong> {input.meals_needed ? `Sim (${input.meals_count})` : 'Não'} | <strong>Hospedagem:</strong> {input.accommodation ? 'Sim' : 'Não'}</p>
+                {input.special_technical_notes && <p><strong>Observações:</strong> {input.special_technical_notes}</p>}
               </div>
               <div className="flex gap-3 justify-end">
                 <button
@@ -518,7 +518,7 @@ export function RiderClient() {
 
         {result && (
           <div id="rider-result" className="mt-12">
-            <h2 className="text-2xl font-bold text-white mb-4">Seu rider esta pronto</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Seu rider está pronto</h2>
             <div className="bg-brand-surface rounded-2xl border border-white/10 overflow-hidden">
               <iframe
                 src={URL.createObjectURL(result.pdfBlob)}
@@ -538,7 +538,7 @@ export function RiderClient() {
                   onClick={copyShareLink}
                   className="px-5 py-3 border border-white/10 text-white rounded-xl hover:bg-white/5"
                 >
-                  Copiar link compartilhavel
+                  Copiar link compartilhável
                 </button>
               )}
               <button

@@ -181,7 +181,7 @@ export async function getGrowthDashboardData(
  */
 export async function generateWeeklyInsight(data: GrowthDashboardData, artistName?: string): Promise<string> {
   const anyData = Object.values(data.current).some((v) => v !== null);
-  if (!anyData) return 'Ainda sem dados suficientes. Volte na proxima segunda.';
+  if (!anyData) return 'Ainda sem dados suficientes. Volte na próxima segunda.';
 
   const lines: string[] = [];
   for (const source of ['spotify', 'youtube', 'instagram', 'tiktok'] as const) {
@@ -192,19 +192,19 @@ export async function generateWeeklyInsight(data: GrowthDashboardData, artistNam
     }
   }
 
-  const prompt = `Dados do artista ${artistName ?? 'anonimo'} essa semana:
+  const prompt = `Dados do artista ${artistName ?? 'anônimo'} essa semana:
 ${lines.join('\n')}
 
-Voce e um consultor de crescimento pra musicos indie brasileiros. Analise os numeros acima de forma DIAGNOSTICA, nao celebratoria.
+Você é um consultor de crescimento pra músicos indie brasileiros. Analise os números acima de forma DIAGNÓSTICA, não celebratória.
 
 Em 2-3 frases:
 1. Identifique o maior movimento da semana (positivo ou negativo)
-2. Sugira UMA hipotese do que pode ter causado (viral? colaboracao? sazonalidade? algoritmo?)
-3. Recomende UMA acao acionavel pra proxima semana
+2. Sugira UMA hipótese do que pode ter causado (viral? colaboração? sazonalidade? algoritmo?)
+3. Recomende UMA ação acionável pra próxima semana
 
-Seja especifico. Nao diga "continue assim". Nao seja generico.
+Seja específico. Não diga "continue assim". Não seja genérico.
 
-Responda APENAS com o paragrafo. Sem marcacoes, sem JSON.`;
+Responda APENAS com o parágrafo. Sem marcações, sem JSON.`;
 
   const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',

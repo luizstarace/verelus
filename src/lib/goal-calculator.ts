@@ -105,15 +105,15 @@ export async function calculateGoalProgress(goal: Goal, supabase: SupabaseClient
   let recommendation: string;
   const metricLabel = GOAL_METRIC_META[goal.metric].label.toLowerCase();
   if (status === 'achieved') {
-    recommendation = `Voce bateu a meta! Considere definir uma proxima mais ambiciosa.`;
+    recommendation = `Você bateu a meta! Considere definir uma próxima mais ambiciosa.`;
   } else if (status === 'on_track') {
-    recommendation = `Ritmo atual de ${Math.round(actualPerWeek!)} ${metricLabel}/semana. Mantem isso e bate a meta no prazo.`;
+    recommendation = `Ritmo atual de ${Math.round(actualPerWeek!)} ${metricLabel}/semana. Mantém isso e bate a meta no prazo.`;
   } else if (status === 'tight' && actualPerWeek !== null) {
     const deficit = Math.round(requiredPerWeek - actualPerWeek);
-    recommendation = `Apertado. Precisa de ${Math.round(requiredPerWeek)}/sem, esta em ${Math.round(actualPerWeek)}. Falta ~${deficit}/sem pra entrar no ritmo.`;
+    recommendation = `Apertado. Precisa de ${Math.round(requiredPerWeek)}/sem, está em ${Math.round(actualPerWeek)}. Falta ~${deficit}/sem pra entrar no ritmo.`;
   } else if (status === 'behind' && actualPerWeek !== null) {
     const needed = Math.round(requiredPerWeek);
-    recommendation = `Ritmo atual nao bate a meta no prazo. Precisa quase dobrar pra ${needed}/sem. Considere ajustar data ou intensificar acoes.`;
+    recommendation = `Ritmo atual não bate a meta no prazo. Precisa quase dobrar pra ${needed}/sem. Considere ajustar data ou intensificar ações.`;
   } else {
     recommendation = `Ainda sem dados de crescimento suficientes. Volta depois de 2 semanas de snapshots.`;
   }

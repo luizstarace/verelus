@@ -154,10 +154,10 @@ export function calculateCache(input: CacheInput): CacheResult {
   if (!range) {
     // Combinacao improvavel (ex: artista reference em bar pequeno)
     alerts.push(
-      `Essa combinacao (${input.stage} em ${input.venue_type}) e rara no mercado. Nao temos dados de referencia suficientes.`
+      `Essa combinação (${input.stage} em ${input.venue_type}) é rara no mercado. Não temos dados de referência suficientes.`
     );
     suggestions.push(
-      'Considere negociar um cache baseado 100% nas suas despesas + margem de 30%, ou recusar a oportunidade se nao fizer sentido estrategico.'
+      'Considere negociar um cachê baseado 100% nas suas despesas + margem de 30%, ou recusar a oportunidade se não fizer sentido estratégico.'
     );
 
     const fallback = Math.max(break_even * 1.3, 500);
@@ -187,15 +187,15 @@ export function calculateCache(input: CacheInput): CacheResult {
   // Alertas e sugestoes
   if (suggested_median < break_even) {
     alerts.push(
-      `O cache mediano de mercado (R$ ${suggested_median.toLocaleString('pt-BR')}) nao cobre suas despesas (R$ ${break_even.toLocaleString('pt-BR')}). Esse show daria prejuizo nessas condicoes.`
+      `O cachê mediano de mercado (R$ ${suggested_median.toLocaleString('pt-BR')}) não cobre suas despesas (R$ ${break_even.toLocaleString('pt-BR')}). Esse show daria prejuízo nessas condições.`
     );
   } else if (margin_percent_at_median < 20) {
     alerts.push(
-      `Margem apertada (${margin_percent_at_median.toFixed(0)}%). Menos de 20% de margem e pouco saudavel — qualquer imprevisto vira prejuizo.`
+      `Margem apertada (${margin_percent_at_median.toFixed(0)}%). Menos de 20% de margem é pouco saudável — qualquer imprevisto vira prejuízo.`
     );
   } else if (margin_percent_at_median > 60) {
     alerts.push(
-      `Margem alta (${margin_percent_at_median.toFixed(0)}%). Otimo! Avalie se nao consegue um cache no topo da faixa (R$ ${suggested_max.toLocaleString('pt-BR')}) — pode haver espaco.`
+      `Margem alta (${margin_percent_at_median.toFixed(0)}%). Ótimo! Avalie se não consegue um cachê no topo da faixa (R$ ${suggested_max.toLocaleString('pt-BR')}) — pode haver espaço.`
     );
   }
 
@@ -205,21 +205,21 @@ export function calculateCache(input: CacheInput): CacheResult {
     const topExpenses = [...expenseEntries].sort((a, b) => b.value - a.value).slice(0, 3);
     for (const exp of topExpenses) {
       if (exp.key === 'accommodation') {
-        suggestions.push('Peca hospedagem ao CONTRATANTE como parte das obrigacoes do show.');
+        suggestions.push('Peça hospedagem ao CONTRATANTE como parte das obrigações do show.');
       } else if (exp.key === 'transport') {
         suggestions.push('Negocie transporte (ou reembolso) com o CONTRATANTE.');
       } else if (exp.key === 'meals') {
-        suggestions.push('Inclua alimentacao no rider como obrigacao do CONTRATANTE.');
+        suggestions.push('Inclua alimentação no rider como obrigação do CONTRATANTE.');
       } else if (exp.key === 'hired_musicians') {
-        suggestions.push('Avalie reduzir a formacao — pode viajar com menos musicos nesse show.');
+        suggestions.push('Avalie reduzir a formação — pode viajar com menos músicos nesse show.');
       } else if (exp.key === 'commission') {
-        suggestions.push('Se a comissao do empresario aperta o lucro, renegocie a porcentagem ou proponha piso fixo.');
+        suggestions.push('Se a comissão do empresário aperta o lucro, renegocie a porcentagem ou proponha piso fixo.');
       } else if (exp.key === 'equipment') {
-        suggestions.push('Inclua equipamento no rider tecnico como obrigacao do CONTRATANTE.');
+        suggestions.push('Inclua equipamento no rider técnico como obrigação do CONTRATANTE.');
       }
     }
     if (suggestions.length === 0) {
-      suggestions.push('Tente negociar o cache pelo teto da faixa sugerida.');
+      suggestions.push('Tente negociar o cachê pelo teto da faixa sugerida.');
     }
   }
 
@@ -227,12 +227,12 @@ export function calculateCache(input: CacheInput): CacheResult {
   if (profit_at_median >= break_even * 0.3) {
     const tierLabel = CITY_TIER_META[input.show_city_tier].label;
     if (input.show_city_tier === 'tier1') {
-      suggestions.push(`${tierLabel}: mercado mais caro. Se o CONTRATANTE aceita a faixa alta, peca valor proximo do maximo (R$ ${suggested_max.toLocaleString('pt-BR')}).`);
+      suggestions.push(`${tierLabel}: mercado mais caro. Se o CONTRATANTE aceita a faixa alta, peça valor próximo do máximo (R$ ${suggested_max.toLocaleString('pt-BR')}).`);
     } else {
-      suggestions.push(`Voce esta em regiao ${tierLabel.toLowerCase()} — ajuste feito. Se for capital proxima, pode testar pedir 10% a mais.`);
+      suggestions.push(`Você está em região ${tierLabel.toLowerCase()} — ajuste feito. Se for capital próxima, pode testar pedir 10% a mais.`);
     }
     if (input.venue_type === 'corporate' || input.venue_type === 'private') {
-      suggestions.push('Eventos corporativos/privados tipicamente pagam acima da faixa de publico. Negocie com confianca.');
+      suggestions.push('Eventos corporativos/privados tipicamente pagam acima da faixa de público. Negocie com confiança.');
     }
   }
 

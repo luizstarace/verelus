@@ -10,7 +10,7 @@ import { CompetitorsClient } from '../competitors/CompetitorsClient';
 type Tab = 'growth' | 'goals' | 'competitors';
 
 const TABS: Array<{ key: Tab; label: string; description: string }> = [
-  { key: 'growth', label: 'Crescimento', description: 'Numeros reais da semana nas plataformas' },
+  { key: 'growth', label: 'Crescimento', description: 'Números reais da semana nas plataformas' },
   { key: 'goals', label: 'Metas', description: 'Defina metas e acompanhe o ritmo' },
   { key: 'competitors', label: 'Concorrentes', description: 'Compare seu crescimento com outros artistas' },
 ];

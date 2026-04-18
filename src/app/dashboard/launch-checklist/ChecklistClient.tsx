@@ -37,12 +37,12 @@ const DEFAULT_INPUT: ChecklistInput = {
 const OBJECTIVE_OPTIONS: Array<{ v: ChecklistObjective; label: string; desc: string }> = [
   { v: 'discovery', label: 'Ser descoberto', desc: 'Algoritmo + playlists editoriais' },
   { v: 'monetization', label: 'Monetizar', desc: 'Streams consistentes + direitos' },
-  { v: 'radio', label: 'Entrar na radio', desc: 'Radio + imprensa tradicional' },
+  { v: 'radio', label: 'Entrar na rádio', desc: 'Rádio + imprensa tradicional' },
 ];
 
 const BUDGET_OPTIONS: Array<{ v: ChecklistBudget; label: string; desc: string }> = [
   { v: 'caseiro', label: 'Caseiro', desc: 'R$0-500' },
-  { v: 'medio', label: 'Medio', desc: 'R$500-5k' },
+  { v: 'medio', label: 'Médio', desc: 'R$500-5k' },
   { v: 'pro', label: 'Profissional', desc: 'R$5k+' },
 ];
 
@@ -152,8 +152,8 @@ export function ChecklistClient() {
       <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <ToolPageHeader
-            title="Checklist de Lancamento"
-            description="Planejamento completo de 8 semanas antes ate 2 semanas pos-release. Curado com padroes de A&R indie BR. Edite, pule e adapte conforme for."
+            title="Checklist de Lançamento"
+            description="Planejamento completo de 8 semanas antes até 2 semanas pós-release. Curado com padrões de A&R indie BR. Edite, pule e adapte conforme for."
             icon={<ToolIcon tool="launch-checklist" size={22} />}
             accent="purple"
           />
@@ -173,7 +173,7 @@ export function ChecklistClient() {
             <ErrorMessage message={error} onRetry={loadChecklists} />
           ) : checklists.length === 0 ? (
             <div className="bg-brand-surface rounded-2xl p-12 border border-white/10 text-center">
-              <p className="text-white/60 mb-4">Voce ainda nao tem nenhuma checklist.</p>
+              <p className="text-white/60 mb-4">Você ainda não tem nenhuma checklist.</p>
               <button
                 onClick={() => setView('setup')}
                 className="px-5 py-3 bg-gradient-to-r from-brand-purple to-brand-purple/80 text-white font-bold rounded-xl"
@@ -202,9 +202,9 @@ export function ChecklistClient() {
                       <div>
                         <h3 className="text-lg font-bold text-white">{cl.input.release_title}</h3>
                         <p className="text-xs text-brand-muted font-mono uppercase tracking-wider mt-0.5">
-                          {cl.input.release_type} · lancamento em {formatDateBR(cl.input.release_date)}
+                          {cl.input.release_type} · lançamento em {formatDateBR(cl.input.release_date)}
                           {days >= 0 && days <= 60 && <span className="ml-2 text-brand-purple">· {days} dias</span>}
-                          {days < 0 && <span className="ml-2 text-brand-muted">· ha {Math.abs(days)} dias</span>}
+                          {days < 0 && <span className="ml-2 text-brand-muted">· há {Math.abs(days)} dias</span>}
                         </p>
                       </div>
                       <span className="text-xs font-mono text-brand-muted">{progressPct}%</span>
@@ -231,18 +231,18 @@ export function ChecklistClient() {
       <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
         <div className="max-w-3xl mx-auto">
           <ToolPageHeader
-            title="Nova Checklist de Lancamento"
+            title="Nova Checklist de Lançamento"
             description="Preenche uma vez e a gente monta uma checklist personalizada de 8 semanas com prazos calculados automaticamente."
             icon={<ToolIcon tool="launch-checklist" size={22} />}
             accent="purple"
           />
 
           <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-6">
-            <Field label="Titulo do release" required>
+            <Field label="Título do release" required>
               <TextInput value={input.release_title} onChange={(v) => setInput({ ...input, release_title: v })} placeholder="Ex: Tem Certeza (single)" />
             </Field>
 
-            <Field label="Data do lancamento" required hint="Idealmente uma sexta-feira (use Quando Lancar pra escolher)">
+            <Field label="Data do lançamento" required hint="Idealmente uma sexta-feira (use Quando Lançar pra escolher)">
               <input
                 type="date"
                 value={input.release_date}
@@ -286,7 +286,7 @@ export function ChecklistClient() {
               </div>
             </Field>
 
-            <Field label="Orcamento do lancamento">
+            <Field label="Orçamento do lançamento">
               <div className="grid grid-cols-3 gap-2">
                 {BUDGET_OPTIONS.map((b) => (
                   <button
@@ -383,12 +383,12 @@ function ChecklistTimeline({
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <p className="text-xs font-mono uppercase tracking-wider text-brand-purple mb-1">
-                {checklist.input.release_type} · {checklist.input.objective} · orcamento {checklist.input.budget}
+                {checklist.input.release_type} · {checklist.input.objective} · orçamento {checklist.input.budget}
               </p>
               <h1 className="text-2xl font-bold text-white mb-1">{checklist.input.release_title}</h1>
               <p className="text-sm text-brand-muted">
-                Lancamento em <strong className="text-white">{formatDateBR(checklist.input.release_date)}</strong>
-                {daysToRelease >= 0 ? ` · em ${daysToRelease} dias` : ` · ha ${Math.abs(daysToRelease)} dias`}
+                Lançamento em <strong className="text-white">{formatDateBR(checklist.input.release_date)}</strong>
+                {daysToRelease >= 0 ? ` · em ${daysToRelease} dias` : ` · há ${Math.abs(daysToRelease)} dias`}
               </p>
             </div>
             <div className="text-right">
@@ -459,7 +459,7 @@ function ChecklistTimeline({
                               {item.title}
                               {item.importance === 'critical' && (
                                 <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 ml-2 align-middle">
-                                  critico
+                                  crítico
                                 </span>
                               )}
                               {item.importance === 'important' && (
@@ -536,7 +536,7 @@ function ChecklistTimeline({
         </div>
 
         <p className="text-xs text-brand-muted/60 mt-10 leading-relaxed">
-          Progresso e salvo automaticamente. Marque como feito conforme executa. Pule itens que nao se aplicam ao seu caso.
+          Progresso é salvo automaticamente. Marque como feito conforme executa. Pule itens que não se aplicam ao seu caso.
         </p>
       </div>
     </div>

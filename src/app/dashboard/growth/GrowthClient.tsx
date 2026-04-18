@@ -153,17 +153,17 @@ export function GrowthClient({ embedded }: { embedded?: boolean } = {}) {
     const setupContent = (
           <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-5">
             <h2 className="text-sm font-bold text-white uppercase tracking-wider">Suas plataformas</h2>
-            <p className="text-xs text-brand-muted">Pelo menos uma. Spotify e YouTube sao automaticos. Instagram e TikTok voce atualiza manualmente (leva 10s por semana).</p>
+            <p className="text-xs text-brand-muted">Pelo menos uma. Spotify e YouTube são automáticos. Instagram e TikTok você atualiza manualmente (leva 10s por semana).</p>
 
-            <Field label="URL do Spotify do artista" hint="Automatico. Ex: https://open.spotify.com/artist/...">
+            <Field label="URL do Spotify do artista" hint="Automático. Ex: https://open.spotify.com/artist/...">
               <TextInput value={profileForm.spotify_artist_url} onChange={(v) => setProfileForm({ ...profileForm, spotify_artist_url: v })} placeholder="https://open.spotify.com/artist/..." />
             </Field>
 
-            <Field label="Canal do YouTube (URL ou @handle)" hint="Automatico. Ex: https://youtube.com/@seucanal ou @seucanal">
+            <Field label="Canal do YouTube (URL ou @handle)" hint="Automático. Ex: https://youtube.com/@seucanal ou @seucanal">
               <TextInput value={profileForm.youtube_channel_url} onChange={(v) => setProfileForm({ ...profileForm, youtube_channel_url: v })} placeholder="https://youtube.com/@seucanal" />
             </Field>
 
-            <Field label="Handle Instagram (opcional)" hint="Manual. Voce atualiza semanalmente em 10s">
+            <Field label="Handle Instagram (opcional)" hint="Manual. Você atualiza semanalmente em 10s">
               <TextInput value={profileForm.instagram_handle} onChange={(v) => setProfileForm({ ...profileForm, instagram_handle: v })} placeholder="@seuhandle" />
             </Field>
 
@@ -214,7 +214,7 @@ export function GrowthClient({ embedded }: { embedded?: boolean } = {}) {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div className="text-xs text-brand-muted font-mono">
             {Object.values(data.last_updated).find((d) => d) && (
-              <>Ultima atualizacao: {Object.values(data.last_updated).find((d) => d)}</>
+              <>Última atualização: {Object.values(data.last_updated).find((d) => d)}</>
             )}
           </div>
           <div className="flex gap-2">
@@ -291,7 +291,7 @@ export function GrowthClient({ embedded }: { embedded?: boolean } = {}) {
                   <span className="text-brand-muted">vs semana ant.</span>
                 </div>
                 {!hasConfig && (
-                  <p className="text-[11px] text-brand-muted mt-2">Nao configurado</p>
+                  <p className="text-[11px] text-brand-muted mt-2">Não configurado</p>
                 )}
               </div>
             );
@@ -301,7 +301,7 @@ export function GrowthClient({ embedded }: { embedded?: boolean } = {}) {
         {/* Chart */}
         <div className="bg-brand-surface rounded-2xl p-5 border border-white/10">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Evolucao 12 semanas</h3>
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Evolução 12 semanas</h3>
             <button
               type="button"
               onClick={() => setLogScale(!logScale)}
@@ -314,8 +314,8 @@ export function GrowthClient({ embedded }: { embedded?: boolean } = {}) {
         </div>
 
         <p className="text-xs text-brand-muted/60 mt-10 leading-relaxed">
-          Dados do Spotify (ouvintes mensais via pagina publica) e YouTube (inscritos via API oficial) atualizados automaticamente.
-          Instagram e TikTok via input manual (OAuth dessas plataformas exige aprovacao burocratica).
+          Dados do Spotify (ouvintes mensais via página pública) e YouTube (inscritos via API oficial) atualizados automaticamente.
+          Instagram e TikTok via input manual (OAuth dessas plataformas exige aprovação burocrática).
         </p>
 
       <InputModal
@@ -343,7 +343,7 @@ export function GrowthClient({ embedded }: { embedded?: boolean } = {}) {
       <div className="max-w-5xl mx-auto">
         <ToolPageHeader
           title="Growth Tracker"
-          description="Seu crescimento real na semana. Atualizado toda segunda 8h + quando voce pedir."
+          description="Seu crescimento real na semana. Atualizado toda segunda 8h + quando você pedir."
           icon={<ToolIcon tool="growth" size={22} />}
           accent="orange"
         />
@@ -376,7 +376,7 @@ function LineChart({ data, logScale }: { data: Record<GrowthSource, Array<{ date
   }
   const dates = Object.keys(allDatesMap).sort();
   if (dates.length === 0) {
-    return <p className="text-sm text-brand-muted">Ainda sem historico. Primeira captura aparece aqui apos seu primeiro refresh.</p>;
+    return <p className="text-sm text-brand-muted">Ainda sem histórico. Primeira captura aparece aqui após seu primeiro refresh.</p>;
   }
 
   // Cada source usa sua propria escala (independentes) — pontos normalizados

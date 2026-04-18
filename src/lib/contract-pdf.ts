@@ -120,17 +120,17 @@ function formatDateLong(iso: string): string {
   if (!iso) return 'data a definir';
   const date = new Date(iso + 'T12:00:00');
   if (isNaN(date.getTime())) return iso;
-  const months = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
   return `${date.getDate()} de ${months[date.getMonth()]} de ${date.getFullYear()}`;
 }
 
 function describeParty(party: ContractParty, role: string): string {
   const docLabel = party.type === 'pj' ? 'CNPJ' : 'CPF';
-  const nameLabel = party.type === 'pj' ? 'pessoa juridica' : 'pessoa fisica';
+  const nameLabel = party.type === 'pj' ? 'pessoa jurídica' : 'pessoa física';
   const rep = party.type === 'pj' && party.representative
     ? `, neste ato representada por ${party.representative}${party.representative_document ? ` (CPF ${party.representative_document})` : ''}`
     : '';
-  return `${role.toUpperCase()}: ${party.name}, ${nameLabel}, inscrita no ${docLabel} sob o numero ${party.document}, com endereco na ${party.address_street}, ${party.address_city}/${party.address_state}, CEP ${party.address_zip}${rep}.`;
+  return `${role.toUpperCase()}: ${party.name}, ${nameLabel}, inscrita no ${docLabel} sob o número ${party.document}, com endereço na ${party.address_street}, ${party.address_city}/${party.address_state}, CEP ${party.address_zip}${rep}.`;
 }
 
 function duration_text(min: number): string {
@@ -143,30 +143,30 @@ function duration_text(min: number): string {
 function recordingText(rule: ContractInput['recording_allowed']): string {
   switch (rule) {
     case 'prohibited':
-      return 'Fica vedada qualquer gravacao audio ou audiovisual do show, exceto uso pessoal e privado pelo publico presente.';
+      return 'Fica vedada qualquer gravação áudio ou audiovisual do show, exceto uso pessoal e privado pelo público presente.';
     case 'personal_only':
-      return 'Fica permitida a gravacao apenas para uso pessoal e nao comercial por parte do publico presente. Gravacoes profissionais e transmissoes dependem de autorizacao expressa do CONTRATADO.';
+      return 'Fica permitida a gravação apenas para uso pessoal e não comercial por parte do público presente. Gravações profissionais e transmissões dependem de autorização expressa do CONTRATADO.';
     case 'promo_with_credit':
-      return 'O CONTRATANTE pode gravar trechos do show para uso promocional em suas redes sociais e materiais de divulgacao, desde que credite o CONTRATADO de forma visivel.';
+      return 'O CONTRATANTE pode gravar trechos do show para uso promocional em suas redes sociais e materiais de divulgação, desde que credite o CONTRATADO de forma visível.';
     case 'full_rights':
-      return 'O CONTRATANTE fica autorizado a gravar o show integralmente e utilizar as gravacoes para fins promocionais em suas proprias plataformas, creditando o CONTRATADO.';
+      return 'O CONTRATANTE fica autorizado a gravar o show integralmente e utilizar as gravações para fins promocionais em suas próprias plataformas, creditando o CONTRATADO.';
   }
 }
 
 function paymentMethodText(m: ContractInput['payment_method']): string {
   switch (m) {
     case 'pix': return 'PIX';
-    case 'transfer': return 'transferencia bancaria';
+    case 'transfer': return 'transferência bancária';
     case 'cash': return 'pagamento em dinheiro';
-    case 'boleto': return 'boleto bancario';
+    case 'boleto': return 'boleto bancário';
   }
 }
 
 function balanceTimingText(t: ContractInput['balance_due_timing']): string {
   switch (t) {
-    case 'before_show': return 'ate 3 dias antes do show';
-    case 'on_show_day': return 'no dia do show, antes do inicio da apresentacao';
-    case 'after_show': return 'ate 5 dias uteis apos o show';
+    case 'before_show': return 'até 3 dias antes do show';
+    case 'on_show_day': return 'no dia do show, antes do início da apresentação';
+    case 'after_show': return 'até 5 dias úteis após o show';
   }
 }
 
@@ -182,14 +182,14 @@ function drawDisclaimer(ctx: DrawContext): DrawContext {
     borderColor: COLOR_DISCLAIMER_BORDER,
     borderWidth: 0.8,
   });
-  c.page.drawText('IMPORTANTE — MODELO GENERICO', {
+  c.page.drawText('IMPORTANTE — MODELO GENÉRICO', {
     x: MARGIN + 10,
     y: boxY + 42,
     size: 9,
     font: c.fontBold,
     color: COLOR_DISCLAIMER_BORDER,
   });
-  const discText = 'Este contrato e um modelo profissional, amplamente aceito no mercado musical brasileiro. Para shows de alto valor, situacoes envolvendo direitos autorais complexos ou disputas com risco juridico elevado, recomenda-se revisao por advogado proprio. A Verelus nao se responsabiliza por adequacao legal a cada caso especifico.';
+  const discText = 'Este contrato é um modelo profissional, amplamente aceito no mercado musical brasileiro. Para shows de alto valor, situações envolvendo direitos autorais complexos ou disputas com risco jurídico elevado, recomenda-se revisão por advogado próprio. A Verelus não se responsabiliza por adequação legal a cada caso específico.';
   const lines = wrapText(discText, c.font, 8, PAGE_W - 2 * MARGIN - 20);
   let yPos = boxY + 30;
   for (const line of lines) {
@@ -206,14 +206,14 @@ export async function generateContractPDF(input: ContractInput): Promise<Uint8Ar
 
   pdf.setTitle(`Contrato de Show - ${input.artist.name}`);
   pdf.setAuthor(input.artist.name);
-  pdf.setSubject('Contrato de Prestacao de Servicos Artisticos');
+  pdf.setSubject('Contrato de Prestação de Serviços Artísticos');
   pdf.setCreator('Verelus');
 
   const firstPage = pdf.addPage([PAGE_W, PAGE_H]);
   let ctx: DrawContext = { pdf, page: firstPage, font, fontBold, cursorY: PAGE_H - MARGIN };
 
   // ========== CAPA / TITULO ==========
-  ctx.page.drawText('CONTRATO DE PRESTACAO', {
+  ctx.page.drawText('CONTRATO DE PRESTAÇÃO', {
     x: MARGIN,
     y: ctx.cursorY - 16,
     size: 10,
@@ -222,7 +222,7 @@ export async function generateContractPDF(input: ContractInput): Promise<Uint8Ar
   });
   ctx = { ...ctx, cursorY: ctx.cursorY - 28 };
 
-  ctx.page.drawText('DE SERVICOS ARTISTICOS', {
+  ctx.page.drawText('DE SERVIÇOS ARTÍSTICOS', {
     x: MARGIN,
     y: ctx.cursorY - 24,
     size: 22,
@@ -251,59 +251,59 @@ export async function generateContractPDF(input: ContractInput): Promise<Uint8Ar
   ctx = drawParagraph(ctx, describeParty(input.artist, 'Contratado'), { size: 10, leading: 1.5 });
   ctx = { ...ctx, cursorY: ctx.cursorY - 4 };
   ctx = drawParagraph(ctx,
-    'As partes, acima qualificadas, tem entre si justo e contratado o presente Contrato de Prestacao de Servicos Artisticos, que se regera pelas clausulas e condicoes a seguir:',
+    'As partes, acima qualificadas, têm entre si justo e contratado o presente Contrato de Prestação de Serviços Artísticos, que se regerá pelas cláusulas e condições a seguir:',
     { size: 10, leading: 1.5 }
   );
   ctx = drawDivider(ctx);
 
   // ========== CLAUSULA 1 — OBJETO ==========
-  ctx = drawSectionTitle(ctx, 'Clausula 1 — Do objeto');
+  ctx = drawSectionTitle(ctx, 'Cláusula 1 — Do objeto');
   const openingText = input.has_opening_act && input.opening_act_name
-    ? ` A atracao de abertura sera: ${input.opening_act_name}.`
+    ? ` A atração de abertura será: ${input.opening_act_name}.`
     : '';
   ctx = drawParagraph(ctx,
-    `O CONTRATADO se obriga a realizar apresentacao artistica para o CONTRATANTE no dia ${formatDateLong(input.show_date)}, com inicio previsto as ${input.show_time}, com duracao aproximada de ${duration_text(input.show_duration_min)}. A apresentacao ocorrera em ${input.venue_name}, localizado em ${input.venue_address}. O evento e caracterizado como: ${input.event_type}.${openingText}`,
+    `O CONTRATADO se obriga a realizar apresentação artística para o CONTRATANTE no dia ${formatDateLong(input.show_date)}, com início previsto às ${input.show_time}, com duração aproximada de ${duration_text(input.show_duration_min)}. A apresentação ocorrerá em ${input.venue_name}, localizado em ${input.venue_address}. O evento é caracterizado como: ${input.event_type}.${openingText}`,
     { size: 10, leading: 1.5 }
   );
   ctx = drawDivider(ctx);
 
   // ========== CLAUSULA 2 — CACHE E PAGAMENTO ==========
-  ctx = drawSectionTitle(ctx, 'Clausula 2 — Do cache e condicoes de pagamento');
+  ctx = drawSectionTitle(ctx, 'Cláusula 2 — Do cachê e condições de pagamento');
   const cacheFormatted = formatCurrency(input.cache_total);
   const depositValue = formatCurrency(Math.round(input.cache_total * input.deposit_percent / 100));
   const balanceValue = formatCurrency(input.cache_total - Math.round(input.cache_total * input.deposit_percent / 100));
 
-  let paymentText = `Pela prestacao dos servicos descritos na Clausula 1, o CONTRATANTE pagara ao CONTRATADO o cache total de ${cacheFormatted}, a ser pago via ${paymentMethodText(input.payment_method)}.`;
+  let paymentText = `Pela prestação dos serviços descritos na Cláusula 1, o CONTRATANTE pagará ao CONTRATADO o cachê total de ${cacheFormatted}, a ser pago via ${paymentMethodText(input.payment_method)}.`;
 
   if (input.deposit_percent > 0 && input.deposit_percent < 100) {
-    paymentText += ` O pagamento sera realizado em duas parcelas: (i) sinal de ${input.deposit_percent}% (${depositValue}) pago na assinatura deste contrato${input.deposit_due_date ? ` ou ate ${formatDate(input.deposit_due_date)}, o que ocorrer primeiro` : ''}; (ii) saldo remanescente de ${balanceValue}, ${balanceTimingText(input.balance_due_timing)}.`;
+    paymentText += ` O pagamento será realizado em duas parcelas: (i) sinal de ${input.deposit_percent}% (${depositValue}) pago na assinatura deste contrato${input.deposit_due_date ? ` ou até ${formatDate(input.deposit_due_date)}, o que ocorrer primeiro` : ''}; (ii) saldo remanescente de ${balanceValue}, ${balanceTimingText(input.balance_due_timing)}.`;
   } else if (input.deposit_percent === 100) {
-    paymentText += ` O valor integral sera pago na assinatura deste contrato.`;
+    paymentText += ` O valor integral será pago na assinatura deste contrato.`;
   } else {
-    paymentText += ` O valor integral sera pago ${balanceTimingText(input.balance_due_timing)}.`;
+    paymentText += ` O valor integral será pago ${balanceTimingText(input.balance_due_timing)}.`;
   }
   ctx = drawParagraph(ctx, paymentText, { size: 10, leading: 1.5 });
   ctx = { ...ctx, cursorY: ctx.cursorY - 4 };
   ctx = drawParagraph(ctx,
-    'O nao cumprimento do prazo de pagamento acarretara em juros de 1% ao mes, pro rata die, alem de multa de 2% sobre o valor em atraso.',
+    'O não cumprimento do prazo de pagamento acarretará em juros de 1% ao mês, pro rata die, além de multa de 2% sobre o valor em atraso.',
     { size: 10, leading: 1.5 }
   );
   ctx = drawDivider(ctx);
 
   // ========== CLAUSULA 3 — OBRIGACOES DO CONTRATANTE ==========
-  ctx = drawSectionTitle(ctx, 'Clausula 3 — Das obrigacoes do Contratante');
+  ctx = drawSectionTitle(ctx, 'Cláusula 3 — Das obrigações do Contratante');
   const responsibilities: string[] = [];
-  if (input.provides_equipment) responsibilities.push('fornecer todo equipamento tecnico conforme rider anexo a este contrato (som, iluminacao, palco, backline quando aplicavel)');
+  if (input.provides_equipment) responsibilities.push('fornecer todo equipamento técnico conforme rider anexo a este contrato (som, iluminação, palco, backline quando aplicável)');
   if (input.provides_transport) responsibilities.push('arcar com o transporte do CONTRATADO e sua equipe para o local do show, bem como o retorno');
-  if (input.provides_accommodation) responsibilities.push('fornecer hospedagem adequada para o CONTRATADO e sua equipe na cidade do evento, quando aplicavel');
-  if (input.provides_meals) responsibilities.push('fornecer alimentacao para o CONTRATADO e sua equipe no dia do show');
-  if (input.provides_security) responsibilities.push('garantir a seguranca do CONTRATADO, sua equipe, equipamentos e do publico durante todo o evento');
-  if (input.provides_promotion) responsibilities.push('realizar a devida divulgacao do evento, sendo vedada a utilizacao da imagem do CONTRATADO em contexto diverso do ora acordado');
-  responsibilities.push('cumprir com o prazo de passagem de som acordado com antecedencia');
-  responsibilities.push('garantir a conformidade do local quanto a alvaras e autorizacoes necessarias');
+  if (input.provides_accommodation) responsibilities.push('fornecer hospedagem adequada para o CONTRATADO e sua equipe na cidade do evento, quando aplicável');
+  if (input.provides_meals) responsibilities.push('fornecer alimentação para o CONTRATADO e sua equipe no dia do show');
+  if (input.provides_security) responsibilities.push('garantir a segurança do CONTRATADO, sua equipe, equipamentos e do público durante todo o evento');
+  if (input.provides_promotion) responsibilities.push('realizar a devida divulgação do evento, sendo vedada a utilização da imagem do CONTRATADO em contexto diverso do ora acordado');
+  responsibilities.push('cumprir com o prazo de passagem de som acordado com antecedência');
+  responsibilities.push('garantir a conformidade do local quanto a alvarás e autorizações necessárias');
 
   ctx = drawParagraph(ctx,
-    'Sao obrigacoes do CONTRATANTE, alem de outras previstas neste instrumento:',
+    'São obrigações do CONTRATANTE, além de outras previstas neste instrumento:',
     { size: 10, leading: 1.5 }
   );
   for (let i = 0; i < responsibilities.length; i++) {
@@ -312,48 +312,48 @@ export async function generateContractPDF(input: ContractInput): Promise<Uint8Ar
   ctx = drawDivider(ctx);
 
   // ========== CLAUSULA 4 — OBRIGACOES DO CONTRATADO ==========
-  ctx = drawSectionTitle(ctx, 'Clausula 4 — Das obrigacoes do Contratado');
+  ctx = drawSectionTitle(ctx, 'Cláusula 4 — Das obrigações do Contratado');
   const artistObligations = [
-    'comparecer no local e no horario ajustados, com antecedencia minima de 2 (duas) horas para passagem de som',
-    'realizar a apresentacao com a qualidade artistica e tecnica compativel com sua reputacao profissional',
-    'respeitar o horario de duracao acordado na Clausula 1',
-    'responsabilizar-se pelos direitos autorais e conexos de sua obra, incluindo eventuais recolhimentos ao ECAD quando aplicavel',
-    'informar previamente ao CONTRATANTE sobre qualquer alteracao de equipe ou formacao',
+    'comparecer no local e no horário ajustados, com antecedência mínima de 2 (duas) horas para passagem de som',
+    'realizar a apresentação com a qualidade artística e técnica compatível com sua reputação profissional',
+    'respeitar o horário de duração acordado na Cláusula 1',
+    'responsabilizar-se pelos direitos autorais e conexos de sua obra, incluindo eventuais recolhimentos ao ECAD quando aplicável',
+    'informar previamente ao CONTRATANTE sobre qualquer alteração de equipe ou formação',
   ];
-  ctx = drawParagraph(ctx, 'Sao obrigacoes do CONTRATADO:', { size: 10, leading: 1.5 });
+  ctx = drawParagraph(ctx, 'São obrigações do CONTRATADO:', { size: 10, leading: 1.5 });
   for (let i = 0; i < artistObligations.length; i++) {
     ctx = drawParagraph(ctx, `(${i + 1}) ${artistObligations[i]};`, { size: 10, leading: 1.45, indent: 10 });
   }
   ctx = drawDivider(ctx);
 
   // ========== CLAUSULA 5 — CANCELAMENTO ==========
-  ctx = drawSectionTitle(ctx, 'Clausula 5 — Do cancelamento');
+  ctx = drawSectionTitle(ctx, 'Cláusula 5 — Do cancelamento');
   ctx = drawParagraph(ctx,
-    `Em caso de cancelamento do show por qualquer das partes, serao aplicadas as seguintes multas sobre o valor total do cache:`,
+    `Em caso de cancelamento do show por qualquer das partes, serão aplicadas as seguintes multas sobre o valor total do cachê:`,
     { size: 10, leading: 1.5 }
   );
-  ctx = drawParagraph(ctx, `(1) cancelamento com mais de 30 dias de antecedencia: multa de ${input.cancel_fee_more_30_days}% do valor do cache;`, { size: 10, leading: 1.45, indent: 10 });
-  ctx = drawParagraph(ctx, `(2) cancelamento entre 7 e 30 dias de antecedencia: multa de ${input.cancel_fee_7_to_30_days}% do valor do cache;`, { size: 10, leading: 1.45, indent: 10 });
-  ctx = drawParagraph(ctx, `(3) cancelamento com menos de 7 dias de antecedencia: multa de ${input.cancel_fee_less_7_days}% do valor do cache.`, { size: 10, leading: 1.45, indent: 10 });
+  ctx = drawParagraph(ctx, `(1) cancelamento com mais de 30 dias de antecedência: multa de ${input.cancel_fee_more_30_days}% do valor do cachê;`, { size: 10, leading: 1.45, indent: 10 });
+  ctx = drawParagraph(ctx, `(2) cancelamento entre 7 e 30 dias de antecedência: multa de ${input.cancel_fee_7_to_30_days}% do valor do cachê;`, { size: 10, leading: 1.45, indent: 10 });
+  ctx = drawParagraph(ctx, `(3) cancelamento com menos de 7 dias de antecedência: multa de ${input.cancel_fee_less_7_days}% do valor do cachê.`, { size: 10, leading: 1.45, indent: 10 });
   ctx = { ...ctx, cursorY: ctx.cursorY - 4 };
   ctx = drawParagraph(ctx,
-    'Nao serao consideradas cancelamento as situacoes de forca maior comprovada (catastrofes naturais, decretos governamentais, problemas graves de saude dos envolvidos), caso em que as partes tentarao, de boa-fe, remarcar o show em data compativel sem aplicacao de multa.',
+    'Não serão consideradas cancelamento as situações de força maior comprovada (catástrofes naturais, decretos governamentais, problemas graves de saúde dos envolvidos), caso em que as partes tentarão, de boa-fé, remarcar o show em data compatível sem aplicação de multa.',
     { size: 10, leading: 1.5 }
   );
   ctx = drawDivider(ctx);
 
   // ========== CLAUSULA 6 — IMAGEM E GRAVACAO ==========
-  ctx = drawSectionTitle(ctx, 'Clausula 6 — Dos direitos de imagem e gravacao');
+  ctx = drawSectionTitle(ctx, 'Cláusula 6 — Dos direitos de imagem e gravação');
   ctx = drawParagraph(ctx, recordingText(input.recording_allowed), { size: 10, leading: 1.5 });
   if (input.streaming_allowed) {
     ctx = drawParagraph(ctx,
-      'Fica autorizada a transmissao ao vivo (streaming) do show, total ou parcial, pelo CONTRATANTE, desde que com creditos apropriados ao CONTRATADO.',
+      'Fica autorizada a transmissão ao vivo (streaming) do show, total ou parcial, pelo CONTRATANTE, desde que com créditos apropriados ao CONTRATADO.',
       { size: 10, leading: 1.5 }
     );
   }
   if (input.image_rights_for_promo) {
     ctx = drawParagraph(ctx,
-      'O CONTRATADO autoriza o CONTRATANTE a utilizar sua imagem e nome para divulgacao especifica deste evento, em materiais impressos e digitais. Esta autorizacao nao se estende a outros eventos ou finalidades comerciais diversas.',
+      'O CONTRATADO autoriza o CONTRATANTE a utilizar sua imagem e nome para divulgação específica deste evento, em materiais impressos e digitais. Esta autorização não se estende a outros eventos ou finalidades comerciais diversas.',
       { size: 10, leading: 1.5 }
     );
   }
@@ -361,9 +361,9 @@ export async function generateContractPDF(input: ContractInput): Promise<Uint8Ar
 
   // ========== CLAUSULA 7 — EXCLUSIVIDADE ==========
   if (input.has_exclusivity && input.exclusivity_radius_km && input.exclusivity_days_before) {
-    ctx = drawSectionTitle(ctx, 'Clausula 7 — Da exclusividade geografica');
+    ctx = drawSectionTitle(ctx, 'Cláusula 7 — Da exclusividade geográfica');
     ctx = drawParagraph(ctx,
-      `O CONTRATADO se compromete a nao realizar apresentacoes em um raio de ${input.exclusivity_radius_km}km da cidade do evento, pelo periodo de ${input.exclusivity_days_before} dias anteriores a data do show. Esta clausula tem por objetivo preservar o publico do evento.`,
+      `O CONTRATADO se compromete a não realizar apresentações em um raio de ${input.exclusivity_radius_km}km da cidade do evento, pelo período de ${input.exclusivity_days_before} dias anteriores à data do show. Esta cláusula tem por objetivo preservar o público do evento.`,
       { size: 10, leading: 1.5 }
     );
     ctx = drawDivider(ctx);
@@ -371,20 +371,20 @@ export async function generateContractPDF(input: ContractInput): Promise<Uint8Ar
 
   // ========== CLAUSULA 8 — CLAUSULAS EXTRAS ==========
   if (input.extra_clauses && input.extra_clauses.trim().length > 0) {
-    ctx = drawSectionTitle(ctx, 'Clausula adicional — Disposicoes especificas');
+    ctx = drawSectionTitle(ctx, 'Cláusula adicional — Disposições específicas');
     ctx = drawParagraph(ctx, input.extra_clauses, { size: 10, leading: 1.5 });
     ctx = drawDivider(ctx);
   }
 
   // ========== CLAUSULA FINAL — FORO ==========
-  ctx = drawSectionTitle(ctx, 'Clausula final — Do foro');
+  ctx = drawSectionTitle(ctx, 'Cláusula final — Do foro');
   ctx = drawParagraph(ctx,
-    `As partes elegem o foro da Comarca de ${input.forum_city}/${input.forum_state} como competente para dirimir quaisquer questoes oriundas deste contrato, com renuncia a qualquer outro, por mais privilegiado que seja.`,
+    `As partes elegem o foro da Comarca de ${input.forum_city}/${input.forum_state} como competente para dirimir quaisquer questões oriundas deste contrato, com renúncia a qualquer outro, por mais privilegiado que seja.`,
     { size: 10, leading: 1.5 }
   );
   ctx = { ...ctx, cursorY: ctx.cursorY - 4 };
   ctx = drawParagraph(ctx,
-    'E por estarem justas e contratadas, assinam as partes o presente instrumento em duas vias de igual teor e forma, na presenca das testemunhas abaixo identificadas.',
+    'E por estarem justas e contratadas, assinam as partes o presente instrumento em duas vias de igual teor e forma, na presença das testemunhas abaixo identificadas.',
     { size: 10, leading: 1.5 }
   );
   ctx = drawDivider(ctx);
@@ -486,7 +486,7 @@ export async function generateContractPDF(input: ContractInput): Promise<Uint8Ar
   // Footer em todas as paginas
   const pages = pdf.getPages();
   pages.forEach((p, i) => {
-    p.drawText(`Contrato ${input.artist.name} x ${input.contractor.name} — Pagina ${i + 1} de ${pages.length}`, {
+    p.drawText(`Contrato ${input.artist.name} x ${input.contractor.name} — Página ${i + 1} de ${pages.length}`, {
       x: MARGIN,
       y: 20,
       size: 7,

@@ -56,7 +56,7 @@ const DEFAULT_INPUT: ContractInput = {
   extra_clauses: '',
 };
 
-const STEP_LABELS = ['Partes', 'Show', 'Pagamento', 'Responsabilidades', 'Clausulas', 'Revisao'];
+const STEP_LABELS = ['Partes', 'Show', 'Pagamento', 'Responsabilidades', 'Cláusulas', 'Revisão'];
 
 export function ContractClient() {
   const [input, setInput] = useState<ContractInput>(DEFAULT_INPUT);
@@ -106,7 +106,7 @@ export function ContractClient() {
 
   const next = () => {
     if (!isStepValid(step)) {
-      setError('Preencha os campos obrigatorios antes de seguir.');
+      setError('Preencha os campos obrigatórios antes de seguir.');
       return;
     }
     setError('');
@@ -163,7 +163,7 @@ export function ContractClient() {
       <div className="max-w-3xl mx-auto">
         <ToolPageHeader
           title="Contrato de Show"
-          description="6 passos rapidos. Geramos um contrato juridico BR profissional pronto pra assinatura, com disclaimer legal claro."
+          description="6 passos rápidos. Geramos um contrato jurídico BR profissional pronto pra assinatura, com disclaimer legal claro."
           icon={<ToolIcon tool="contract" size={22} />}
           accent="green"
         />
@@ -244,7 +244,7 @@ export function ContractClient() {
             <div className="relative bg-brand-surface border border-white/10 rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-bold mb-4">Preview do Contrato</h3>
               <p className="text-sm text-brand-muted mb-4">
-                Revise os dados antes de gerar o PDF. Depois de gerado, alteracoes exigem um novo arquivo.
+                Revise os dados antes de gerar o PDF. Depois de gerado, alterações exigem um novo arquivo.
               </p>
               <div className="text-sm text-white/80 space-y-2 mb-6 bg-black/30 rounded-lg p-4">
                 <p>
@@ -264,7 +264,7 @@ export function ContractClient() {
                 </p>
                 <p>
                   <strong>Valor:</strong> R$ {(input.cache_total / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  {' '}({input.deposit_percent}% de sinal, saldo {input.balance_due_timing === 'before_show' ? 'ate 3 dias antes' : input.balance_due_timing === 'on_show_day' ? 'no dia do show' : 'ate 5 dias uteis depois'})
+                  {' '}({input.deposit_percent}% de sinal, saldo {input.balance_due_timing === 'before_show' ? 'até 3 dias antes' : input.balance_due_timing === 'on_show_day' ? 'no dia do show' : 'até 5 dias úteis depois'})
                 </p>
                 <p>
                   <strong>Multas de cancelamento:</strong> {input.cancel_fee_less_7_days}% (&lt;7d) / {input.cancel_fee_7_to_30_days}% (7-30d) / {input.cancel_fee_more_30_days}% (&gt;30d)
@@ -298,7 +298,7 @@ export function ContractClient() {
 
         {result && (
           <div id="contract-result" className="mt-12">
-            <h2 className="text-2xl font-bold text-white mb-4">Seu contrato esta pronto</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Seu contrato está pronto</h2>
             <div className="bg-brand-surface rounded-2xl border border-white/10 overflow-hidden">
               <iframe
                 src={URL.createObjectURL(result.pdfBlob)}
@@ -318,7 +318,7 @@ export function ContractClient() {
                   onClick={copyShareLink}
                   className="px-5 py-3 border border-white/10 text-white rounded-xl hover:bg-white/5"
                 >
-                  Copiar link compartilhavel
+                  Copiar link compartilhável
                 </button>
               )}
               <button
@@ -352,7 +352,7 @@ function StepParties({ input, updateParty, updatePartyType }: {
       />
       <div className="border-t border-white/5" />
       <PartyForm
-        label="CONTRATADO (voce / artista / banda)"
+        label="CONTRATADO (você / artista / banda)"
         party={input.artist}
         onChange={(field, value) => updateParty('artist', field, value)}
         onTypeChange={(t) => updatePartyType('artist', t)}
@@ -378,7 +378,7 @@ function PartyForm({ label, party, onChange, onTypeChange }: {
             party.type === 'pf' ? 'border-brand-green bg-brand-green/10 text-white' : 'border-white/10 bg-white/[0.02] text-white/70'
           }`}
         >
-          Pessoa fisica (CPF)
+          Pessoa física (CPF)
         </button>
         <button
           type="button"
@@ -387,21 +387,21 @@ function PartyForm({ label, party, onChange, onTypeChange }: {
             party.type === 'pj' ? 'border-brand-green bg-brand-green/10 text-white' : 'border-white/10 bg-white/[0.02] text-white/70'
           }`}
         >
-          Pessoa juridica (CNPJ)
+          Pessoa jurídica (CNPJ)
         </button>
       </div>
-      <Field label={party.type === 'pj' ? 'Razao social' : 'Nome completo'} required>
+      <Field label={party.type === 'pj' ? 'Razão social' : 'Nome completo'} required>
         <TextInput value={party.name} onChange={(v) => onChange('name', v)} placeholder={party.type === 'pj' ? 'Empresa LTDA' : 'Nome completo'} />
       </Field>
       <Field label={party.type === 'pj' ? 'CNPJ' : 'CPF'} required>
         <TextInput value={party.document} onChange={(v) => onChange('document', v)} placeholder={party.type === 'pj' ? '00.000.000/0000-00' : '000.000.000-00'} />
       </Field>
-      <Field label="Endereco (rua, numero, complemento)" required>
+      <Field label="Endereço (rua, número, complemento)" required>
         <TextInput value={party.address_street} onChange={(v) => onChange('address_street', v)} placeholder="Rua X, 123, apto 4" />
       </Field>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <Field label="Cidade" required>
-          <TextInput value={party.address_city} onChange={(v) => onChange('address_city', v)} placeholder="Sao Paulo" />
+          <TextInput value={party.address_city} onChange={(v) => onChange('address_city', v)} placeholder="São Paulo" />
         </Field>
         <Field label="UF" required>
           <TextInput value={party.address_state} onChange={(v) => onChange('address_state', v.toUpperCase().slice(0, 2))} placeholder="SP" />
@@ -438,7 +438,7 @@ function StepShow({ input, update }: { input: ContractInput; update: <K extends 
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-green/50"
           />
         </Field>
-        <Field label="Horario (HH:MM)" required>
+        <Field label="Horário (HH:MM)" required>
           <input
             type="time"
             value={input.show_time}
@@ -447,7 +447,7 @@ function StepShow({ input, update }: { input: ContractInput; update: <K extends 
           />
         </Field>
       </div>
-      <Field label="Duracao (minutos)">
+      <Field label="Duração (minutos)">
         <div className="grid grid-cols-5 gap-2">
           {[30, 45, 60, 90, 120].map((m) => (
             <button
@@ -466,15 +466,15 @@ function StepShow({ input, update }: { input: ContractInput; update: <K extends 
       <Field label="Nome do local (casa de show, evento, festival)" required>
         <TextInput value={input.venue_name} onChange={(v) => update('venue_name', v)} placeholder="Ex: Sesc Pompeia / Clube B / Festival X" />
       </Field>
-      <Field label="Endereco do local" required>
-        <TextInput value={input.venue_address} onChange={(v) => update('venue_address', v)} placeholder="Rua, numero, cidade, UF" />
+      <Field label="Endereço do local" required>
+        <TextInput value={input.venue_address} onChange={(v) => update('venue_address', v)} placeholder="Rua, número, cidade, UF" />
       </Field>
       <Field label="Tipo do evento" required>
         <TextInput value={input.event_type} onChange={(v) => update('event_type', v)} placeholder="Ex: Show musical em casa de shows" />
       </Field>
-      <Checkbox label="Tem atracao de abertura?" checked={input.has_opening_act} onChange={(v) => update('has_opening_act', v)} />
+      <Checkbox label="Tem atração de abertura?" checked={input.has_opening_act} onChange={(v) => update('has_opening_act', v)} />
       {input.has_opening_act && (
-        <Field label="Nome da atracao de abertura">
+        <Field label="Nome da atração de abertura">
           <TextInput value={input.opening_act_name ?? ''} onChange={(v) => update('opening_act_name', v)} placeholder="Nome do artista abertura" />
         </Field>
       )}
@@ -519,7 +519,7 @@ function StepPayment({ input, update }: { input: ContractInput; update: <K exten
           ))}
         </div>
       </Field>
-      <Field label={`Sinal antecipado: ${input.deposit_percent}%`} hint="0% = pagamento so no show. 100% = tudo antecipado.">
+      <Field label={`Sinal antecipado: ${input.deposit_percent}%`} hint="0% = pagamento só no show. 100% = tudo antecipado.">
         <input
           type="range"
           min={0}
@@ -543,9 +543,9 @@ function StepPayment({ input, update }: { input: ContractInput; update: <K exten
       <Field label="Quando pagar o saldo?">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {([
-            { v: 'before_show', l: 'Ate 3 dias antes' },
+            { v: 'before_show', l: 'Até 3 dias antes' },
             { v: 'on_show_day', l: 'No dia do show' },
-            { v: 'after_show', l: 'Ate 5 dias uteis depois' },
+            { v: 'after_show', l: 'Até 5 dias úteis depois' },
           ] as const).map((opt) => (
             <button
               key={opt.v}
@@ -570,12 +570,12 @@ function StepResponsibilities({ input, update }: { input: ContractInput; update:
       <h2 className="text-sm font-bold text-white uppercase tracking-wider">Responsabilidades do CONTRATANTE</h2>
       <p className="text-xs text-brand-muted">Marque tudo que o CONTRATANTE (casa de show/produtor) deve fornecer ou arcar.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Checkbox label="Equipamento tecnico (conforme rider)" checked={input.provides_equipment} onChange={(v) => update('provides_equipment', v)} />
+        <Checkbox label="Equipamento técnico (conforme rider)" checked={input.provides_equipment} onChange={(v) => update('provides_equipment', v)} />
         <Checkbox label="Transporte" checked={input.provides_transport} onChange={(v) => update('provides_transport', v)} />
         <Checkbox label="Hospedagem" checked={input.provides_accommodation} onChange={(v) => update('provides_accommodation', v)} />
-        <Checkbox label="Alimentacao" checked={input.provides_meals} onChange={(v) => update('provides_meals', v)} />
-        <Checkbox label="Seguranca" checked={input.provides_security} onChange={(v) => update('provides_security', v)} />
-        <Checkbox label="Divulgacao do evento" checked={input.provides_promotion} onChange={(v) => update('provides_promotion', v)} />
+        <Checkbox label="Alimentação" checked={input.provides_meals} onChange={(v) => update('provides_meals', v)} />
+        <Checkbox label="Segurança" checked={input.provides_security} onChange={(v) => update('provides_security', v)} />
+        <Checkbox label="Divulgação do evento" checked={input.provides_promotion} onChange={(v) => update('provides_promotion', v)} />
       </div>
     </div>
   );
@@ -614,7 +614,7 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
 
       <div className="space-y-3 pt-4 border-t border-white/5">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Direitos de imagem e gravacao</h2>
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Direitos de imagem e gravação</h2>
           <HelpTooltip content={
             <>
               <strong>{CLAUSE_HELP.recording.what}</strong>
@@ -626,12 +626,12 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
             </>
           } />
         </div>
-        <Field label="Gravacao do show">
+        <Field label="Gravação do show">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {([
               { v: 'prohibited', l: 'Proibida' },
-              { v: 'personal_only', l: 'Apenas uso pessoal do publico' },
-              { v: 'promo_with_credit', l: 'Permitida com credito' },
+              { v: 'personal_only', l: 'Apenas uso pessoal do público' },
+              { v: 'promo_with_credit', l: 'Permitida com crédito' },
               { v: 'full_rights', l: 'Totalmente liberada' },
             ] as const).map((opt) => (
               <button
@@ -647,13 +647,13 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
             ))}
           </div>
         </Field>
-        <Checkbox label="Transmissao ao vivo (streaming) permitida" checked={input.streaming_allowed} onChange={(v) => update('streaming_allowed', v)} />
-        <Checkbox label="Contratante pode usar imagem pra divulgacao deste evento" checked={input.image_rights_for_promo} onChange={(v) => update('image_rights_for_promo', v)} />
+        <Checkbox label="Transmissão ao vivo (streaming) permitida" checked={input.streaming_allowed} onChange={(v) => update('streaming_allowed', v)} />
+        <Checkbox label="Contratante pode usar imagem pra divulgação deste evento" checked={input.image_rights_for_promo} onChange={(v) => update('image_rights_for_promo', v)} />
       </div>
 
       <div className="space-y-3 pt-4 border-t border-white/5">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Exclusividade geografica (opcional)</h2>
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Exclusividade geográfica (opcional)</h2>
           <HelpTooltip content={
             <>
               <strong>{CLAUSE_HELP.exclusivity.what}</strong>
@@ -665,7 +665,7 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
             </>
           } />
         </div>
-        <Checkbox label="Incluir clausula de exclusividade" checked={input.has_exclusivity} onChange={(v) => update('has_exclusivity', v)} />
+        <Checkbox label="Incluir cláusula de exclusividade" checked={input.has_exclusivity} onChange={(v) => update('has_exclusivity', v)} />
         {input.has_exclusivity && (
           <div className="grid grid-cols-2 gap-3">
             <Field label="Raio (km)">
@@ -691,13 +691,13 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
       </div>
 
       <div className="space-y-3 pt-4 border-t border-white/5">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Clausulas extras (opcional)</h2>
-        <Field label="Qualquer disposicao especifica que queira adicionar" hint="Ex: forma de pagamento com retencao de impostos, clausula de backstage restrito, bilheteria partilhada, etc.">
+        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Cláusulas extras (opcional)</h2>
+        <Field label="Qualquer disposição específica que queira adicionar" hint="Ex: forma de pagamento com retenção de impostos, cláusula de backstage restrito, bilheteria partilhada, etc.">
           <textarea
             value={input.extra_clauses ?? ''}
             onChange={(e) => update('extra_clauses', e.target.value)}
             rows={4}
-            placeholder="Deixe em branco se nao tiver clausulas extras"
+            placeholder="Deixe em branco se não tiver cláusulas extras"
             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 resize-none"
           />
         </Field>
@@ -709,7 +709,7 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
 function StepReview({ input, update }: { input: ContractInput; update: <K extends keyof ContractInput>(k: K, v: ContractInput[K]) => void }) {
   return (
     <div className="space-y-5">
-      <h2 className="text-sm font-bold text-white uppercase tracking-wider">Revisao final e foro</h2>
+      <h2 className="text-sm font-bold text-white uppercase tracking-wider">Revisão final e foro</h2>
 
       {/* Resumo */}
       <div className="bg-white/[0.02] border border-white/10 rounded-xl p-5 space-y-2 text-sm">
@@ -723,7 +723,7 @@ function StepReview({ input, update }: { input: ContractInput; update: <K extend
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label="Cidade do foro" required hint="Cidade que julgaria disputas do contrato">
-          <TextInput value={input.forum_city} onChange={(v) => update('forum_city', v)} placeholder="Ex: Sao Paulo" />
+          <TextInput value={input.forum_city} onChange={(v) => update('forum_city', v)} placeholder="Ex: São Paulo" />
         </Field>
         <Field label="UF do foro" required>
           <TextInput value={input.forum_state} onChange={(v) => update('forum_state', v.toUpperCase().slice(0, 2))} placeholder="SP" />
@@ -733,7 +733,7 @@ function StepReview({ input, update }: { input: ContractInput; update: <K extend
       <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm text-yellow-100">
         <p className="font-bold mb-1">Lembre-se</p>
         <p className="text-yellow-100/80 leading-relaxed">
-          Este contrato e um modelo profissional que cobre 90% dos shows. Para shows de alto valor ou situacoes peculiares (ex: festivais grandes, shows internacionais), leia com calma e, se tiver duvida, consulte um advogado.
+          Este contrato é um modelo profissional que cobre 90% dos shows. Para shows de alto valor ou situações peculiares (ex: festivais grandes, shows internacionais), leia com calma e, se tiver dúvida, consulte um advogado.
         </p>
       </div>
     </div>

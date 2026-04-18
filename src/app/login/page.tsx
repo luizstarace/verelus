@@ -28,7 +28,7 @@ export default function LoginPage() {
 
     if (hash.includes('otp_expired') || hash.includes('access_denied') || search.includes('auth_callback_error')) {
       setMode('reset');
-      setError('Seu link de recuperacao expirou. Informe seu email abaixo para receber um novo.');
+      setError('Seu link de recuperação expirou. Informe seu email abaixo para receber um novo.');
       // Clean URL so reload doesn't keep the error
       window.history.replaceState({}, '', '/login');
     }
@@ -60,7 +60,7 @@ export default function LoginPage() {
           redirectTo: window.location.origin + '/auth/reset',
         });
         if (resetError) throw resetError;
-        setMessage('Email de recuperacao enviado. Verifique sua caixa de entrada.');
+        setMessage('Email de recuperação enviado. Verifique sua caixa de entrada.');
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
@@ -195,7 +195,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full px-4 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-brand-green/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Aguarde...' : mode === 'signup' ? 'Criar conta' : mode === 'reset' ? 'Enviar email de recuperacao' : 'Entrar'}
+              {loading ? 'Aguarde...' : mode === 'signup' ? 'Criar conta' : mode === 'reset' ? 'Enviar email de recuperação' : 'Entrar'}
             </button>
           </form>
 

@@ -20,11 +20,11 @@ const DEFAULT_INPUT: ReleaseTimingInput = {
 };
 
 const GOAL_OPTIONS: Array<{ v: ReleaseTimingInput['goal']; label: string; desc: string }> = [
-  { v: 'discovery', label: 'Entrar em playlists editoriais', desc: 'Algoritmos, Release Radar, crescer streams rapido' },
-  { v: 'grow_base', label: 'Construir fanbase leal', desc: 'Crescimento organico, engajamento profundo, longo prazo' },
+  { v: 'discovery', label: 'Entrar em playlists editoriais', desc: 'Algoritmos, Release Radar, crescer streams rápido' },
+  { v: 'grow_base', label: 'Construir fanbase leal', desc: 'Crescimento orgânico, engajamento profundo, longo prazo' },
   { v: 'monetize', label: 'Gerar renda consistente', desc: 'Playlists pagas, streams recorrentes, royalties' },
   { v: 'playlist_placement', label: 'Placement em curadorias', desc: 'Foco em playlists editoriais e independentes' },
-  { v: 'press', label: 'Expandir territorio/alcance', desc: 'Chegar em novos mercados, blogs e jornalistas' },
+  { v: 'press', label: 'Expandir território/alcance', desc: 'Chegar em novos mercados, blogs e jornalistas' },
 ];
 
 function formatDateBR(iso: string): string {
@@ -66,9 +66,9 @@ export function ReleaseTimingClient() {
     const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
     const url = new URL('https://calendar.google.com/calendar/render');
     url.searchParams.set('action', 'TEMPLATE');
-    url.searchParams.set('text', `Lancamento — ${input.artist_name || 'Release'}`);
+    url.searchParams.set('text', `Lançamento — ${input.artist_name || 'Release'}`);
     url.searchParams.set('dates', `${fmt(date)}/${fmt(endDate)}`);
-    url.searchParams.set('details', `Data sugerida pelo Verelus pro lancamento do seu ${input.release_type}.`);
+    url.searchParams.set('details', `Data sugerida pelo Verelus pro lançamento do seu ${input.release_type}.`);
     window.open(url.toString(), '_blank');
   };
 
@@ -76,8 +76,8 @@ export function ReleaseTimingClient() {
     <div className="min-h-screen bg-brand-dark text-white py-12 px-4">
       <div className="max-w-5xl mx-auto">
         <ToolPageHeader
-          title="Quando Lancar"
-          description="3 datas ideais nos proximos 30/60/90 dias pra seu proximo lancamento, pontuadas com base em padroes da industria indie BR, feriados nacionais e seu objetivo."
+          title="Quando Lançar"
+          description="3 datas ideais nos próximos 30/60/90 dias pra seu próximo lançamento, pontuadas com base em padrões da indústria indie BR, feriados nacionais e seu objetivo."
           icon={<ToolIcon tool="release-timing" size={22} />}
           accent="purple"
         />
@@ -88,11 +88,11 @@ export function ReleaseTimingClient() {
             <div className="bg-brand-surface rounded-2xl p-6 border border-white/10 space-y-4">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider">Sobre o release</h2>
 
-              <Field label="Nome artistico (opcional)">
+              <Field label="Nome artístico (opcional)">
                 <TextInput value={input.artist_name} onChange={(v) => update('artist_name', v)} placeholder="Pra integrar com Google Calendar" />
               </Field>
 
-              <Field label="Genero">
+              <Field label="Gênero">
                 <TextInput value={input.genre} onChange={(v) => update('genre', v)} placeholder="Ex: indie rock, MPB" />
               </Field>
 
@@ -154,7 +154,7 @@ export function ReleaseTimingClient() {
                 </div>
               </Field>
 
-              <Field label="Meses a evitar (opcional)" hint="Clica pra marcar/desmarcar. Ex: voce ta viajando, de ferias, etc.">
+              <Field label="Meses a evitar (opcional)" hint="Clica pra marcar/desmarcar. Ex: você tá viajando, de férias, etc.">
                 <div className="grid grid-cols-6 gap-1.5">
                   {MONTH_NAMES.map((m, i) => (
                     <button
@@ -202,7 +202,7 @@ export function ReleaseTimingClient() {
                           <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full ${
                             i === 0 ? 'bg-brand-purple text-black' : 'bg-white/10 text-white/70'
                           }`}>
-                            {i === 0 ? 'Top pick' : `opcao ${i + 1}`}
+                            {i === 0 ? 'Top pick' : `opção ${i + 1}`}
                           </span>
                           <span className="text-xs text-brand-muted font-mono">score {s.score}/100</span>
                         </div>
@@ -288,7 +288,7 @@ export function ReleaseTimingClient() {
         </div>
 
         <p className="text-xs text-brand-muted/60 mt-10 leading-relaxed">
-          Scoring baseado em: sazonalidade da industria indie BR (pico set-nov, evitar dezembro), feriados nacionais, seu objetivo. Sextas-feiras sao o dia global de lancamento — por isso so elas sao consideradas.
+          Scoring baseado em: sazonalidade da indústria indie BR (pico set-nov, evitar dezembro), feriados nacionais, seu objetivo. Sextas-feiras são o dia global de lançamento — por isso só elas são consideradas.
         </p>
       </div>
     </div>

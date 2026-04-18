@@ -69,7 +69,7 @@ describe('calculateCache', () => {
       venue_type: 'bar_small',
       expenses: { ...ZERO_EXPENSES, transport: 5000 }, // despesas altas pro estagio
     });
-    expect(result.alerts.some((a) => a.toLowerCase().includes('prejuizo'))).toBe(true);
+    expect(result.alerts.some((a) => a.toLowerCase().includes('prejuízo'))).toBe(true);
   });
 
   it('gera sugestoes de negociacao quando margem apertada', () => {

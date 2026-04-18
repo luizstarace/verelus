@@ -38,7 +38,7 @@ const DEFAULT_INPUT: PitchInput = {
 
 const TONE_OPTIONS: Array<{ v: PitchTone; label: string; desc: string }> = [
   { v: 'professional', label: 'Profissional', desc: 'polido, editorial' },
-  { v: 'casual', label: 'Casual', desc: 'direto, proximo' },
+  { v: 'casual', label: 'Casual', desc: 'direto, próximo' },
   { v: 'bold', label: 'Ousado', desc: 'confiante, sem pedir desculpa' },
 ];
 
@@ -136,7 +136,7 @@ export function PitchKitClient() {
       <div className="max-w-3xl mx-auto">
         <ToolPageHeader
           title="Pitch Kit"
-          description="Voce informa pra quem vai enviar e sua musica. Sai com email + 1-pager + press release coordenados, prontos pra copiar e enviar."
+          description="Você informa pra quem vai enviar e sua música. Sai com email + 1-pager + press release coordenados, prontos pra copiar e enviar."
           icon={<ToolIcon tool="pitch-kit" size={22} />}
           accent="purple"
         />
@@ -144,16 +144,16 @@ export function PitchKitClient() {
         <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-6">
           {/* ----- Sobre a musica ----- */}
           <section className="space-y-4">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">1. Sobre voce e a musica</h2>
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">1. Sobre você e a música</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Field label="Nome artistico" required>
-                <TextInput value={input.artist_name} onChange={(v) => update('artist_name', v)} placeholder="Ex: Ana Frango Eletrico" />
+              <Field label="Nome artístico" required>
+                <TextInput value={input.artist_name} onChange={(v) => update('artist_name', v)} placeholder="Ex: Ana Frango Elétrico" />
               </Field>
-              <Field label="Titulo da musica/release" required>
+              <Field label="Título da música/release" required>
                 <TextInput value={input.song_title} onChange={(v) => update('song_title', v)} placeholder="Ex: Tem Certeza" />
               </Field>
             </div>
-            <Field label="URL Spotify da musica (opcional)" hint="Se informar, o pitch fica mais forte (curador ja tem link)">
+            <Field label="URL Spotify da música (opcional)" hint="Se informar, o pitch fica mais forte (curador já tem link)">
               <TextInput value={input.song_spotify_url ?? ''} onChange={(v) => update('song_spotify_url', v)} placeholder="https://open.spotify.com/track/..." />
             </Field>
             <Field label="Tipo">
@@ -173,14 +173,14 @@ export function PitchKitClient() {
               </div>
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Field label="Genero primario" required>
+              <Field label="Gênero primário" required>
                 <TextInput value={input.genre_primary} onChange={(v) => update('genre_primary', v)} placeholder="Ex: indie pop, MPB, trap" />
               </Field>
               <Field label="Mood em 3 palavras" required>
-                <TextInput value={input.mood_keywords} onChange={(v) => update('mood_keywords', v)} placeholder="Ex: melancolica, urgente, cinematica" />
+                <TextInput value={input.mood_keywords} onChange={(v) => update('mood_keywords', v)} placeholder="Ex: melancólica, urgente, cinemática" />
               </Field>
             </div>
-            <Field label="Data de lancamento (opcional)" hint="Deixe vazio se ainda nao lancou (pitch pre-release)">
+            <Field label="Data de lançamento (opcional)" hint="Deixe vazio se ainda não lançou (pitch pre-release)">
               <input
                 type="date"
                 value={input.release_date ?? ''}
@@ -193,7 +193,7 @@ export function PitchKitClient() {
           {/* ----- Credibilidade ----- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
             <h2 className="text-sm font-bold text-white uppercase tracking-wider">2. Credibilidade</h2>
-            <Field label="2-3 conquistas recentes" required hint="Seja especifico. Numeros, shows, imprensa, colaboracoes.">
+            <Field label="2-3 conquistas recentes" required hint="Seja específico. Números, shows, imprensa, colaborações.">
               <textarea
                 value={input.achievements}
                 onChange={(e) => update('achievements', e.target.value)}
@@ -202,15 +202,15 @@ export function PitchKitClient() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 resize-none"
               />
             </Field>
-            <Field label="2-3 artistas similares" required hint="Ajuda o destinatario a situar sua musica rapido">
-              <TextInput value={input.similar_artists} onChange={(v) => update('similar_artists', v)} placeholder="Ex: Sessa, Tim Bernardes, Jucara Marcal" />
+            <Field label="2-3 artistas similares" required hint="Ajuda o destinatário a situar sua música rápido">
+              <TextInput value={input.similar_artists} onChange={(v) => update('similar_artists', v)} placeholder="Ex: Sessa, Tim Bernardes, Juçara Marçal" />
             </Field>
           </section>
 
           {/* ----- Destinatario ----- */}
           <section className="space-y-4 pt-4 border-t border-white/5">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">3. Para quem voce vai enviar</h2>
-            <Field label="Tipo de destinatario">
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">3. Para quem você vai enviar</h2>
+            <Field label="Tipo de destinatário">
               <select
                 value={input.recipient_type}
                 onChange={(e) => update('recipient_type', e.target.value as PitchRecipientType)}
@@ -224,10 +224,10 @@ export function PitchKitClient() {
               </select>
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Field label="Nome do destinatario" required>
+              <Field label="Nome do destinatário" required>
                 <TextInput value={input.recipient_name} onChange={(v) => update('recipient_name', v)} placeholder="Ex: Ana Silva" />
               </Field>
-              <Field label="Entidade/veiculo" required>
+              <Field label="Entidade/veículo" required>
                 <TextInput value={input.recipient_entity} onChange={(v) => update('recipient_entity', v)} placeholder="Ex: Playlist Indie BR" />
               </Field>
             </div>
@@ -264,7 +264,7 @@ export function PitchKitClient() {
                       input.language === l ? 'border-brand-green bg-brand-green/10 text-white' : 'border-white/10 bg-white/[0.02] text-white/70'
                     }`}
                   >
-                    {l === 'pt' ? 'Portugues' : 'Ingles'}
+                    {l === 'pt' ? 'Português' : 'Inglês'}
                   </button>
                 ))}
               </div>
@@ -301,7 +301,7 @@ export function PitchKitClient() {
             {loading ? 'Gerando pitch kit...' : 'Gerar pitch kit'}
           </button>
           {!canSubmit && (
-            <p className="text-xs text-brand-muted text-center">Preencha os campos obrigatorios pra liberar</p>
+            <p className="text-xs text-brand-muted text-center">Preencha os campos obrigatórios pra liberar</p>
           )}
         </div>
 
@@ -311,7 +311,7 @@ export function PitchKitClient() {
             <div>
               <h2 className="text-2xl font-bold text-white mb-1">Seu pitch kit</h2>
               <p className="text-sm text-brand-muted">
-                3 pecas coordenadas. Clica na aba pra ver cada uma, edite se quiser, copia e envia.
+                3 peças coordenadas. Clica na aba pra ver cada uma, edite se quiser, copia e envia.
               </p>
             </div>
 

@@ -37,14 +37,14 @@ const DEFAULT_INPUT: CacheInput = {
 };
 
 const EXPENSE_LABELS: Array<{ key: keyof CacheExpenses; label: string; hint?: string }> = [
-  { key: 'transport', label: 'Transporte (ida + volta)', hint: 'Combustivel, passagens, uber, etc.' },
-  { key: 'accommodation', label: 'Hospedagem', hint: 'Se nao fornecida pelo contratante' },
-  { key: 'meals', label: 'Alimentacao' },
-  { key: 'hired_musicians', label: 'Cache musicos contratados', hint: 'Total pra todos os musicos que levou' },
+  { key: 'transport', label: 'Transporte (ida + volta)', hint: 'Combustível, passagens, uber, etc.' },
+  { key: 'accommodation', label: 'Hospedagem', hint: 'Se não fornecida pelo contratante' },
+  { key: 'meals', label: 'Alimentação' },
+  { key: 'hired_musicians', label: 'Cachê músicos contratados', hint: 'Total pra todos os músicos que levou' },
   { key: 'equipment', label: 'Equipamento extra', hint: 'Aluguel de qualquer equipamento' },
-  { key: 'tech_crew', label: 'Tecnico / roadie' },
-  { key: 'commission', label: 'Comissao empresario/agent', hint: 'Valor absoluto. Geralmente 15-20% do cache.' },
-  { key: 'other', label: 'Outros', hint: 'Qualquer coisa que nao cabe acima' },
+  { key: 'tech_crew', label: 'Técnico / roadie' },
+  { key: 'commission', label: 'Comissão empresário/agent', hint: 'Valor absoluto. Geralmente 15-20% do cachê.' },
+  { key: 'other', label: 'Outros', hint: 'Qualquer coisa que não cabe acima' },
 ];
 
 const PIE_COLORS = ['#00f5a0', '#00d9f5', '#e040fb', '#ffa500', '#ffd700', '#ff6b6b', '#a29bfe', '#fd79a8'];
@@ -94,7 +94,7 @@ export function CacheClient() {
       <div className="max-w-5xl mx-auto">
         <ToolPageHeader
           title="Calculadora de Cache"
-          description="Em 2 minutos voce sabe quanto cobrar e quanto sobra no bolso. Baseado em dados reais do mercado indie BR."
+          description="Em 2 minutos você sabe quanto cobrar e quanto sobra no bolso. Baseado em dados reais do mercado indie BR."
           icon={<ToolIcon tool="cache" size={22} />}
           accent="green"
         />
@@ -126,7 +126,7 @@ export function CacheClient() {
             <div className="bg-brand-surface rounded-2xl p-6 border border-white/10 space-y-4">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider">1. Seu perfil</h2>
 
-              <Field label="Ouvintes mensais no Spotify (opcional)" hint="Se informar, calculamos seu estagio automaticamente">
+              <Field label="Ouvintes mensais no Spotify (opcional)" hint="Se informar, calculamos seu estágio automaticamente">
                 <input
                   type="number"
                   min={0}
@@ -151,11 +151,11 @@ export function CacheClient() {
                   className="w-4 h-4 accent-brand-green"
                 />
                 <label htmlFor="auto-stage" className="text-xs text-brand-muted cursor-pointer">
-                  Inferir estagio a partir dos ouvintes automaticamente
+                  Inferir estágio a partir dos ouvintes automaticamente
                 </label>
               </div>
 
-              <Field label="Seu estagio de carreira">
+              <Field label="Seu estágio de carreira">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {(Object.keys(STAGE_META) as ArtistStage[]).map((s) => (
                     <button
@@ -198,7 +198,7 @@ export function CacheClient() {
               <Field
                 label="Cidade do show"
                 tooltip={
-                  <HelpTooltip content="Tier 1: SP, RJ, BH, POA, BSB. Tier 2: outras capitais e grandes cidades do interior. Tier 3: cidades menores. Afeta a referencia de cache do mercado." />
+                  <HelpTooltip content="Tier 1: SP, RJ, BH, POA, BSB. Tier 2: outras capitais e grandes cidades do interior. Tier 3: cidades menores. Afeta a referência de cachê do mercado." />
                 }
               >
                 <div className="grid grid-cols-1 gap-2">
@@ -222,7 +222,7 @@ export function CacheClient() {
                 </div>
               </Field>
 
-              <Field label="Quantos musicos vao viajar" hint="Incluindo voce">
+              <Field label="Quantos músicos vão viajar" hint="Incluindo você">
                 <input
                   type="number"
                   min={1}
@@ -238,7 +238,7 @@ export function CacheClient() {
             <div className="bg-brand-surface rounded-2xl p-6 border border-white/10 space-y-4">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider">3. Despesas do show</h2>
               <p className="text-xs text-brand-muted">
-                Preencha apenas o que vai pagar do proprio bolso. Se o CONTRATANTE ja fornece hospedagem, deixe em branco.
+                Preencha apenas o que vai pagar do próprio bolso. Se o CONTRATANTE já fornece hospedagem, deixe em branco.
               </p>
               <div className="space-y-2">
                 {EXPENSE_LABELS.map((exp) => (
@@ -284,11 +284,11 @@ export function CacheClient() {
               </div>
               <div className="flex justify-between text-sm">
                 <div>
-                  <div className="text-xs text-brand-muted">Minimo</div>
+                  <div className="text-xs text-brand-muted">Mínimo</div>
                   <div className="text-white font-semibold">{formatBRLCompact(result.suggested_min)}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-brand-muted">Maximo</div>
+                  <div className="text-xs text-brand-muted">Máximo</div>
                   <div className="text-white font-semibold">{formatBRLCompact(result.suggested_max)}</div>
                 </div>
               </div>
@@ -303,11 +303,11 @@ export function CacheClient() {
                   </span>
                 </p>
                 <div className="text-xl font-bold text-white">{formatBRLCompact(result.break_even)}</div>
-                <div className="text-xs text-brand-muted mt-1">Seu piso pra nao dar prejuizo</div>
+                <div className="text-xs text-brand-muted mt-1">Seu piso pra não dar prejuízo</div>
                 <details className="mt-2">
                   <summary className="text-xs text-brand-muted cursor-pointer hover:text-white">Como calculamos?</summary>
                   <p className="text-xs text-brand-muted mt-2 leading-relaxed">
-                    Break-even = total de despesas dividido por (1 − margem de imposto/taxa). Abaixo desse valor voce paga pra tocar; acima, entra lucro liquido.
+                    Break-even = total de despesas dividido por (1 − margem de imposto/taxa). Abaixo desse valor você paga pra tocar; acima, entra lucro líquido.
                   </p>
                 </details>
               </div>
@@ -318,7 +318,7 @@ export function CacheClient() {
                   ? 'bg-yellow-500/10 border-yellow-500/30'
                   : 'bg-brand-green/5 border-brand-green/20'
               }`}>
-                <p className="text-[11px] uppercase tracking-wider text-brand-muted font-mono mb-1">Lucro liquido</p>
+                <p className="text-[11px] uppercase tracking-wider text-brand-muted font-mono mb-1">Lucro líquido</p>
                 <div className={`text-xl font-bold ${
                   result.profit_at_median < 0 ? 'text-red-400' : result.margin_percent_at_median < 20 ? 'text-yellow-300' : 'text-brand-green'
                 }`}>
@@ -373,7 +373,7 @@ export function CacheClient() {
             {result.suggestions.length > 0 && (
               <div className="bg-brand-surface rounded-2xl p-5 border border-white/10">
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                  Sugestoes de negociacao
+                  Sugestões de negociação
                 </h3>
                 <ul className="space-y-2">
                   {result.suggestions.map((s, i) => (
@@ -389,7 +389,7 @@ export function CacheClient() {
         </div>
 
         <p className="text-xs text-brand-muted/60 mt-10 leading-relaxed">
-          Base de dados construida com pesquisa de mercado indie BR 2024-2026 (managers, dados publicos GIRA/Superfonia). Aproximado. Valores individuais podem variar — use como referencia, nao regra.
+          Base de dados construída com pesquisa de mercado indie BR 2024-2026 (managers, dados públicos GIRA/Superfonia). Aproximado. Valores individuais podem variar — use como referência, não regra.
         </p>
       </div>
     </div>

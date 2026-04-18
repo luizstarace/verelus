@@ -13,8 +13,8 @@ import { ErrorMessage } from '@/components/ui/ErrorMessage';
 
 const TONE_OPTIONS: Array<{ value: Tone; label: string; hint: string }> = [
   { value: 'formal', label: 'Formal', hint: 'profissional, editorial' },
-  { value: 'casual', label: 'Casual', hint: 'amigavel, proximo' },
-  { value: 'poetico', label: 'Poetico', hint: 'imagetico, metaforas' },
+  { value: 'casual', label: 'Casual', hint: 'amigável, próximo' },
+  { value: 'poetico', label: 'Poético', hint: 'imagético, metáforas' },
   { value: 'edgy', label: 'Edgy', hint: 'direto, com atitude' },
 ];
 
@@ -70,7 +70,7 @@ function BioCard({ platform, label, text, limit, onRegenerate, regenerating }: B
             disabled={regenerating}
             className="px-3 py-1.5 text-xs bg-brand-green/10 hover:bg-brand-green/20 text-brand-green rounded-lg transition disabled:opacity-50"
           >
-            {regenerating ? 'gerando...' : 'regerar'}
+            {regenerating ? 'gerando...' : 'regenerar'}
           </button>
         </div>
       </div>
@@ -162,27 +162,27 @@ export function BioClient() {
         />
 
         <div className="bg-brand-surface rounded-2xl p-8 border border-white/10 space-y-5">
-          <Field label="Nome artistico" required>
+          <Field label="Nome artístico" required>
             <input
               type="text"
               value={input.artist_name}
               onChange={(e) => update('artist_name', e.target.value)}
-              placeholder="Ex: Ana Frango Eletrico"
+              placeholder="Ex: Ana Frango Elétrico"
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
             />
           </Field>
 
-          <Field label="Em 2 frases, o que te diferencia de outros artistas?" required hint="Algo concreto, nao 'sou unico'. Ex: instrumentacao, tematica, origem, abordagem">
+          <Field label="Em 2 frases, o que te diferencia de outros artistas?" required hint="Algo concreto, não 'sou único'. Ex: instrumentação, temática, origem, abordagem">
             <textarea
               value={input.differentiator}
               onChange={(e) => update('differentiator', e.target.value)}
               rows={3}
-              placeholder="Ex: Combino samba-funk dos anos 70 com producao eletronica. Letras sobre periferia de BH com humor."
+              placeholder="Ex: Combino samba-funk dos anos 70 com produção eletrônica. Letras sobre periferia de BH com humor."
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 resize-none"
             />
           </Field>
 
-          <Field label="Conquista mais significativa ate hoje" required hint="Show relevante, indicacao, numero de streams marcante, colaboracao, premio">
+          <Field label="Conquista mais significativa até hoje" required hint="Show relevante, indicação, número de streams marcante, colaboração, prêmio">
             <input
               type="text"
               value={input.main_achievement}
@@ -192,17 +192,17 @@ export function BioClient() {
             />
           </Field>
 
-          <Field label="Em 3 palavras, o mood da sua musica" required>
+          <Field label="Em 3 palavras, o mood da sua música" required>
             <input
               type="text"
               value={input.mood_three_words}
               onChange={(e) => update('mood_three_words', e.target.value)}
-              placeholder="Ex: melancolica, urgente, cinematica"
+              placeholder="Ex: melancólica, urgente, cinemática"
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50"
             />
           </Field>
 
-          <Field label="Uma influencia nao-obvia que te inspira" required hint="Um artista, cineasta, autor, arquiteto — qualquer referencia fora do seu genero obvio. Ex: Wong Kar-wai, Clarice Lispector, Arvo Part">
+          <Field label="Uma influência não-óbvia que te inspira" required hint="Um artista, cineasta, autor, arquiteto — qualquer referência fora do seu gênero óbvio. Ex: Wong Kar-wai, Clarice Lispector, Arvo Pärt">
             <input
               type="text"
               value={input.unusual_influence}
@@ -212,7 +212,7 @@ export function BioClient() {
             />
           </Field>
 
-          <Field label="2-3 influencias musicais diretas" required hint="Artistas que compartilham algo com sua musica">
+          <Field label="2-3 influências musicais diretas" required hint="Artistas que compartilham algo com sua música">
             <input
               type="text"
               value={input.direct_influences}
@@ -223,7 +223,7 @@ export function BioClient() {
           </Field>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field label="Genero (opcional)">
+            <Field label="Gênero (opcional)">
               <input
                 type="text"
                 value={input.genre ?? ''}
@@ -279,7 +279,7 @@ export function BioClient() {
                       : 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20'
                   }`}
                 >
-                  {lang === 'pt' ? 'Portugues' : 'Ingles'}
+                  {lang === 'pt' ? 'Português' : 'Inglês'}
                 </button>
               ))}
             </div>
@@ -296,7 +296,7 @@ export function BioClient() {
           </button>
           {!canSubmit && (
             <p className="text-xs text-brand-muted text-center">
-              Preencha todos os campos obrigatorios pra liberar
+              Preencha todos os campos obrigatórios pra liberar
             </p>
           )}
         </div>
@@ -313,7 +313,7 @@ export function BioClient() {
               </button>
             </div>
             <p className="text-brand-muted mb-6 text-sm">
-              Cada uma foi escrita especificamente pra sua plataforma. Regera individualmente se nao gostou de alguma.
+              Cada uma foi escrita especificamente pra sua plataforma. Regenera individualmente se não gostou de alguma.
             </p>
             <BioCard
               platform="spotify"

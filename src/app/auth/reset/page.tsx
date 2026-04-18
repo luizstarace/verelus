@@ -56,11 +56,11 @@ export default function ResetPasswordPage() {
     setMessage('');
 
     if (password !== confirmPassword) {
-      setError('As senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return;
     }
     if (password.length < 6) {
-      setError('A senha precisa de no minimo 6 caracteres.');
+      setError('A senha precisa de no mínimo 6 caracteres.');
       return;
     }
 

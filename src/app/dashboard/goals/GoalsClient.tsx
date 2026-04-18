@@ -146,20 +146,20 @@ export function GoalsClient({ embedded }: { embedded?: boolean } = {}) {
                     ...v,
                     target_date: (() => { const d = new Date(); d.setMonth(d.getMonth() + (v.metric === 'instagram_followers' || v.metric === 'tiktok_followers' ? 3 : 6)); return d.toISOString().slice(0, 10); })(),
                   }))}
-                  label="Metas comuns (pre-preencher)"
+                  label="Metas comuns (pré-preencher)"
                 />
                 {GOAL_BENCHMARKS[form.metric] && (
                   <div className="bg-white/5 rounded-lg p-3 border border-white/10 text-xs leading-relaxed">
-                    <p className="font-semibold text-white/90 mb-1">Benchmarks pra referencia:</p>
+                    <p className="font-semibold text-white/90 mb-1">Benchmarks pra referência:</p>
                     <p className="text-brand-muted">Emergente: {GOAL_BENCHMARKS[form.metric].emerging}</p>
                     <p className="text-brand-muted">Em crescimento: {GOAL_BENCHMARKS[form.metric].growing}</p>
                     <p className="text-brand-muted">Estabelecido: {GOAL_BENCHMARKS[form.metric].established}</p>
                   </div>
                 )}
-                <Field label="Titulo" required hint="Ex: 10k ouvintes ate julho">
+                <Field label="Título" required hint="Ex: 10k ouvintes até julho">
                   <TextInput value={form.title} onChange={(v) => setForm({ ...form, title: v })} placeholder="Meu objetivo..." />
                 </Field>
-                <Field label="Metrica" required>
+                <Field label="Métrica" required>
                   <select
                     value={form.metric}
                     onChange={(e) => setForm({ ...form, metric: e.target.value as GoalMetric })}
@@ -212,7 +212,7 @@ export function GoalsClient({ embedded }: { embedded?: boolean } = {}) {
               <EmptyState
                 icon="🎯"
                 title="Nenhuma meta ainda"
-                description='Comece com algo como "10k ouvintes no Spotify ate janeiro" ou "5k subs YouTube em 6 meses".'
+                description='Comece com algo como "10k ouvintes no Spotify até janeiro" ou "5k subs YouTube em 6 meses".'
                 action={{ label: '+ Nova meta', onClick: () => setShowAdd(true) }}
               />
             ) : (
@@ -223,14 +223,14 @@ export function GoalsClient({ embedded }: { embedded?: boolean } = {}) {
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-bold text-white">{gp.goal.title}</h3>
                         <p className="text-xs text-brand-muted font-mono uppercase tracking-wider mt-0.5">
-                          {GOAL_METRIC_META[gp.goal.metric].label} · ate {formatDateBR(gp.goal.target_date)}
+                          {GOAL_METRIC_META[gp.goal.metric].label} · até {formatDateBR(gp.goal.target_date)}
                         </p>
                       </div>
                       <span className="flex items-center gap-1">
                         <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded-full border ${statusColor(gp.status)}`}>
                           {statusLabel(gp.status)}
                         </span>
-                        <HelpTooltip content="Status calculado comparando ritmo atual (ultimas 4 semanas) com ritmo necessario para bater a meta. No ritmo = 80%+ do necessario. Apertado = 50-80%. Atrasado = <50%." />
+                        <HelpTooltip content="Status calculado comparando ritmo atual (últimas 4 semanas) com ritmo necessário para bater a meta. No ritmo = 80%+ do necessário. Apertado = 50-80%. Atrasado = <50%." />
                       </span>
                     </div>
 
@@ -258,7 +258,7 @@ export function GoalsClient({ embedded }: { embedded?: boolean } = {}) {
                         <div className="text-white font-semibold">{gp.actual_per_week !== null ? `${formatNum(gp.actual_per_week)}/sem` : '—'}</div>
                       </div>
                       <div>
-                        <div className="text-brand-muted uppercase tracking-wider font-mono mb-0.5">Necessario</div>
+                        <div className="text-brand-muted uppercase tracking-wider font-mono mb-0.5">Necessário</div>
                         <div className="text-white font-semibold">{formatNum(gp.required_per_week)}/sem</div>
                       </div>
                       <div>
@@ -266,7 +266,7 @@ export function GoalsClient({ embedded }: { embedded?: boolean } = {}) {
                         <div className="text-white font-semibold">{gp.days_remaining}</div>
                       </div>
                       <div>
-                        <div className="text-brand-muted uppercase tracking-wider font-mono mb-0.5">Projecao</div>
+                        <div className="text-brand-muted uppercase tracking-wider font-mono mb-0.5">Projeção</div>
                         <div className="text-white font-semibold">{gp.projected_eta ? formatDateBR(gp.projected_eta) : '—'}</div>
                       </div>
                     </div>
@@ -306,14 +306,14 @@ export function GoalsClient({ embedded }: { embedded?: boolean } = {}) {
         )}
 
         <p className="text-xs text-brand-muted/60 mt-10 leading-relaxed">
-          Metas comparam o ritmo das ultimas 4 semanas de snapshots (Growth Tracker) com o crescimento necessario pra bater no prazo.
+          Metas comparam o ritmo das últimas 4 semanas de snapshots (Growth Tracker) com o crescimento necessário pra bater no prazo.
           Precisa de pelo menos 2 snapshots pra calcular ritmo.
         </p>
 
       <ConfirmModal
         open={deleteTarget !== null}
         title="Deletar meta"
-        message="Tem certeza? Essa acao nao pode ser desfeita."
+        message="Tem certeza? Essa ação não pode ser desfeita."
         confirmLabel="Deletar"
         danger
         onConfirm={() => { if (deleteTarget) { updateGoal(deleteTarget, { action: 'delete' }); setDeleteTarget(null); } }}
@@ -328,7 +328,7 @@ export function GoalsClient({ embedded }: { embedded?: boolean } = {}) {
       <div className="max-w-3xl mx-auto">
         <ToolPageHeader
           title="Meta Tracker"
-          description="Defina metas concretas e acompanhe se esta no ritmo certo pra bater. Usa dados do Growth Tracker."
+          description="Defina metas concretas e acompanhe se está no ritmo certo pra bater. Usa dados do Growth Tracker."
           icon={<ToolIcon tool="goals" size={22} />}
           accent="orange"
         />

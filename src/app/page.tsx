@@ -158,7 +158,7 @@ export default function Home() {
             <span className="text-xl font-bold">
               <span className="gradient-text">{t.nav.logo}</span>
             </span>
-            <p className="text-xs text-brand-muted">Ferramentas para musicos</p>
+            <p className="text-xs text-brand-muted">Ferramentas para músicos</p>
           </div>
         </div>
         <div className="flex items-center gap-6">
@@ -190,7 +190,7 @@ export default function Home() {
       <section className="relative z-10 flex flex-col items-center text-center px-6 pt-20 pb-16 max-w-5xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-green/10 border border-brand-green/20 rounded-full text-brand-green text-xs font-mono mb-8">
           <span className="w-1.5 h-1.5 bg-brand-green rounded-full animate-pulse" />
-          {lang === "pt" ? "11 ferramentas — R$29/mes" : "11 tools — R$29/month"}
+          {lang === "pt" ? "11 ferramentas — R$29/mês" : "11 tools — R$29/month"}
         </div>
 
         <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl tracking-tight leading-none mb-6">
@@ -403,14 +403,14 @@ export default function Home() {
       <section className="relative z-10 px-6 py-20 max-w-4xl mx-auto text-center">
         <h2 className="font-display text-4xl sm:text-5xl mb-4">
           {lang === "pt" ? (
-            <>Pronto pra levar sua <span className="gradient-text">carreira musical</span> a serio?</>
+            <>Pronto pra levar sua <span className="gradient-text">carreira musical</span> a sério?</>
           ) : (
             <>Ready to take your <span className="gradient-text">music career</span> seriously?</>
           )}
         </h2>
         <p className="text-brand-muted mb-8 max-w-xl mx-auto">
           {lang === "pt"
-            ? "11 ferramentas profissionais por R$29/mes. Teste gratis, sem cartao."
+            ? "11 ferramentas profissionais por R$29/mês. Teste grátis, sem cartão."
             : "11 professional tools for R$29/month. Free to try, no credit card."}
         </p>
         <div className="flex justify-center">

@@ -27,11 +27,11 @@ const NAV_ITEMS: NavItem[] = [
   // Tier 1
   { href: '/dashboard/bio', label: 'Bio Adaptativa', icon: '\u{270D}\u{FE0F}', tier: 1 },
   { href: '/dashboard/cache-calculator', label: 'Calculadora de Cache', icon: '\u{1F4B0}', tier: 1 },
-  { href: '/dashboard/rider', label: 'Rider Tecnico', icon: '\u{1F3B8}', tier: 1 },
+  { href: '/dashboard/rider', label: 'Rider Técnico', icon: '\u{1F3B8}', tier: 1 },
   { href: '/dashboard/contract', label: 'Contrato de Show', icon: '\u{1F4DD}', tier: 1 },
   // Tier 2
   { href: '/dashboard/pitch-kit', label: 'Pitch Kit', icon: '\u{1F4E8}', tier: 2 },
-  { href: '/dashboard/release-timing', label: 'Quando Lancar', icon: '\u{1F4C5}', tier: 2 },
+  { href: '/dashboard/release-timing', label: 'Quando Lançar', icon: '\u{1F4C5}', tier: 2 },
   { href: '/dashboard/launch-checklist', label: 'Checklist', icon: '\u{2705}', tier: 2 },
   // Tier 3
   { href: '/dashboard/growth', label: 'Crescimento', icon: '\u{1F4C8}', tier: 3 },

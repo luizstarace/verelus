@@ -16,20 +16,20 @@ interface Tool {
 }
 
 const TOOLS: Tool[] = [
-  // Tier 1 — disponiveis
+  // Tier 1 — disponíveis
   { key: 'bio', name: 'Bio Adaptativa', description: '4 bios profissionais nos tamanhos de Spotify, Instagram, EPK e Twitter', href: '/dashboard/bio', tier: 1, accent: 'green' },
-  { key: 'cache', name: 'Calculadora de Cache', description: 'Quanto cobrar por show e quanto sobra no bolso de verdade', href: '/dashboard/cache-calculator', tier: 1, accent: 'green' },
-  { key: 'rider', name: 'Rider Tecnico', description: 'PDF profissional com diagrama de palco editavel', href: '/dashboard/rider', tier: 1, accent: 'green' },
-  { key: 'contract', name: 'Contrato de Show', description: 'Contrato juridico BR pronto pra assinatura', href: '/dashboard/contract', tier: 1, accent: 'green' },
+  { key: 'cache', name: 'Calculadora de Cachê', description: 'Quanto cobrar por show e quanto sobra no bolso de verdade', href: '/dashboard/cache-calculator', tier: 1, accent: 'green' },
+  { key: 'rider', name: 'Rider Técnico', description: 'PDF profissional com diagrama de palco editável', href: '/dashboard/rider', tier: 1, accent: 'green' },
+  { key: 'contract', name: 'Contrato de Show', description: 'Contrato jurídico BR pronto pra assinatura', href: '/dashboard/contract', tier: 1, accent: 'green' },
   // Tier 2 — em breve
   { key: 'pitch-kit', name: 'Pitch Kit', description: 'Email + 1-pager + press release pra enviar a curador', href: '/dashboard/pitch-kit', tier: 2, accent: 'purple' },
-  { key: 'release-timing', name: 'Quando Lancar', description: '3 datas ideais para o seu proximo lancamento', href: '/dashboard/release-timing', tier: 2, accent: 'purple' },
-  { key: 'launch-checklist', name: 'Checklist de Lancamento', description: 'Planejamento de 8 semanas antes ao pos-release', href: '/dashboard/launch-checklist', tier: 2, accent: 'purple' },
+  { key: 'release-timing', name: 'Quando Lançar', description: '3 datas ideais para o seu próximo lançamento', href: '/dashboard/release-timing', tier: 2, accent: 'purple' },
+  { key: 'launch-checklist', name: 'Checklist de Lançamento', description: 'Planejamento de 8 semanas antes ao pós-release', href: '/dashboard/launch-checklist', tier: 2, accent: 'purple' },
   // Tier 3 — em breve
   { key: 'growth', name: 'Growth Tracker', description: 'Painel semanal do seu crescimento real nas plataformas', href: '/dashboard/growth', tier: 3, accent: 'orange' },
-  { key: 'competitors', name: 'Comparador de Concorrentes', description: 'Voce vs 3 artistas similares, ao longo do tempo', href: '/dashboard/competitors', tier: 3, accent: 'orange' },
+  { key: 'competitors', name: 'Comparador de Concorrentes', description: 'Você vs 3 artistas similares, ao longo do tempo', href: '/dashboard/competitors', tier: 3, accent: 'orange' },
   { key: 'goals', name: 'Meta Tracker', description: 'Defina e acompanhe metas concretas de carreira', href: '/dashboard/goals', tier: 3, accent: 'orange' },
-  { key: 'content-calendar', name: 'Cronograma de Posts', description: '30 dias de posts sugeridos pro seu lancamento', href: '/dashboard/content-calendar', tier: 3, accent: 'orange' },
+  { key: 'content-calendar', name: 'Cronograma de Posts', description: '30 dias de posts sugeridos pro seu lançamento', href: '/dashboard/content-calendar', tier: 3, accent: 'orange' },
 ];
 
 const ACCENT_BG: Record<Tool['accent'], string> = {
@@ -72,14 +72,14 @@ export default async function DashboardHome() {
           <div className="flex items-center gap-2 mb-3">
             <div className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse" />
             <span className="text-xs font-mono uppercase tracking-wider text-brand-muted">
-              {availableCount} de {TOOLS.length} ferramentas disponiveis
+              {availableCount} de {TOOLS.length} ferramentas disponíveis
             </span>
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-3">
             Caixa de ferramentas <span className="bg-gradient-to-r from-brand-green to-brand-green/60 bg-clip-text text-transparent">Verelus</span>
           </h1>
           <p className="text-brand-muted leading-relaxed max-w-2xl">
-            Cada ferramenta resolve uma dor especifica do musico independente. Bem feita. Direta. Sem firulas.
+            Cada ferramenta resolve uma dor específica do músico independente. Bem feita. Direta. Sem firulas.
           </p>
         </header>
 
@@ -88,7 +88,7 @@ export default async function DashboardHome() {
           {([1, 2, 3] as const).map((tier) => {
             const tools = TOOLS.filter((t) => t.tier === tier);
             const tierLabels: Record<typeof tier, string> = {
-              1: 'Disponiveis',
+              1: 'Disponíveis',
               2: 'Tier 2 — em breve',
               3: 'Tier 3 — em breve',
             };

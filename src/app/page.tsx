@@ -205,9 +205,22 @@ export default function Home() {
           {t.hero.description}
         </p>
 
-        <SignUpForm t={t} lang={lang} />
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <a
+            href="/login"
+            className="px-8 py-4 bg-brand-green text-brand-dark font-bold rounded-lg hover:brightness-110 transition-all glow-green text-lg"
+          >
+            {lang === 'pt' ? 'Criar conta grátis' : 'Create free account'}
+          </a>
+          <a
+            href="#pricing"
+            className="px-8 py-4 border border-white/10 text-white/70 rounded-lg hover:bg-white/5 transition text-lg"
+          >
+            {lang === 'pt' ? 'Ver preços' : 'See pricing'}
+          </a>
+        </div>
 
-        <p className="text-xs text-brand-muted/50 mt-4">{t.hero.trust}</p>
+        <p className="text-xs text-brand-muted/50">{t.hero.trust}</p>
       </section>
 
       {/* Integrations */}

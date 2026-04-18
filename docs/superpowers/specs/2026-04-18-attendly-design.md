@@ -30,6 +30,29 @@ Paleta otimizada para conversao (baseada em dados):
 | Fundo | Branco/cinza claro | #f8fafc | Legibilidade pro publico nao-tech |
 | Texto | Quase-preto | #0f172a | Contraste alto, leitura confortavel |
 
+Cores de estado e UI:
+
+| Funcao | Hex | Uso |
+|--------|-----|-----|
+| Sucesso | #22c55e | Confirmacoes, status ativo, conectado |
+| Erro | #ef4444 | Erros, desconectado, badges urgentes |
+| Warning | #f59e0b | Alertas de uso, atencao (reutiliza laranja) |
+| Borda/Divisor | #e2e8f0 | Separadores, cards, inputs |
+| Fundo secundario | #f1f5f9 | Cards, hover, areas destacadas |
+| Texto secundario | #64748b | Subtitulos, timestamps, placeholders |
+
+Tipografia:
+
+| Elemento | Font | Peso | Tamanho |
+|----------|------|------|---------|
+| Headings | Inter | 700 | 32/24/20px |
+| Body | Inter | 400 | 16px |
+| Small/Labels | Inter | 500 | 14/12px |
+| Mono (codigo widget) | JetBrains Mono | 400 | 14px |
+
+Fontes: Inter (Google Fonts, gratis, otima legibilidade em PT-BR).
+
+Fundamentacao:
 - Fundo claro converte melhor pra PME (Nielsen Norman Group)
 - Azul = cor #1 em confianca (Journal of Business Research)
 - Laranja CTA = contraste maximo contra azul (HubSpot A/B tests)
@@ -42,7 +65,7 @@ Paleta otimizada para conversao (baseada em dados):
 ```
 verelus.com/                        → Homepage neutra (vitrine de produtos)
 verelus.com/attendly                → Landing page do Attendly
-verelus.com/attendly/pricing        → Pricing (ou inline na landing)
+verelus.com/attendly#pricing        → Ancora na landing (scroll pra pricing)
 verelus.com/login                   → Auth compartilhado (ja existe)
 verelus.com/dashboard/attendly      → Dashboard do cliente
   /dashboard/attendly/setup         → Onboarding wizard
@@ -75,12 +98,27 @@ CREATE TABLE attendly_businesses (
   ai_context text,                    -- gerado pelo Claude a partir dos dados acima
   voice_id text DEFAULT 'default',
   widget_config jsonb DEFAULT '{}',   -- {color, position, greeting}
-  whatsapp_number text,
-  onboarding_step int DEFAULT 1,        -- passo atual do wizard (1-7), null = completo
+  whatsapp_number text,                -- numero do WhatsApp do NEGOCIO (Evolution API)
+  owner_whatsapp text,                  -- numero pessoal do DONO (notificacoes)
+  owner_notify_channel text DEFAULT 'email' CHECK (owner_notify_channel IN ('email', 'whatsapp', 'both')),
+  onboarding_step int DEFAULT 1,        -- passo atual do wizard (1-5), null = completo
   status text DEFAULT 'setup' CHECK (status IN ('setup', 'active', 'paused')),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
+
+-- Trigger: auto-update updated_at
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_updated_at
+  BEFORE UPDATE ON attendly_businesses
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- RLS: usuario so ve seu negocio
 ALTER TABLE attendly_businesses ENABLE ROW LEVEL SECURITY;
@@ -179,6 +217,9 @@ CREATE TABLE attendly_logs (
 
 CREATE INDEX idx_logs_date ON attendly_logs (created_at DESC);
 CREATE INDEX idx_logs_business ON attendly_logs (business_id, created_at DESC);
+
+-- Retencao: cron semanal deleta logs com mais de 30 dias
+-- DELETE FROM attendly_logs WHERE created_at < now() - interval '30 days';
 ```
 
 Notas:
@@ -194,21 +235,42 @@ Notas:
 ### 5.1 Onboarding (self-service)
 
 ```
-Dashboard /attendly/setup (wizard com checklist)
-  Passo 1: Dados do negocio (nome, categoria, telefone)
-  Passo 2: Servicos (nome, preco, duracao)
-  Passo 3: Horarios de funcionamento
-  Passo 4: FAQ (perguntas frequentes)
-  → POST /api/attendly/setup
-  → Salva em attendly_businesses
-  → Claude API gera ai_context a partir dos dados
+Dashboard /attendly/setup (wizard com checklist — 5 passos)
+
+  Passo 1: Dados do negocio (nome, categoria, telefone, endereco)
+  → PATCH /api/attendly/business {step: 1, data: {...}}
+  → Salva parcial em attendly_businesses
+  → onboarding_step = 2
+
+  Passo 2: Servicos + Horarios + FAQ
+  → PATCH /api/attendly/business {step: 2, data: {...}}
+  → Salva services, hours, faq
+  → Claude API gera ai_context a partir de TODOS os dados
   → Salva ai_context
-  Passo 5: Preview do atendente (cliente testa ANTES de ativar)
+  → onboarding_step = 3
+
+  Passo 3: Preview do atendente (cliente testa ANTES de ativar)
+  → POST /api/attendly/chat {preview: true}
   → Cliente faz perguntas teste, ve como IA responde
-  → Ajusta se necessario
-  Passo 6: Instalar widget (codigo pra copiar)
-  Passo 7: Conectar WhatsApp (QR code)
-  → status: setup → active
+  → Pode voltar ao passo 2 pra ajustar dados
+  → onboarding_step = 4
+
+  Passo 4: Instalar widget (codigo pra copiar + preview visual)
+  → GET /api/attendly/widget/[id].js retorna script
+  → Instrucao: "Cole antes do </body>"
+  → Passo opcional: pode pular e instalar depois
+  → onboarding_step = 5
+
+  Passo 5: Conectar WhatsApp (QR code)
+  → POST /api/attendly/whatsapp/connect
+  → QR code no dashboard
+  → Passo opcional: pode pular e conectar depois
+  → onboarding_step = null, status: setup → active
+
+Cada passo salva independentemente. Cliente pode fechar o browser
+e retomar de onde parou (onboarding_step persiste).
+Passos 4 e 5 sao opcionais — atendente funciona so com widget
+ou so com WhatsApp.
 ```
 
 ### 5.2 Chat (endpoint unico — widget + WhatsApp)
@@ -216,12 +278,38 @@ Dashboard /attendly/setup (wizard com checklist)
 ```
 POST /api/attendly/chat
   ← body: {business_id, conversation_id?, message, channel}
-  → Valida business_id, verifica status='active'
-  → Cria ou recupera conversation
-  → Carrega ai_context do business
+
+  Validacao:
+  → Valida business_id existe
+  → Se status='paused': retorna msg amigavel
+    "Este atendente está temporariamente indisponível.
+     Entre em contato diretamente: [phone do business]"
+  → Se status='setup': retorna 403 (atendente nao ativo)
+  → Se conversation.status='human_needed': nao responde IA,
+    retorna "Seu atendimento está sendo feito por [nome]"
+
+  Lookup de conversa existente:
+  → Widget: usa conversation_id do body (vem do localStorage)
+  → WhatsApp: busca conversa ativa pelo customer_phone
+  → Se nao encontra: cria nova conversation
+
+  Context window (controle de tokens):
+  → Carrega ai_context do business (system prompt)
+  → Carrega ultimas 20 mensagens da conversa (sliding window)
+  → Se conversa tem mais de 20 msgs, inclui resumo das anteriores
+  → Modelo: claude-haiku-4-5 (custo otimo pra atendimento)
+    - Haiku: ~R$0,01/msg (500 msgs = R$5)
+    - Sonnet: ~R$0,05/msg (500 msgs = R$25) — margem cai demais
+    - Qualidade do Haiku e suficiente pra FAQ/atendimento
+
+  Streaming:
   → Envia pra Claude API com streaming (SSE)
+  → Buffer completo da resposta em memoria
+  → Ao finalizar stream: salva resposta completa em attendly_messages
+    (garante persistencia mesmo se conexao cair mid-stream)
   → Salva mensagem do cliente em attendly_messages
-  → Salva resposta da IA em attendly_messages
+
+  Pos-resposta:
   → Incrementa message_count na conversation
   → Incrementa text_messages + tokens em attendly_usage
   → Checa limite do plano:
@@ -318,8 +406,14 @@ Fluxo:
 
 - Stripe subscriptions + usage-based billing (metered)
 - Trial: 7 dias, sem cartao de credito
+  - Dia 5: email "Seu trial acaba em 2 dias. Adicione seu cartao pra continuar."
+  - Dia 7: trial expira → status business = 'paused'
+  - Atendente para de responder. Msg: "Atendente em pausa. Ative seu plano."
+  - Cliente adiciona cartao → plano ativa → status = 'active' imediatamente
+  - Dados NUNCA sao deletados. Cliente pode voltar a qualquer momento.
 - Excedente: calculado no fim do mes via attendly_usage, invoice item adicional no Stripe
 - Excedente nunca bloqueia atendente — continua funcionando, cobra depois
+- Downgrade: aplica no proximo ciclo. Nao prorratea.
 - Toggle anual na pricing page: 2 meses gratis
   - Starter anual: R$1.470/ano (R$122,50/mes efetivo, economia R$294)
   - Pro anual: R$2.970/ano (R$247,50/mes efetivo, economia R$594)
@@ -332,8 +426,13 @@ Fluxo:
 ### Instalacao
 
 ```html
-<script src="https://verelus.com/widget/BUSINESS_ID.js" async></script>
+<!-- Widget generico (cacheable via CDN, ~12KB) -->
+<script src="https://verelus.com/widget.js" data-business="BUSINESS_ID" async></script>
 ```
+
+O script generico e cacheado globalmente. A config do negocio (nome, cores, greeting)
+e carregada via `GET /api/attendly/widget/[id]/config` no init (JSON leve, ~1KB).
+Separar codigo de config permite cache agressivo do JS principal.
 
 ### Comportamento
 
@@ -433,7 +532,12 @@ verelus.com
 
 ### Onboarding Wizard (primeira vez)
 
-Checklist visual persistente: Criar conta → Dados do negocio → Revisar atendente → Instalar widget → Conectar WhatsApp
+Checklist visual de 5 passos (alinhado com fluxo 5.1):
+1. Dados do negocio (nome, categoria, telefone)
+2. Servicos + Horarios + FAQ
+3. Revisar atendente (testar IA antes de ativar)
+4. Instalar widget (opcional, pode pular)
+5. Conectar WhatsApp (opcional, pode pular)
 
 "Revisar atendente" permite testar a IA antes de ativar.
 
@@ -449,7 +553,13 @@ Checklist visual persistente: Criar conta → Dados do negocio → Revisar atend
 - Lista com filtros: canal, status, "IA nao soube"
 - Badge vermelho em conversas que precisam atencao
 - Detalhe: historico + botao "Responder como humano"
-- Polling 30s pra novas msgs (SSE pos-MVP)
+- Resposta humana (fluxo completo):
+  - Dono digita resposta no dashboard → POST .../reply
+  - Backend salva msg com role='human'
+  - Widget: polling 5s detecta nova msg, exibe pro cliente
+  - WhatsApp: n8n cron detecta msg humana, envia via Evolution API
+  - Pos-MVP: SSE/websocket pra entrega instantanea
+- Polling 30s pra novas msgs na lista (SSE pos-MVP)
 
 ### Configuracoes (/dashboard/attendly/settings)
 
@@ -475,7 +585,7 @@ Checklist visual persistente: Criar conta → Dados do negocio → Revisar atend
 | Frontend | Next.js 14, Tailwind CSS, Vercel |
 | Widget | Vanilla JS, Shadow DOM, SSE |
 | Backend | Next.js API Routes |
-| IA | Claude API (streaming) |
+| IA | Claude API — claude-haiku-4-5 (streaming) |
 | Voz | ElevenLabs API |
 | Database | Supabase (PostgreSQL + Auth + Storage + RLS) |
 | Payments | Stripe (subscriptions + usage metering) |
@@ -495,7 +605,8 @@ GET    /api/attendly/conversations            → lista com filtros
 GET    /api/attendly/conversations/[id]       → detalhe + mensagens
 POST   /api/attendly/conversations/[id]/reply → resposta humana
 PATCH  /api/attendly/conversations/[id]/status → fechar/devolver pra IA
-GET    /api/attendly/widget/[id].js           → script embeddable
+GET    /api/attendly/widget.js                 → script generico (cacheable CDN)
+GET    /api/attendly/widget/[id]/config       → config do business (JSON)
 POST   /api/attendly/widget/lead              → captura pre-chat
 POST   /api/attendly/whatsapp/connect         → gera QR code
 GET    /api/attendly/whatsapp/status          → status conexao

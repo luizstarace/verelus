@@ -2,163 +2,104 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ToolIcon } from '@/components/ToolIcon';
 
 export const runtime = 'edge';
 
-interface Tool {
-  key: string;
-  name: string;
-  description: string;
-  href: string | null;
-  tier: 1 | 2 | 3;
-  accent: 'green' | 'purple' | 'orange' | 'blue';
-}
-
-const TOOLS: Tool[] = [
-  // Tier 1 — gratuitas
-  { key: 'bio', name: 'Bio Adaptativa', description: '4 bios profissionais nos tamanhos de Spotify, Instagram, EPK e Twitter', href: '/dashboard/bio', tier: 1, accent: 'green' },
-  { key: 'cache', name: 'Calculadora de Cachê', description: 'Quanto cobrar por show e quanto sobra no bolso de verdade', href: '/dashboard/cache-calculator', tier: 1, accent: 'green' },
-  { key: 'rider', name: 'Rider Técnico', description: 'PDF profissional com diagrama de palco editável', href: '/dashboard/rider', tier: 1, accent: 'green' },
-  { key: 'contract', name: 'Contrato de Show', description: 'Contrato jurídico BR pronto pra assinatura', href: '/dashboard/contract', tier: 1, accent: 'green' },
-  // Tier 2 — Pro
-  { key: 'pitch-kit', name: 'Pitch Kit', description: 'Email + 1-pager + press release pra enviar a curador', href: '/dashboard/pitch-kit', tier: 2, accent: 'purple' },
-  { key: 'release-timing', name: 'Quando Lançar', description: '3 datas ideais para o seu próximo lançamento', href: '/dashboard/release-timing', tier: 2, accent: 'purple' },
-  { key: 'launch-checklist', name: 'Checklist de Lançamento', description: 'Planejamento de 8 semanas antes ao pós-release', href: '/dashboard/launch-checklist', tier: 2, accent: 'purple' },
-  // Tier 3 — Pro
-  { key: 'growth', name: 'Painel de Crescimento', description: 'Crescimento real, metas e comparação com concorrentes', href: '/dashboard/growth', tier: 3, accent: 'orange' },
-  { key: 'content-calendar', name: 'Cronograma de Posts', description: '30 dias de posts sugeridos pro seu lançamento', href: '/dashboard/content-calendar', tier: 3, accent: 'orange' },
-];
-
-const ACCENT_BG: Record<Tool['accent'], string> = {
-  green: 'group-hover:text-brand-green',
-  purple: 'group-hover:text-brand-purple',
-  orange: 'group-hover:text-brand-orange',
-  blue: 'group-hover:text-blue-400',
-};
-
-const ACCENT_BORDER: Record<Tool['accent'], string> = {
-  green: 'hover:border-brand-green/40',
-  purple: 'hover:border-brand-purple/40',
-  orange: 'hover:border-brand-orange/40',
-  blue: 'hover:border-blue-400/40',
-};
-
 export default async function DashboardHome() {
   const cookieStore = cookies();
-  const supabaseAuth = createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     { cookies: { get(name: string) { return cookieStore.get(name)?.value; } } }
   );
-  const { data: { user } } = await supabaseAuth.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const availableCount = TOOLS.filter((t) => t.href).length;
+  const cards = [
+    {
+      href: '/dashboard/proposals',
+      title: 'Propostas',
+      description: 'Veja todas as suas propostas, acompanhe visualizacoes e aceites.',
+      icon: '\u{1F4E8}',
+    },
+    {
+      href: '/dashboard/proposals/new',
+      title: 'Nova proposta',
+      description: 'Crie uma proposta profissional em menos de 2 minutos.',
+      icon: '\u{2795}',
+    },
+    {
+      href: '/dashboard/profile',
+      title: 'Perfil',
+      description: 'Configure seus dados que aparecem no cabecalho das propostas.',
+      icon: '\u{1F464}',
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-brand-dark text-white">
-      {/* Background subtle glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 left-1/4 w-96 h-96 bg-brand-green/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-0 w-96 h-96 bg-brand-purple/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-4 py-12 lg:py-16">
+      <div className="relative max-w-5xl mx-auto px-4 py-12 lg:py-16">
         {/* Header */}
-        <header className="mb-12">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse" />
-            <span className="text-xs font-mono uppercase tracking-wider text-brand-muted">
-              {availableCount} de {TOOLS.length} ferramentas disponíveis
-            </span>
-          </div>
+        <header className="mb-10">
           <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-3">
-            Caixa de ferramentas <span className="bg-gradient-to-r from-brand-green to-brand-green/60 bg-clip-text text-transparent">Verelus</span>
+            <span className="bg-gradient-to-r from-brand-green to-brand-green/60 bg-clip-text text-transparent">
+              Verelus
+            </span>
           </h1>
           <p className="text-brand-muted leading-relaxed max-w-2xl">
-            Cada ferramenta resolve uma dor específica do músico independente. Bem feita. Direta. Sem firulas.
+            Propostas profissionais que fecham. Em 2 minutos.
           </p>
         </header>
 
         {/* Onboarding banner */}
-        <div className="bg-gradient-to-r from-brand-green/10 to-brand-green/5 rounded-2xl p-6 border border-brand-green/20 mb-10">
-          <h2 className="text-lg font-bold text-white mb-2">Comece por aqui</h2>
+        <div className="bg-gradient-to-r from-brand-green/15 to-brand-green/5 rounded-2xl p-6 border border-brand-green/20 mb-10">
+          <h2 className="text-lg font-bold text-white mb-2">Comece aqui</h2>
           <p className="text-sm text-brand-muted leading-relaxed mb-4">
-            As 4 ferramentas gratuitas já resolvem problemas reais. Teste uma agora — leva menos de 2 minutos.
+            Configure seu perfil e crie sua primeira proposta para comecar a fechar projetos.
           </p>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/dashboard/bio" className="px-4 py-2 bg-brand-green/15 text-brand-green text-sm font-semibold rounded-lg hover:bg-brand-green/25 transition">
-              Gerar Bio
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/dashboard/profile"
+              className="px-4 py-2 bg-brand-green/15 text-brand-green text-sm font-semibold rounded-lg hover:bg-brand-green/25 transition"
+            >
+              Completar perfil
             </Link>
-            <Link href="/dashboard/cache-calculator" className="px-4 py-2 bg-white/5 text-white/70 text-sm rounded-lg hover:bg-white/10 transition">
-              Calcular Cachê
-            </Link>
-            <Link href="/dashboard/rider" className="px-4 py-2 bg-white/5 text-white/70 text-sm rounded-lg hover:bg-white/10 transition">
-              Criar Rider
+            <Link
+              href="/dashboard/proposals/new"
+              className="px-4 py-2 bg-white/5 text-white/70 text-sm rounded-lg hover:bg-white/10 transition"
+            >
+              Criar primeira proposta
             </Link>
           </div>
         </div>
 
-        {/* Grid */}
-        <div className="space-y-10">
-          {([1, 2, 3] as const).map((tier) => {
-            const tools = TOOLS.filter((t) => t.tier === tier);
-            const tierLabels: Record<typeof tier, string> = {
-              1: 'Gratuitas',
-              2: 'Lançamento — Pro',
-              3: 'Crescimento — Pro',
-            };
-            return (
-              <section key={tier}>
-                <h2 className="text-xs font-mono uppercase tracking-wider text-brand-muted mb-4 flex items-center gap-2">
-                  {tierLabels[tier]}
-                  {tier === 1 && <span className="px-1.5 py-0.5 bg-brand-green/10 text-brand-green rounded text-[10px] font-bold">grátis</span>}
-                  {tier > 1 && <span className="px-1.5 py-0.5 bg-brand-orange/10 text-brand-orange rounded text-[10px] font-bold">R$29/mês</span>}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {tools.map((tool) => {
-                    const available = tool.href !== null;
-                    const card = (
-                      <div className={`group relative h-full bg-brand-surface rounded-2xl p-5 border transition-all duration-200 ${
-                        available
-                          ? `border-white/10 ${ACCENT_BORDER[tool.accent]} cursor-pointer hover:bg-white/[0.04] hover:-translate-y-0.5`
-                          : 'border-white/5 opacity-50'
-                      }`}>
-                        <div className="flex items-start justify-between mb-4">
-                          <div className={`flex-shrink-0 w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 transition-colors ${available ? ACCENT_BG[tool.accent] : ''}`}>
-                            <ToolIcon tool={tool.key} size={20} />
-                          </div>
-                          {!available && (
-                            <span className="text-[9px] uppercase tracking-wider bg-white/5 text-brand-muted px-2 py-0.5 rounded-full font-mono">
-                              Pro
-                            </span>
-                          )}
-                          {available && (
-                            <span className="text-brand-muted group-hover:text-white group-hover:translate-x-0.5 transition-all">
-                              →
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="font-bold text-white mb-1.5 leading-snug">{tool.name}</h3>
-                        <p className="text-xs text-brand-muted leading-relaxed">{tool.description}</p>
-                      </div>
-                    );
-                    return available && tool.href ? (
-                      <Link key={tool.key} href={tool.href} className="block h-full">{card}</Link>
-                    ) : (
-                      <div key={tool.key}>{card}</div>
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })}
+        {/* Cards grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cards.map((card) => (
+            <Link
+              key={card.href}
+              href={card.href}
+              className="group block bg-brand-surface rounded-2xl p-6 border border-white/10 hover:border-brand-green/40 transition-all duration-200 hover:bg-white/[0.04] hover:-translate-y-0.5"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <span className="text-2xl">{card.icon}</span>
+                <span className="text-brand-muted group-hover:text-white group-hover:translate-x-0.5 transition-all">
+                  &rarr;
+                </span>
+              </div>
+              <h3 className="font-bold text-white mb-1.5">{card.title}</h3>
+              <p className="text-xs text-brand-muted leading-relaxed">{card.description}</p>
+            </Link>
+          ))}
         </div>
 
-        <footer className="mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-brand-muted/60">
+        {/* Footer */}
+        <footer className="mt-16 pt-8 border-t border-white/5 text-xs text-brand-muted/60">
           <span>Conta: {user.email}</span>
-          <span>{TOOLS.length} ferramentas. 4 gratuitas, {TOOLS.length - 4} no Pro.</span>
         </footer>
       </div>
     </div>

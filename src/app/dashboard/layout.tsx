@@ -23,20 +23,9 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', label: 'Painel', icon: '\u{1F3AF}', tier: 1 },
-  // Tier 1
-  { href: '/dashboard/bio', label: 'Bio Adaptativa', icon: '\u{270D}\u{FE0F}', tier: 1 },
-  { href: '/dashboard/cache-calculator', label: 'Calculadora de Cache', icon: '\u{1F4B0}', tier: 1 },
-  { href: '/dashboard/rider', label: 'Rider Técnico', icon: '\u{1F3B8}', tier: 1 },
-  { href: '/dashboard/contract', label: 'Contrato de Show', icon: '\u{1F4DD}', tier: 1 },
-  // Tier 2
-  { href: '/dashboard/pitch-kit', label: 'Pitch Kit', icon: '\u{1F4E8}', tier: 2 },
-  { href: '/dashboard/release-timing', label: 'Quando Lançar', icon: '\u{1F4C5}', tier: 2 },
-  { href: '/dashboard/launch-checklist', label: 'Checklist', icon: '\u{2705}', tier: 2 },
-  // Tier 3
-  { href: '/dashboard/growth', label: 'Crescimento', icon: '\u{1F4C8}', tier: 3 },
-  { href: '/dashboard/content-calendar', label: 'Cronograma', icon: '\u{1F4C5}', tier: 3 },
-  // Profile
+  { href: '/dashboard', label: 'Painel', icon: '\u{1F4CB}', tier: 1 },
+  { href: '/dashboard/proposals', label: 'Propostas', icon: '\u{1F4E8}', tier: 1 },
+  { href: '/dashboard/proposals/new', label: 'Nova proposta', icon: '\u{2795}', tier: 1 },
   { href: '/dashboard/profile', label: 'Perfil', icon: '\u{1F464}', tier: 1 },
 ];
 
@@ -134,10 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <nav className="flex-1 py-3 overflow-y-auto">
             {NAV_ITEMS.map((item) => {
-              const growthPaths = ['/dashboard/growth', '/dashboard/goals', '/dashboard/competitors'];
-              const isActive = item.href === '/dashboard/growth'
-                ? growthPaths.some((p) => currentPath === p || currentPath.startsWith(p + '/'))
-                : currentPath === item.href || (item.href !== '/dashboard' && currentPath.startsWith(item.href));
+              const isActive = currentPath === item.href || (item.href !== '/dashboard' && currentPath.startsWith(item.href + '/'));
 
               return (
                 <a

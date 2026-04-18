@@ -1,7 +1,8 @@
 import { ChecklistClient } from './ChecklistClient';
+import { UpgradeGate } from '@/lib/upgrade-gate';
 
 export const runtime = 'edge';
 
 export default function ChecklistPage() {
-  return <ChecklistClient />;
+  return <UpgradeGate><ChecklistClient /></UpgradeGate>;
 }

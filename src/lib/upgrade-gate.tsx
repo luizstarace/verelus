@@ -31,14 +31,14 @@ export function UpgradeGate({ children }: UpgradeGateProps) {
           Recurso do plano Pro
         </h2>
         <p className="text-brand-muted mb-6 text-sm leading-relaxed">
-          Assine o Pro por R$29/mes para desbloquear uso ilimitado de todas as ferramentas.
+          Assine o Pro por R$29/mês para desbloquear uso ilimitado de todas as ferramentas.
         </p>
         <div className="flex gap-3 justify-center">
           <a
             href="/#pricing"
             className="px-6 py-3 bg-brand-green text-black font-bold rounded-lg hover:brightness-110 transition text-sm"
           >
-            Assinar Pro — R$29/mes
+            Assinar Pro — R$29/mês
           </a>
           <a
             href="/dashboard"

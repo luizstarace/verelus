@@ -33,9 +33,9 @@ export function UpgradeModal({ open, onClose, feature }: UpgradeModalProps) {
           </h2>
           <p className="text-brand-muted text-sm leading-relaxed mb-6">
             {feature
-              ? `Para usar "${feature}", voce precisa do plano Pro.`
-              : 'Voce atingiu o limite do plano gratuito.'}
-            {' '}Assine o Pro por R$29/mes para uso ilimitado de todas as ferramentas.
+              ? `Para usar "${feature}", você precisa do plano Pro.`
+              : 'Você atingiu o limite do plano gratuito.'}
+            {' '}Assine o Pro por R$29/mês para uso ilimitado de todas as ferramentas.
           </p>
 
           <div className="space-y-3">
@@ -43,7 +43,7 @@ export function UpgradeModal({ open, onClose, feature }: UpgradeModalProps) {
               href="/#pricing"
               className="block w-full py-3 bg-brand-green text-black font-bold rounded-lg hover:brightness-110 transition text-sm"
             >
-              Assinar Pro — R$29/mes
+              Assinar Pro — R$29/mês
             </a>
             <button
               onClick={onClose}

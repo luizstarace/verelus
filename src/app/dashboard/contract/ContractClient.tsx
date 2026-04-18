@@ -5,6 +5,8 @@ import type { ContractInput, ContractParty } from '@/lib/types/tools';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { HelpTooltip } from '@/components/ui/HelpTooltip';
+import { CLAUSE_HELP } from '@/lib/tool-content';
 
 const DEFAULT_PARTY: ContractParty = {
   type: 'pf',
@@ -62,6 +64,7 @@ export function ContractClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<{ pdfBlob: Blob; shareId: string | null } | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   const update = <K extends keyof ContractInput>(key: K, value: ContractInput[K]) => {
     setInput({ ...input, [key]: value });
@@ -222,7 +225,10 @@ export function ContractClient() {
             ) : (
               <button
                 type="button"
-                onClick={generate}
+                onClick={() => {
+                  if (!canGenerate || loading) return;
+                  setShowPreview(true);
+                }}
                 disabled={!canGenerate || loading}
                 className="flex-1 px-4 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl disabled:opacity-50"
               >
@@ -231,6 +237,64 @@ export function ContractClient() {
             )}
           </div>
         </div>
+
+        {showPreview && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/70" onClick={() => setShowPreview(false)} />
+            <div className="relative bg-brand-surface border border-white/10 rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-bold mb-4">Preview do Contrato</h3>
+              <p className="text-sm text-brand-muted mb-4">
+                Revise os dados antes de gerar o PDF. Depois de gerado, alteracoes exigem um novo arquivo.
+              </p>
+              <div className="text-sm text-white/80 space-y-2 mb-6 bg-black/30 rounded-lg p-4">
+                <p>
+                  <strong>Contratante:</strong> {input.contractor.name || '—'}
+                  {input.contractor.document ? ` (${input.contractor.document})` : ''}
+                </p>
+                <p>
+                  <strong>Contratado:</strong> {input.artist.name || '—'}
+                  {input.artist.document ? ` (${input.artist.document})` : ''}
+                </p>
+                <p>
+                  <strong>Show:</strong> {input.show_date || '—'} as {input.show_time || '—'} ({input.show_duration_min}min)
+                </p>
+                <p>
+                  <strong>Local:</strong> {input.venue_name || '—'}
+                  {input.venue_address ? ` — ${input.venue_address}` : ''}
+                </p>
+                <p>
+                  <strong>Valor:</strong> R$ {(input.cache_total / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  {' '}({input.deposit_percent}% de sinal, saldo {input.balance_due_timing === 'before_show' ? 'ate 3 dias antes' : input.balance_due_timing === 'on_show_day' ? 'no dia do show' : 'ate 5 dias uteis depois'})
+                </p>
+                <p>
+                  <strong>Multas de cancelamento:</strong> {input.cancel_fee_less_7_days}% (&lt;7d) / {input.cancel_fee_7_to_30_days}% (7-30d) / {input.cancel_fee_more_30_days}% (&gt;30d)
+                </p>
+                <p>
+                  <strong>Foro:</strong> {input.forum_city || '—'}/{input.forum_state || '—'}
+                </p>
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowPreview(false)}
+                  className="px-4 py-2 border border-white/10 text-white/60 rounded-lg hover:text-white hover:border-white/20 text-sm"
+                >
+                  Voltar e editar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPreview(false);
+                    generate();
+                  }}
+                  className="px-4 py-2 bg-brand-green text-black font-bold rounded-lg hover:brightness-110 text-sm"
+                >
+                  Gerar PDF agora
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {result && (
           <div id="contract-result" className="mt-12">
@@ -521,7 +585,19 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Cancelamento</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Cancelamento</h2>
+          <HelpTooltip content={
+            <>
+              <strong>{CLAUSE_HELP.cancellation.what}</strong>
+              <br />
+              <span className="text-brand-muted block mt-1">Quando usar: {CLAUSE_HELP.cancellation.when}</span>
+              {CLAUSE_HELP.cancellation.example && (
+                <em className="text-brand-muted block mt-1">Ex: {CLAUSE_HELP.cancellation.example}</em>
+              )}
+            </>
+          } />
+        </div>
         <p className="text-xs text-brand-muted">% de multa sobre o cache se houver cancelamento.</p>
         <div className="grid grid-cols-3 gap-3">
           <Field label="Menos de 7 dias">
@@ -537,7 +613,19 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
       </div>
 
       <div className="space-y-3 pt-4 border-t border-white/5">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Direitos de imagem e gravacao</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Direitos de imagem e gravacao</h2>
+          <HelpTooltip content={
+            <>
+              <strong>{CLAUSE_HELP.recording.what}</strong>
+              <br />
+              <span className="text-brand-muted block mt-1">Quando usar: {CLAUSE_HELP.recording.when}</span>
+              {CLAUSE_HELP.recording.example && (
+                <em className="text-brand-muted block mt-1">Ex: {CLAUSE_HELP.recording.example}</em>
+              )}
+            </>
+          } />
+        </div>
         <Field label="Gravacao do show">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {([
@@ -564,7 +652,19 @@ function StepClauses({ input, update }: { input: ContractInput; update: <K exten
       </div>
 
       <div className="space-y-3 pt-4 border-t border-white/5">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Exclusividade geografica (opcional)</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Exclusividade geografica (opcional)</h2>
+          <HelpTooltip content={
+            <>
+              <strong>{CLAUSE_HELP.exclusivity.what}</strong>
+              <br />
+              <span className="text-brand-muted block mt-1">Quando usar: {CLAUSE_HELP.exclusivity.when}</span>
+              {CLAUSE_HELP.exclusivity.example && (
+                <em className="text-brand-muted block mt-1">Ex: {CLAUSE_HELP.exclusivity.example}</em>
+              )}
+            </>
+          } />
+        </div>
         <Checkbox label="Incluir clausula de exclusividade" checked={input.has_exclusivity} onChange={(v) => update('has_exclusivity', v)} />
         {input.has_exclusivity && (
           <div className="grid grid-cols-2 gap-3">

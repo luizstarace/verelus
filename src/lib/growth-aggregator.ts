@@ -195,7 +195,14 @@ export async function generateWeeklyInsight(data: GrowthDashboardData, artistNam
   const prompt = `Dados do artista ${artistName ?? 'anonimo'} essa semana:
 ${lines.join('\n')}
 
-Escreva 1 paragrafo curto (2-4 frases) em portugues brasileiro natural, como se fosse um email semanal pra um musico indie. Seja especifico aos numeros, nao generico. Se houve crescimento saudavel, celebre. Se houve queda ou estagnacao, seja honesto e sugira 1 coisa concreta. Nao use frases tipo "continue assim", "voce e incrivel". Seja consultor, nao cheerleader.
+Voce e um consultor de crescimento pra musicos indie brasileiros. Analise os numeros acima de forma DIAGNOSTICA, nao celebratoria.
+
+Em 2-3 frases:
+1. Identifique o maior movimento da semana (positivo ou negativo)
+2. Sugira UMA hipotese do que pode ter causado (viral? colaboracao? sazonalidade? algoritmo?)
+3. Recomende UMA acao acionavel pra proxima semana
+
+Seja especifico. Nao diga "continue assim". Nao seja generico.
 
 Responda APENAS com o paragrafo. Sem marcacoes, sem JSON.`;
 

@@ -9,6 +9,9 @@ import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { PresetSelector } from '@/components/ui/PresetSelector';
+import { HelpTooltip } from '@/components/ui/HelpTooltip';
+import { GOAL_BENCHMARKS } from '@/lib/tool-content';
 
 function formatNum(n: number | null | undefined): string {
   if (n === null || n === undefined) return '—';
@@ -27,6 +30,13 @@ function getMinDate(): string {
   d.setDate(d.getDate() + 1);
   return d.toISOString().slice(0, 10);
 }
+
+const GOAL_PRESETS = [
+  { label: '5k ouvintes Spotify', values: { metric: 'spotify_listeners' as GoalMetric, target_value: 5000, title: '5k ouvintes mensais em 6 meses' } },
+  { label: '10k ouvintes Spotify', values: { metric: 'spotify_listeners' as GoalMetric, target_value: 10000, title: '10k ouvintes mensais em 6 meses' } },
+  { label: '1k subs YouTube', values: { metric: 'youtube_subscribers' as GoalMetric, target_value: 1000, title: '1k inscritos YouTube em 6 meses' } },
+  { label: '5k seguidores IG', values: { metric: 'instagram_followers' as GoalMetric, target_value: 5000, title: '5k seguidores Instagram em 3 meses' } },
+];
 
 export function GoalsClient() {
   const [goals, setGoals] = useState<GoalProgress[]>([]);
@@ -137,6 +147,23 @@ export function GoalsClient() {
             {showAdd && (
               <div className="bg-brand-surface rounded-2xl p-6 border border-white/10 mb-6 space-y-4">
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider">Criar meta</h3>
+                <PresetSelector
+                  presets={GOAL_PRESETS}
+                  onSelect={(v) => setForm((f) => ({
+                    ...f,
+                    ...v,
+                    target_date: (() => { const d = new Date(); d.setMonth(d.getMonth() + (v.metric === 'instagram_followers' || v.metric === 'tiktok_followers' ? 3 : 6)); return d.toISOString().slice(0, 10); })(),
+                  }))}
+                  label="Metas comuns (pre-preencher)"
+                />
+                {GOAL_BENCHMARKS[form.metric] && (
+                  <div className="bg-white/5 rounded-lg p-3 border border-white/10 text-xs leading-relaxed">
+                    <p className="font-semibold text-white/90 mb-1">Benchmarks pra referencia:</p>
+                    <p className="text-brand-muted">Emergente: {GOAL_BENCHMARKS[form.metric].emerging}</p>
+                    <p className="text-brand-muted">Em crescimento: {GOAL_BENCHMARKS[form.metric].growing}</p>
+                    <p className="text-brand-muted">Estabelecido: {GOAL_BENCHMARKS[form.metric].established}</p>
+                  </div>
+                )}
                 <Field label="Titulo" required hint="Ex: 10k ouvintes ate julho">
                   <TextInput value={form.title} onChange={(v) => setForm({ ...form, title: v })} placeholder="Meu objetivo..." />
                 </Field>
@@ -207,8 +234,11 @@ export function GoalsClient() {
                           {GOAL_METRIC_META[gp.goal.metric].label} · ate {formatDateBR(gp.goal.target_date)}
                         </p>
                       </div>
-                      <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded-full border ${statusColor(gp.status)}`}>
-                        {statusLabel(gp.status)}
+                      <span className="flex items-center gap-1">
+                        <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded-full border ${statusColor(gp.status)}`}>
+                          {statusLabel(gp.status)}
+                        </span>
+                        <HelpTooltip content="Status calculado comparando ritmo atual (ultimas 4 semanas) com ritmo necessario para bater a meta. No ritmo = 80%+ do necessario. Apertado = 50-80%. Atrasado = <50%." />
                       </span>
                     </div>
 

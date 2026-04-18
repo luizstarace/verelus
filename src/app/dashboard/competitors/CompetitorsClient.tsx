@@ -16,6 +16,16 @@ function formatNum(n: number | null | undefined): string {
   return n.toLocaleString('pt-BR');
 }
 
+function calcWeeklyGrowth(history: Array<{ date: string; spotify?: number }>): number | null {
+  const sorted = history.filter((h) => h.spotify !== undefined).slice(-4);
+  if (sorted.length < 2) return null;
+  const first = sorted[0].spotify as number;
+  const last = sorted[sorted.length - 1].spotify as number;
+  const daysDiff = (new Date(sorted[sorted.length - 1].date).getTime() - new Date(sorted[0].date).getTime()) / 86400000;
+  if (daysDiff < 1) return null;
+  return Math.round((last - first) / (daysDiff / 7));
+}
+
 function isValidSpotifyUrl(url: string): boolean {
   return /^https?:\/\/(open\.)?spotify\.com\/(intl-\w+\/)?artist\/[a-zA-Z0-9]+/.test(url.trim())
     || /^[a-zA-Z0-9]{22}$/.test(url.trim());
@@ -147,6 +157,11 @@ export function CompetitorsClient() {
             {showAdd && (
               <div className="bg-brand-surface rounded-2xl p-6 border border-white/10 mb-6 space-y-4">
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider">Adicionar competidor</h3>
+                <div className="bg-white/5 rounded-lg p-3 border border-white/10 mb-2">
+                  <p className="text-xs text-white/80 leading-relaxed">
+                    <strong className="text-brand-orange">Dica:</strong> escolha artistas 2-5x seu tamanho no seu genero. Evite superestrelas — olhe pra quem chegou no proximo nivel que voce quer. 3-5 concorrentes bons &gt; 10 aleatorios.
+                  </p>
+                </div>
                 <Field label="URL do Spotify do artista" required>
                   <TextInput value={form.spotify_artist_url} onChange={(v) => setForm({ ...form, spotify_artist_url: v })} placeholder="https://open.spotify.com/artist/..." />
                 </Field>
@@ -193,6 +208,7 @@ export function CompetitorsClient() {
                         <th className="text-left py-3 px-4 text-xs font-mono uppercase tracking-wider text-brand-muted">Artista</th>
                         <th className="text-right py-3 px-4 text-xs font-mono uppercase tracking-wider text-brand-muted">Spotify</th>
                         <th className="text-right py-3 px-4 text-xs font-mono uppercase tracking-wider text-brand-muted">YouTube</th>
+                        <th className="text-right py-3 px-4 text-xs font-mono uppercase tracking-wider text-brand-muted">Spotify/sem</th>
                         <th className="w-20"></th>
                       </tr>
                     </thead>
@@ -206,6 +222,13 @@ export function CompetitorsClient() {
                         </td>
                         <td className="text-right py-4 px-4 font-bold text-white">{formatNum(dashboard!.you.current.spotify)}</td>
                         <td className="text-right py-4 px-4 font-bold text-white">{formatNum(dashboard!.you.current.youtube)}</td>
+                        <td className="text-right py-4 px-4 text-xs font-mono">
+                          {(() => {
+                            const g = calcWeeklyGrowth(dashboard!.you.history);
+                            if (g === null) return <span className="text-brand-muted">—</span>;
+                            return <span className={g >= 0 ? 'text-brand-green' : 'text-red-400'}>{g >= 0 ? '+' : ''}{formatNum(g)}/sem</span>;
+                          })()}
+                        </td>
                         <td></td>
                       </tr>
                       {dashboard!.competitors.map((c) => (
@@ -218,6 +241,13 @@ export function CompetitorsClient() {
                           </td>
                           <td className="text-right py-4 px-4 text-white/80">{formatNum(c.current.spotify)}</td>
                           <td className="text-right py-4 px-4 text-white/80">{formatNum(c.current.youtube)}</td>
+                          <td className="text-right py-4 px-4 text-xs font-mono">
+                            {(() => {
+                              const g = calcWeeklyGrowth(c.history);
+                              if (g === null) return <span className="text-brand-muted">—</span>;
+                              return <span className={g >= 0 ? 'text-brand-green' : 'text-red-400'}>{g >= 0 ? '+' : ''}{formatNum(g)}/sem</span>;
+                            })()}
+                          </td>
                           <td className="text-right py-2 px-4">
                             <button
                               onClick={() => setDeleteTarget(c.id)}

@@ -39,6 +39,7 @@ export function GrowthClient() {
   }>({ spotify_artist_url: '', youtube_channel_url: '', instagram_handle: '', tiktok_handle: '' });
   const [saving, setSaving] = useState(false);
   const [manualModal, setManualModal] = useState<{ source: 'instagram' | 'tiktok'; label: string; current: number } | null>(null);
+  const [logScale, setLogScale] = useState(false);
 
   const loadDashboard = async () => {
     try {
@@ -265,7 +266,20 @@ export function GrowthClient() {
             return (
               <div key={source} className="bg-brand-surface rounded-2xl p-5 border border-white/10">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-mono uppercase tracking-wider text-brand-muted">{meta.label}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono uppercase tracking-wider text-brand-muted">{meta.label}</span>
+                    {(source === 'instagram' || source === 'tiktok') && (() => {
+                      const last = data.last_updated[source];
+                      if (!last) return null;
+                      const daysStale = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+                      if (daysStale < 7) return null;
+                      return (
+                        <span className="text-[10px] text-yellow-400 font-mono uppercase bg-yellow-500/10 border border-yellow-500/30 px-1.5 py-0.5 rounded">
+                          atualizar ({daysStale}d)
+                        </span>
+                      );
+                    })()}
+                  </div>
                   {isManual && hasConfig && (
                     <button
                       onClick={() => setManualModal({ source: source as 'instagram' | 'tiktok', label: meta.label, current: value ?? 0 })}
@@ -290,8 +304,17 @@ export function GrowthClient() {
 
         {/* Chart */}
         <div className="bg-brand-surface rounded-2xl p-5 border border-white/10">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Evolucao 12 semanas</h3>
-          <LineChart data={data.history} />
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Evolucao 12 semanas</h3>
+            <button
+              type="button"
+              onClick={() => setLogScale(!logScale)}
+              className="text-xs font-mono text-brand-muted hover:text-white transition-colors"
+            >
+              {logScale ? 'escala linear' : 'escala log'}
+            </button>
+          </div>
+          <LineChart data={data.history} logScale={logScale} />
         </div>
 
         <p className="text-xs text-brand-muted/60 mt-10 leading-relaxed">
@@ -322,7 +345,8 @@ export function GrowthClient() {
 
 // =============== CHART ===============
 
-function LineChart({ data }: { data: Record<GrowthSource, Array<{ date: string; value: number }>> }) {
+function LineChart({ data, logScale }: { data: Record<GrowthSource, Array<{ date: string; value: number }>>; logScale?: boolean }) {
+  const transform = (v: number) => (logScale ? Math.log10(v + 1) : v);
   const W = 600;
   const H = 200;
   const PAD = 30;
@@ -368,12 +392,13 @@ function LineChart({ data }: { data: Record<GrowthSource, Array<{ date: string; 
         {activeSources.map((source) => {
           const points = data[source];
           if (points.length === 0) return null;
-          const minV = Math.min(...points.map((p) => p.value));
-          const maxV = Math.max(...points.map((p) => p.value));
-          const range = Math.max(1, maxV - minV);
+          const transformed = points.map((p) => ({ ...p, value: transform(p.value) }));
+          const minV = Math.min(...transformed.map((p) => p.value));
+          const maxV = Math.max(...transformed.map((p) => p.value));
+          const range = Math.max(1e-9, maxV - minV);
 
-          const coords = points.map((p, i) => {
-            const x = PAD + (i / Math.max(1, points.length - 1)) * (W - 2 * PAD);
+          const coords = transformed.map((p, i) => {
+            const x = PAD + (i / Math.max(1, transformed.length - 1)) * (W - 2 * PAD);
             const y = H - PAD - ((p.value - minV) / range) * (H - 2 * PAD);
             return { x, y };
           });

@@ -5,6 +5,8 @@ import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { POST_PLATFORM_META } from '@/lib/types/tools';
 import type { ContentCalendarInput, ContentCalendarOutput, PostPlatform, PostSuggestion } from '@/lib/types/tools';
+import { useToast } from '@/lib/use-toast';
+import { PHASE_STRATEGY, type PhaseKey } from '@/lib/tool-content';
 
 const ALL_PLATFORMS = Object.keys(POST_PLATFORM_META) as PostPlatform[];
 
@@ -29,7 +31,7 @@ function dayLabel(offset: number): string {
 }
 
 export function ContentCalendarClient() {
-  const [form, setForm] = useState<ContentCalendarInput>({
+  const [form, setForm] = useState<ContentCalendarInput & { window_days: 15 | 30 | 60 }>({
     artist_name: '',
     song_title: '',
     release_type: 'single',
@@ -37,10 +39,13 @@ export function ContentCalendarClient() {
     genre: '',
     mood: '',
     platforms: ['instagram_reel', 'instagram_feed', 'tiktok'],
+    window_days: 30,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ContentCalendarOutput | null>(null);
+  const [editedCaptions, setEditedCaptions] = useState<Record<number, string>>({});
+  const toast = useToast();
 
   function togglePlatform(p: PostPlatform) {
     setForm((f) => ({
@@ -70,9 +75,11 @@ export function ContentCalendarClient() {
     }
   }
 
-  function copyPost(p: PostSuggestion) {
-    const text = `${p.caption_draft}\n\n${p.hashtags.map((h) => h.startsWith('#') ? h : `#${h}`).join(' ')}`;
+  function copyPost(p: PostSuggestion, idx: number) {
+    const caption = editedCaptions[idx] ?? p.caption_draft;
+    const text = `${caption}\n\n${p.hashtags.map((h) => h.startsWith('#') ? h : `#${h}`).join(' ')}`;
     navigator.clipboard.writeText(text);
+    toast.success('Post copiado!');
   }
 
   const postsByPhase = result ? groupByPhase(result.posts) : null;
@@ -147,6 +154,25 @@ export function ContentCalendarClient() {
               </Field>
             </div>
 
+            <Field label="Janela de posts">
+              <div className="flex gap-2">
+                {([15, 30, 60] as const).map((w) => (
+                  <button
+                    key={w}
+                    type="button"
+                    onClick={() => setForm({ ...form, window_days: w })}
+                    className={`px-3 py-2 rounded-lg text-xs font-medium border ${
+                      form.window_days === w
+                        ? 'bg-brand-orange/20 text-brand-orange border-brand-orange/40'
+                        : 'bg-white/5 text-brand-muted border-white/10'
+                    }`}
+                  >
+                    {w} dias
+                  </button>
+                ))}
+              </div>
+            </Field>
+
             <div>
               <label className="block text-xs font-mono uppercase tracking-wider text-brand-muted mb-2">
                 Plataformas ativas
@@ -183,7 +209,7 @@ export function ContentCalendarClient() {
               disabled={loading || form.platforms.length === 0}
               className="w-full sm:w-auto px-6 py-3 rounded-lg bg-brand-orange text-black font-bold hover:bg-brand-orange/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Gerando cronograma...' : 'Gerar cronograma de 30 dias'}
+              {loading ? 'Gerando cronograma...' : `Gerar cronograma de ${form.window_days} dias`}
             </button>
             <p className="text-xs text-brand-muted/70">
               Pode levar 20-40 segundos. Gera 15-20 posts coordenados.
@@ -197,7 +223,7 @@ export function ContentCalendarClient() {
               <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
                 <h2 className="text-lg font-bold text-white">Estrategia</h2>
                 <button
-                  onClick={() => { setResult(null); }}
+                  onClick={() => { setResult(null); setEditedCaptions({}); }}
                   className="text-xs font-mono uppercase tracking-wider text-brand-muted hover:text-white transition-colors"
                 >
                   ← Novo cronograma
@@ -211,12 +237,29 @@ export function ContentCalendarClient() {
               </div>
             </div>
 
-            {postsByPhase.map(({ phase, posts }) => (
+            <details className="bg-brand-surface rounded-xl p-4 border border-white/10">
+              <summary className="text-sm font-semibold text-white cursor-pointer">Por que essa estrategia de {form.window_days} dias funciona?</summary>
+              <div className="mt-3 space-y-2 text-sm text-brand-muted leading-relaxed">
+                {(Object.keys(PHASE_STRATEGY) as PhaseKey[]).map((key) => (
+                  <div key={key}>
+                    <p className="text-white font-semibold">{PHASE_STRATEGY[key].title}</p>
+                    <p className="text-xs">Meta: {PHASE_STRATEGY[key].goal}</p>
+                    <p className="text-xs">Tatica: {PHASE_STRATEGY[key].tactics}</p>
+                  </div>
+                ))}
+              </div>
+            </details>
+
+            {(() => {
+              let globalIdx = 0;
+              return postsByPhase.map(({ phase, posts }) => (
               <section key={phase}>
                 <h3 className="text-xs font-mono uppercase tracking-wider text-brand-muted mb-3">{phase}</h3>
                 <div className="space-y-3">
-                  {posts.map((p, i) => (
-                    <div key={i} className="bg-brand-surface rounded-xl p-5 border border-white/10">
+                  {posts.map((p) => {
+                    const postIdx = globalIdx++;
+                    return (
+                    <div key={postIdx} className="bg-brand-surface rounded-xl p-5 border border-white/10">
                       <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
                         <div className="flex items-center gap-3 flex-wrap">
                           <span className="text-[10px] font-mono uppercase tracking-wider bg-white/5 text-white px-2 py-0.5 rounded">
@@ -231,7 +274,7 @@ export function ContentCalendarClient() {
                           )}
                         </div>
                         <button
-                          onClick={() => copyPost(p)}
+                          onClick={() => copyPost(p, postIdx)}
                           className="text-xs font-mono uppercase text-brand-muted hover:text-brand-orange transition-colors"
                         >
                           Copiar
@@ -240,7 +283,12 @@ export function ContentCalendarClient() {
 
                       <div className="mb-3">
                         <div className="text-[10px] font-mono uppercase tracking-wider text-brand-muted mb-1">{p.post_type}</div>
-                        <p className="text-sm text-white leading-relaxed whitespace-pre-wrap">{p.caption_draft}</p>
+                        <textarea
+                          value={editedCaptions[postIdx] ?? p.caption_draft}
+                          onChange={(e) => setEditedCaptions({ ...editedCaptions, [postIdx]: e.target.value })}
+                          rows={4}
+                          className="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-sm text-white leading-relaxed resize-none focus:outline-none focus:border-brand-orange/40"
+                        />
                       </div>
 
                       {p.hashtags.length > 0 && (
@@ -268,10 +316,12 @@ export function ContentCalendarClient() {
                         <p className="text-xs text-brand-muted/70 italic border-l-2 border-white/10 pl-3">{p.notes}</p>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
-            ))}
+              ));
+            })()}
           </div>
         )}
       </div>

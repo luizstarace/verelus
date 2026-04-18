@@ -23,11 +23,34 @@ IMPORTANTE: Responda APENAS com um JSON valido. Sem texto antes ou depois.`;
 }
 
 export function buildContentCalendarPrompt(input: ContentCalendarInput): string {
+  const w = input.window_days ?? 30;
   const platformList = input.platforms
     .map((p) => `- ${p}: ${PLATFORM_GUIDANCE[p]}`)
     .join('\n');
 
-  return `Gere um cronograma de 30 dias de posts coordenados para o lancamento:
+  const postCount = w === 15 ? '8-12' : w === 60 ? '25-35' : '15-20';
+
+  const distribution = w === 15
+    ? `- **D-15 a D-8** (teaser + curiosidade): 3-4 posts, sem revelar audio
+- **D-7 a D-1** (preview + countdown): 3-4 posts com trechos, pre-save, contagem regressiva
+- **D-0** (release): 1-2 posts coordenados anunciando
+- **D+1 a D+7** (pos): 2-3 posts de reacao, agradecimento`
+    : w === 60
+    ? `- **D-60 a D-45** (pre-teaser): 3-4 posts ambientais, visual identity, mood board
+- **D-44 a D-30** (teaser): 3-4 posts conceituais, bastidores crus
+- **D-29 a D-15** (construindo curiosidade): 4-5 posts com bastidores detalhados, quotes
+- **D-14 a D-7** (preview): 4-5 posts com trechos de 15s, pre-save
+- **D-6 a D-1** (countdown): 3-4 posts de contagem regressiva, capa final
+- **D-0** (release): 2-3 posts coordenados anunciando
+- **D+1 a D+7** (pos): 3-4 posts de reacao, bastidores do lancamento, numeros`
+    : `- **D-30 a D-22** (teaser inicial): 2-3 posts conceituais, sem revelar audio
+- **D-21 a D-14** (construindo curiosidade): 3-4 posts com bastidores, quotes da letra
+- **D-13 a D-7** (preview): 3-4 posts com trechos de 15s da musica, pre-save
+- **D-6 a D-1** (countdown): 3-4 posts de contagem regressiva, capa final
+- **D-0** (release): 2-3 posts coordenados anunciando
+- **D+1 a D+7** (pos): 2-3 posts de reacao, agradecimento, bastidores do lancamento`;
+
+  return `Gere um cronograma de ${w} dias de posts coordenados para o lancamento:
 
 ## Release
 - Artista: ${input.artist_name}
@@ -42,14 +65,9 @@ ${platformList}
 
 ## Tarefa
 
-Gere 15-20 posts distribuidos entre D-30 e D+7. Cada post em uma plataforma especifica. Distribuicao tipica:
+Gere ${postCount} posts distribuidos entre D-${w} e D+7. Cada post em uma plataforma especifica. Distribuicao tipica:
 
-- **D-30 a D-22** (teaser inicial): 2-3 posts conceituais, sem revelar audio
-- **D-21 a D-14** (construindo curiosidade): 3-4 posts com bastidores, quotes da letra
-- **D-13 a D-7** (preview): 3-4 posts com trechos de 15s da musica, pre-save
-- **D-6 a D-1** (countdown): 3-4 posts de contagem regressiva, capa final
-- **D-0** (release): 2-3 posts coordenados anunciando
-- **D+1 a D+7** (pos): 2-3 posts de reacao, agradecimento, bastidores do lancamento
+${distribution}
 
 Responda APENAS no formato JSON abaixo:
 
@@ -72,7 +90,7 @@ Responda APENAS no formato JSON abaixo:
 \`\`\`
 
 Regras:
-- day_offset: numero inteiro entre -30 e +7
+- day_offset: numero inteiro entre -${w} e +7
 - platform: apenas valores da lista de plataformas ativas informadas
 - image_prompt: NAO e opcional — sempre inclua. Mas nao precisa em posts de twitter (coloque null).
 - Cada post DEVE ser diferente dos outros. Nao repita temas.

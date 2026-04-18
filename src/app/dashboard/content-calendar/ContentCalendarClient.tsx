@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { POST_PLATFORM_META } from '@/lib/types/tools';
@@ -45,7 +45,24 @@ export function ContentCalendarClient() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ContentCalendarOutput | null>(null);
   const [editedCaptions, setEditedCaptions] = useState<Record<number, string>>({});
+  const [loadingStep, setLoadingStep] = useState(0);
+  const loadingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const toast = useToast();
+
+  useEffect(() => {
+    if (loading) {
+      setLoadingStep(0);
+      let step = 0;
+      loadingTimer.current = setInterval(() => {
+        step++;
+        if (step <= 4) setLoadingStep(step);
+      }, 5000);
+    } else {
+      if (loadingTimer.current) clearInterval(loadingTimer.current);
+      setLoadingStep(0);
+    }
+    return () => { if (loadingTimer.current) clearInterval(loadingTimer.current); };
+  }, [loading]);
 
   function togglePlatform(p: PostPlatform) {
     setForm((f) => ({
@@ -82,14 +99,14 @@ export function ContentCalendarClient() {
     toast.success('Post copiado!');
   }
 
-  const postsByPhase = result ? groupByPhase(result.posts) : null;
+  const postsByPhase = result ? groupByPhase(result.posts, form.window_days) : null;
 
   return (
     <div className="min-h-screen bg-brand-dark text-white">
       <div className="max-w-6xl mx-auto px-4 py-12 lg:py-16">
         <ToolPageHeader
           title="Cronograma de Posts"
-          description="30 dias de posts coordenados para o lancamento. Captions, hashtags e prompts de imagem prontos."
+          description={`${form.window_days} dias de posts coordenados para o lancamento. Captions, hashtags e prompts de imagem prontos.`}
           accent="orange"
         />
 
@@ -209,11 +226,16 @@ export function ContentCalendarClient() {
               disabled={loading || form.platforms.length === 0}
               className="w-full sm:w-auto px-6 py-3 rounded-lg bg-brand-orange text-black font-bold hover:bg-brand-orange/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Gerando cronograma...' : `Gerar cronograma de ${form.window_days} dias`}
+              {loading ? 'Gerando...' : `Gerar cronograma de ${form.window_days} dias`}
             </button>
-            <p className="text-xs text-brand-muted/70">
-              Pode levar 20-40 segundos. Gera 15-20 posts coordenados.
-            </p>
+
+            {loading && <LoadingProgress step={loadingStep} />}
+
+            {!loading && (
+              <p className="text-xs text-brand-muted/70">
+                Leva 20-40 segundos. Gera 15-20 posts coordenados com captions, hashtags e prompts de imagem.
+              </p>
+            )}
           </form>
         )}
 
@@ -230,10 +252,27 @@ export function ContentCalendarClient() {
                 </button>
               </div>
               <p className="text-sm text-brand-muted leading-relaxed">{result.summary}</p>
-              <div className="mt-4 flex items-center gap-4 text-xs text-brand-muted/70">
-                <span>{result.posts.length} posts</span>
-                <span>•</span>
-                <span>D-30 a D+7</span>
+              <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center gap-4 text-xs text-brand-muted/70">
+                  <span>{result.posts.length} posts</span>
+                  <span>•</span>
+                  <span>D-{form.window_days} a D+7</span>
+                </div>
+                <button
+                  onClick={() => {
+                    const lines = result.posts.map((p, i) => {
+                      const caption = editedCaptions[i] ?? p.caption_draft;
+                      const date = formatDate(p.suggested_date);
+                      const tags = p.hashtags.map((h) => h.startsWith('#') ? h : `#${h}`).join(' ');
+                      return `[${dayLabel(p.day_offset)} · ${date}] ${POST_PLATFORM_META[p.platform].label}\n${caption}\n${tags}\n`;
+                    });
+                    navigator.clipboard.writeText(lines.join('\n'));
+                    toast.success(`${result.posts.length} posts copiados!`);
+                  }}
+                  className="text-xs font-mono uppercase text-brand-orange hover:text-brand-orange/80 transition-colors"
+                >
+                  Copiar tudo
+                </button>
               </div>
             </div>
 
@@ -252,10 +291,14 @@ export function ContentCalendarClient() {
 
             {(() => {
               let globalIdx = 0;
-              return postsByPhase.map(({ phase, posts }) => (
-              <section key={phase}>
-                <h3 className="text-xs font-mono uppercase tracking-wider text-brand-muted mb-3">{phase}</h3>
-                <div className="space-y-3">
+              return postsByPhase.map(({ phase, posts }, phaseIdx) => (
+              <details key={phase} open={phaseIdx === 0}>
+                <summary className="text-xs font-mono uppercase tracking-wider text-brand-muted mb-3 cursor-pointer hover:text-white transition-colors list-none flex items-center gap-2">
+                  <span className="text-[10px] select-none">▸</span>
+                  {phase}
+                  <span className="text-[10px] bg-white/5 px-1.5 py-0.5 rounded">{posts.length}</span>
+                </summary>
+                <div className="space-y-3 mb-6">
                   {posts.map((p) => {
                     const postIdx = globalIdx++;
                     return (
@@ -319,7 +362,7 @@ export function ContentCalendarClient() {
                     );
                   })}
                 </div>
-              </section>
+              </details>
               ));
             })()}
           </div>
@@ -340,15 +383,66 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 const inputClass = 'w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white text-sm focus:outline-none focus:border-brand-orange/40 transition-colors';
 
-function groupByPhase(posts: PostSuggestion[]): Array<{ phase: string; posts: PostSuggestion[] }> {
-  const phases: Array<{ phase: string; range: [number, number] }> = [
-    { phase: 'Teaser (D-30 a D-22)', range: [-30, -22] },
-    { phase: 'Construindo curiosidade (D-21 a D-14)', range: [-21, -14] },
-    { phase: 'Preview (D-13 a D-7)', range: [-13, -7] },
-    { phase: 'Countdown (D-6 a D-1)', range: [-6, -1] },
-    { phase: 'Lancamento (D-0)', range: [0, 0] },
-    { phase: 'Pos-lancamento (D+1 a D+7)', range: [1, 7] },
-  ];
+const LOADING_STEPS = [
+  'Analisando genero e mood...',
+  'Planejando fases do lancamento...',
+  'Escrevendo captions e hashtags...',
+  'Gerando prompts de imagem...',
+  'Finalizando cronograma...',
+];
+
+function LoadingProgress({ step }: { step: number }) {
+  return (
+    <div className="bg-brand-surface rounded-xl p-5 border border-white/10 space-y-3">
+      {LOADING_STEPS.map((label, i) => {
+        const done = i < step;
+        const active = i === step;
+        return (
+          <div key={i} className="flex items-center gap-3 text-xs">
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+              done ? 'bg-brand-green/20 border-brand-green text-brand-green' :
+              active ? 'border-brand-orange animate-pulse' :
+              'border-white/10'
+            }`}>
+              {done && <span className="text-[10px]">✓</span>}
+            </div>
+            <span className={done ? 'text-white/60 line-through' : active ? 'text-white font-medium' : 'text-white/30'}>
+              {label}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function groupByPhase(posts: PostSuggestion[], windowDays: number): Array<{ phase: string; posts: PostSuggestion[] }> {
+  const phases: Array<{ phase: string; range: [number, number] }> =
+    windowDays === 15
+      ? [
+          { phase: `Teaser + Curiosidade (D-${windowDays} a D-8)`, range: [-windowDays, -8] },
+          { phase: 'Preview + Countdown (D-7 a D-1)', range: [-7, -1] },
+          { phase: 'Lancamento (D-0)', range: [0, 0] },
+          { phase: 'Pos-lancamento (D+1 a D+7)', range: [1, 7] },
+        ]
+      : windowDays === 60
+      ? [
+          { phase: 'Pre-teaser (D-60 a D-45)', range: [-60, -45] },
+          { phase: 'Teaser (D-44 a D-30)', range: [-44, -30] },
+          { phase: 'Construindo curiosidade (D-29 a D-15)', range: [-29, -15] },
+          { phase: 'Preview (D-14 a D-7)', range: [-14, -7] },
+          { phase: 'Countdown (D-6 a D-1)', range: [-6, -1] },
+          { phase: 'Lancamento (D-0)', range: [0, 0] },
+          { phase: 'Pos-lancamento (D+1 a D+7)', range: [1, 7] },
+        ]
+      : [
+          { phase: 'Teaser (D-30 a D-22)', range: [-30, -22] },
+          { phase: 'Construindo curiosidade (D-21 a D-14)', range: [-21, -14] },
+          { phase: 'Preview (D-13 a D-7)', range: [-13, -7] },
+          { phase: 'Countdown (D-6 a D-1)', range: [-6, -1] },
+          { phase: 'Lancamento (D-0)', range: [0, 0] },
+          { phase: 'Pos-lancamento (D+1 a D+7)', range: [1, 7] },
+        ];
   return phases
     .map(({ phase, range }) => ({
       phase,

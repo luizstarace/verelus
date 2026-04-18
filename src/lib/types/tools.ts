@@ -600,6 +600,7 @@ export interface ContentCalendarInput {
   genre: string;
   platforms: PostPlatform[];
   artist_name: string;
+  window_days?: 15 | 30 | 60; // dias de janela de posts (default 30)
 }
 
 export interface PostSuggestion {

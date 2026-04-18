@@ -37,6 +37,8 @@ function validateInput(raw: unknown): ContentCalendarInput | { error: string } {
     }
   }
 
+  const windowDays = [15, 30, 60].includes(Number(r.window_days)) ? Number(r.window_days) as 15 | 30 | 60 : 30;
+
   return {
     artist_name: String(r.artist_name).trim(),
     song_title: String(r.song_title).trim(),
@@ -45,6 +47,7 @@ function validateInput(raw: unknown): ContentCalendarInput | { error: string } {
     genre: String(r.genre).trim(),
     mood: String(r.mood).trim(),
     platforms: r.platforms as PostPlatform[],
+    window_days: windowDays,
   };
 }
 

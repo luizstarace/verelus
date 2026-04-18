@@ -6,6 +6,18 @@ import { PITCH_RECIPIENT_META } from '@/lib/types/tools';
 import { ToolPageHeader } from '@/components/ToolPageHeader';
 import { ToolIcon } from '@/components/ToolIcon';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { useToast } from '@/lib/use-toast';
+import { RECIPIENT_PREVIEWS, type RecipientType } from '@/lib/tool-content';
+
+// Mapeia o PitchRecipientType do form pra chave em RECIPIENT_PREVIEWS.
+// Tipos sem mapping (bookers, labels, tastemaker) nao mostram preview.
+const RECIPIENT_PREVIEW_MAP: Partial<Record<PitchRecipientType, RecipientType>> = {
+  playlist_curator_indie: 'playlist_curator',
+  playlist_curator_mainstream: 'playlist_curator',
+  music_journalist: 'journalist',
+  music_blog: 'journalist',
+  radio_station: 'radio',
+};
 
 const DEFAULT_INPUT: PitchInput = {
   artist_name: '',
@@ -38,8 +50,8 @@ export function PitchKitClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('email');
-  const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const toast = useToast();
 
   const update = <K extends keyof PitchInput>(key: K, value: PitchInput[K]) => {
     setInput({ ...input, [key]: value });
@@ -85,10 +97,9 @@ export function PitchKitClient() {
     }
   };
 
-  const copy = async (key: string, text: string) => {
+  const copy = async (label: string, text: string) => {
     await navigator.clipboard.writeText(text);
-    setCopiedSection(key);
-    setTimeout(() => setCopiedSection(null), 1800);
+    toast.success(`${label} copiado!`);
   };
 
   const downloadOnePager = async () => {
@@ -262,6 +273,26 @@ export function PitchKitClient() {
 
           {error && <ErrorMessage message={error} />}
 
+          {RECIPIENT_PREVIEW_MAP[input.recipient_type] && (() => {
+            const previewKey = RECIPIENT_PREVIEW_MAP[input.recipient_type]!;
+            const preview = RECIPIENT_PREVIEWS[previewKey];
+            return (
+              <div className="bg-brand-green/5 rounded-xl p-4 border border-brand-green/20 mb-4">
+                <p className="text-xs font-mono uppercase tracking-wider text-brand-green mb-2">
+                  Como vai ser a pitch
+                </p>
+                <h4 className="font-semibold text-white mb-2">{preview.title}</h4>
+                <p className="text-xs text-white/80 mb-1">Vai enfatizar:</p>
+                <ul className="text-xs text-white/70 space-y-1 mb-2 list-disc list-inside">
+                  {preview.emphasis.map((e, i) => <li key={i}>{e}</li>)}
+                </ul>
+                <p className="text-xs text-brand-muted">
+                  <strong>Evita:</strong> {preview.avoid}
+                </p>
+              </div>
+            );
+          })()}
+
           <button
             onClick={generate}
             disabled={!canSubmit || loading}
@@ -313,10 +344,10 @@ export function PitchKitClient() {
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs uppercase tracking-wider text-brand-muted font-mono">Assunto</span>
                     <button
-                      onClick={() => copy('subject', output.email_subject)}
+                      onClick={() => copy('Assunto', output.email_subject)}
                       className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-lg"
                     >
-                      {copiedSection === 'subject' ? 'copiado!' : 'copiar'}
+                      copiar
                     </button>
                   </div>
                   <input
@@ -330,10 +361,10 @@ export function PitchKitClient() {
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs uppercase tracking-wider text-brand-muted font-mono">Corpo</span>
                     <button
-                      onClick={() => copy('body', output.email_body)}
+                      onClick={() => copy('Corpo', output.email_body)}
                       className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-lg"
                     >
-                      {copiedSection === 'body' ? 'copiado!' : 'copiar'}
+                      copiar
                     </button>
                   </div>
                   <textarea
@@ -345,10 +376,10 @@ export function PitchKitClient() {
                 </div>
                 <div className="px-5 pb-5">
                   <button
-                    onClick={() => copy('full', `${output.email_subject}\n\n${output.email_body}`)}
+                    onClick={() => copy('Email', `${output.email_subject}\n\n${output.email_body}`)}
                     className="px-4 py-2.5 bg-gradient-to-r from-brand-purple to-brand-purple/80 text-white font-semibold rounded-xl text-sm"
                   >
-                    {copiedSection === 'full' ? 'copiado! cole no cliente de email' : 'copiar assunto + corpo'}
+                    copiar assunto + corpo
                   </button>
                 </div>
               </div>
@@ -361,10 +392,10 @@ export function PitchKitClient() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs uppercase tracking-wider text-brand-muted font-mono">Hook line</span>
                     <button
-                      onClick={() => copy('hook', output.one_pager.hook_line)}
+                      onClick={() => copy('Hook line', output.one_pager.hook_line)}
                       className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-lg"
                     >
-                      {copiedSection === 'hook' ? 'copiado!' : 'copiar'}
+                      copiar
                     </button>
                   </div>
                   <input
@@ -379,10 +410,10 @@ export function PitchKitClient() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs uppercase tracking-wider text-brand-muted font-mono">Bio curta</span>
                     <button
-                      onClick={() => copy('bio', output.one_pager.short_bio)}
+                      onClick={() => copy('Bio', output.one_pager.short_bio)}
                       className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-lg"
                     >
-                      {copiedSection === 'bio' ? 'copiado!' : 'copiar'}
+                      copiar
                     </button>
                   </div>
                   <textarea
@@ -433,10 +464,10 @@ export function PitchKitClient() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs uppercase tracking-wider text-brand-muted font-mono">Press release completo</span>
                   <button
-                    onClick={() => copy('press', output.press_release)}
+                    onClick={() => copy('Press release', output.press_release)}
                     className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-lg"
                   >
-                    {copiedSection === 'press' ? 'copiado!' : 'copiar tudo'}
+                    copiar tudo
                   </button>
                 </div>
                 <textarea

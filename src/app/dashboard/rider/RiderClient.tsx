@@ -172,6 +172,7 @@ export function RiderClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<{ pdfBlob: Blob; shareId: string | null } | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   const update = <K extends keyof RiderInput>(key: K, value: RiderInput[K]) => {
     setInput({ ...input, [key]: value });
@@ -462,7 +463,7 @@ export function RiderClient() {
           {error && <ErrorMessage message={error} />}
 
           <button
-            onClick={generate}
+            onClick={() => setShowPreview(true)}
             disabled={!canSubmit || loading}
             className="w-full px-6 py-4 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl disabled:opacity-50 transition"
           >
@@ -474,6 +475,46 @@ export function RiderClient() {
             </p>
           )}
         </div>
+
+        {showPreview && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/70" onClick={() => setShowPreview(false)} />
+            <div className="relative bg-brand-surface border border-white/10 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-bold mb-4">Preview do Rider</h3>
+              <p className="text-sm text-brand-muted mb-4">
+                Revise as informacoes antes de gerar o PDF. Depois de gerado, alteracoes exigem um novo arquivo.
+              </p>
+              <div className="text-sm text-white/80 space-y-2 mb-6 bg-black/30 rounded-lg p-4">
+                <p><strong>Artista:</strong> {input.artist_name || '—'}</p>
+                <p><strong>Contato:</strong> {input.contact_name || '—'} ({input.contact_email || '—'}, {input.contact_phone || '—'})</p>
+                <p><strong>Formato:</strong> {STAGE_TEMPLATES[input.stage_template].label}</p>
+                <p><strong>Musicos:</strong> {input.musicians?.length ?? 0}</p>
+                <p><strong>Equipamentos no palco:</strong> {input.stage_items?.length ?? 0}</p>
+                <p><strong>PA minimo:</strong> {input.pa_minimum_watts}w</p>
+                <p><strong>Iluminacao:</strong> {input.lighting === 'basic' ? 'Basica' : input.lighting === 'scenic' ? 'Cenica' : 'Customizada'}</p>
+                <p><strong>Passagem de som:</strong> {input.soundcheck_minutes} min</p>
+                <p><strong>Camarim:</strong> {input.dressing_room ? 'Sim' : 'Nao'} | <strong>Refeicoes:</strong> {input.meals_needed ? `Sim (${input.meals_count})` : 'Nao'} | <strong>Hospedagem:</strong> {input.accommodation ? 'Sim' : 'Nao'}</p>
+                {input.special_technical_notes && <p><strong>Observacoes:</strong> {input.special_technical_notes}</p>}
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowPreview(false)}
+                  className="px-4 py-2 border border-white/10 text-white/60 rounded-lg hover:text-white hover:border-white/20 text-sm"
+                >
+                  Voltar e editar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setShowPreview(false); void generate(); }}
+                  className="px-4 py-2 bg-brand-green text-black font-bold rounded-lg hover:brightness-110 text-sm"
+                >
+                  Gerar PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {result && (
           <div id="rider-result" className="mt-12">

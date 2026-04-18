@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { StageItem, StageItemType } from '@/lib/types/tools';
 import { STAGE_ITEM_META } from '@/lib/types/tools';
 import { StageItemIcon } from './StageItemIcon';
@@ -41,6 +41,49 @@ export function StagePlotEditor({ items, onChange }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
 
+  // Undo/redo history. Holds snapshots of item arrays, index points at current snapshot.
+  const [history, setHistory] = useState<StageItem[][]>([items]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  // Tracks whether a drag actually produced a position change (so we can commit on pointer-up)
+  const dragStartSnapshotRef = useRef<StageItem[] | null>(null);
+  // Track items references we've emitted ourselves — if parent sends something else, we know it's external.
+  const lastEmittedRef = useRef<StageItem[]>(items);
+
+  // If parent replaces items externally (e.g., template change), reset history.
+  useEffect(() => {
+    if (items !== lastEmittedRef.current) {
+      setHistory([items]);
+      setHistoryIndex(0);
+      lastEmittedRef.current = items;
+    }
+  }, [items]);
+
+  const pushHistory = (next: StageItem[]) => {
+    const newHistory = history.slice(0, historyIndex + 1).concat([next]);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+    lastEmittedRef.current = next;
+    onChange(next);
+  };
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      const i = historyIndex - 1;
+      setHistoryIndex(i);
+      lastEmittedRef.current = history[i];
+      onChange(history[i]);
+    }
+  };
+
+  const redo = () => {
+    if (historyIndex < history.length - 1) {
+      const i = historyIndex + 1;
+      setHistoryIndex(i);
+      lastEmittedRef.current = history[i];
+      onChange(history[i]);
+    }
+  };
+
   const addItem = (type: StageItemType) => {
     // Place item center by default, slight offset per additional to avoid stack
     const sameType = items.filter((i) => i.type === type).length;
@@ -51,18 +94,22 @@ export function StagePlotEditor({ items, onChange }: Props) {
       x: 0.5 + offset,
       y: 0.5 + offset,
     };
-    onChange([...items, newItem]);
+    pushHistory([...items, newItem]);
     setSelectedId(newItem.id);
   };
 
   const removeItem = (id: string) => {
-    onChange(items.filter((i) => i.id !== id));
+    pushHistory(items.filter((i) => i.id !== id));
     if (selectedId === id) setSelectedId(null);
     if (editingLabelId === id) setEditingLabelId(null);
   };
 
   const updateLabel = (id: string, label: string) => {
-    onChange(items.map((i) => (i.id === id ? { ...i, label } : i)));
+    pushHistory(items.map((i) => (i.id === id ? { ...i, label } : i)));
+  };
+
+  const clearAll = () => {
+    pushHistory([]);
   };
 
   // Drag handlers
@@ -76,6 +123,8 @@ export function StagePlotEditor({ items, onChange }: Props) {
     setDragOffset({ dx: pointerX - itemPixelX, dy: pointerY - itemPixelY });
     setDraggingId(item.id);
     setSelectedId(item.id);
+    // Snapshot state at drag start so pointer-up commits a single history entry.
+    dragStartSnapshotRef.current = items;
     (e.target as Element).setPointerCapture(e.pointerId);
   };
 
@@ -89,15 +138,53 @@ export function StagePlotEditor({ items, onChange }: Props) {
     // Clamp to stage
     const x = Math.max(0, Math.min(1, rawX / STAGE_W));
     const y = Math.max(0, Math.min(1, rawY / STAGE_H));
-    onChange(items.map((i) => (i.id === draggingId ? { ...i, x, y } : i)));
+    // Live update via onChange only — do NOT push history during drag movement.
+    const next = items.map((i) => (i.id === draggingId ? { ...i, x, y } : i));
+    // Mark as internal so the external-change effect doesn't wipe history mid-drag.
+    lastEmittedRef.current = next;
+    onChange(next);
   };
 
   const onPointerUp = () => {
+    if (draggingId && dragStartSnapshotRef.current) {
+      // Commit final position to history (items now holds the final dragged state).
+      const startSnapshot = dragStartSnapshotRef.current;
+      const finalItems = items;
+      // Only push a history entry if something actually changed.
+      const changed = startSnapshot !== finalItems && JSON.stringify(startSnapshot) !== JSON.stringify(finalItems);
+      if (changed) {
+        const newHistory = history.slice(0, historyIndex + 1).concat([finalItems]);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+        lastEmittedRef.current = finalItems;
+      }
+    }
+    dragStartSnapshotRef.current = null;
     setDraggingId(null);
   };
 
   return (
     <div className="space-y-3">
+      {/* Undo / redo toolbar */}
+      <div className="flex gap-2 mb-2">
+        <button
+          type="button"
+          onClick={undo}
+          disabled={historyIndex === 0}
+          className="px-2 py-1 text-xs bg-white/5 hover:bg-white/10 text-white/70 rounded disabled:opacity-30"
+        >
+          ↶ Desfazer
+        </button>
+        <button
+          type="button"
+          onClick={redo}
+          disabled={historyIndex >= history.length - 1}
+          className="px-2 py-1 text-xs bg-white/5 hover:bg-white/10 text-white/70 rounded disabled:opacity-30"
+        >
+          ↷ Refazer
+        </button>
+      </div>
+
       {/* Palette */}
       <div>
         <p className="text-xs text-brand-muted mb-2">Clique em um equipamento pra adicionar ao palco:</p>
@@ -288,7 +375,7 @@ export function StagePlotEditor({ items, onChange }: Props) {
           ))}
           <button
             type="button"
-            onClick={() => onChange([])}
+            onClick={clearAll}
             className="text-[11px] px-2 py-1 text-red-400 hover:text-red-300 ml-auto"
           >
             Limpar tudo

@@ -436,6 +436,9 @@ export interface ChecklistItem {
     objectives?: ChecklistObjective[];
     budgets?: ChecklistBudget[];
   };
+  importance?: 'critical' | 'important' | 'optional';
+  /** Slug de outra ferramenta Verelus pra deep link (ex: 'pitch-kit', 'content-calendar', 'bio') */
+  link_tool?: string;
 }
 
 export interface ChecklistInput {

@@ -457,6 +457,21 @@ function ChecklistTimeline({
                               item.completed ? 'text-white/50 line-through' : item.skipped ? 'text-white/40 line-through' : 'text-white'
                             }`}>
                               {item.title}
+                              {item.importance === 'critical' && (
+                                <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 ml-2 align-middle">
+                                  critico
+                                </span>
+                              )}
+                              {item.importance === 'important' && (
+                                <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-300 ml-2 align-middle">
+                                  importante
+                                </span>
+                              )}
+                              {item.importance === 'optional' && (
+                                <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/50 ml-2 align-middle">
+                                  opcional
+                                </span>
+                              )}
                             </h3>
                             <span className={`text-[10px] font-mono flex-shrink-0 px-1.5 py-0.5 rounded ${
                               CATEGORY_META[item.category].color === 'purple' ? 'bg-brand-purple/15 text-brand-purple' :
@@ -493,6 +508,14 @@ function ChecklistTimeline({
                                 className="text-brand-purple hover:underline"
                               >
                                 {item.link_label} →
+                              </a>
+                            )}
+                            {item.link_tool && (
+                              <a
+                                href={`/dashboard/${item.link_tool}`}
+                                className="text-brand-orange hover:text-brand-orange/80"
+                              >
+                                Abrir {item.link_tool.replace('-', ' ')} →
                               </a>
                             )}
                             <button

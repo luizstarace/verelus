@@ -147,3 +147,14 @@ BEGIN
     tokens_total = attendly_usage.tokens_total + p_tokens;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- RPC: atomic voice usage increment
+CREATE OR REPLACE FUNCTION increment_voice_usage(biz_id uuid, period_date date, seconds_to_add int)
+RETURNS void AS $$
+BEGIN
+  INSERT INTO attendly_usage (business_id, period, voice_seconds)
+  VALUES (biz_id, period_date, seconds_to_add)
+  ON CONFLICT (business_id, period)
+  DO UPDATE SET voice_seconds = attendly_usage.voice_seconds + seconds_to_add;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

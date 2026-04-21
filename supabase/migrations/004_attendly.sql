@@ -131,3 +131,19 @@ BEGIN
   WHERE id = conv_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- RPC: atomic usage increment (avoids race conditions)
+CREATE OR REPLACE FUNCTION increment_usage(
+  p_business_id uuid,
+  p_tokens int
+)
+RETURNS void AS $$
+BEGIN
+  INSERT INTO attendly_usage (business_id, period, text_messages, tokens_total)
+  VALUES (p_business_id, date_trunc('month', now())::date, 1, p_tokens)
+  ON CONFLICT (business_id, period)
+  DO UPDATE SET
+    text_messages = attendly_usage.text_messages + 1,
+    tokens_total = attendly_usage.tokens_total + p_tokens;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

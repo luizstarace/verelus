@@ -4,10 +4,17 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { buildMessageHistory, toClaudeMessages } from '@/lib/attendly/chat';
 import { detectTransfer } from '@/lib/attendly/transfer';
-import { incrementUsage } from '@/lib/attendly/usage';
+import { incrementUsage, checkUsageLimit } from '@/lib/attendly/usage';
+import { getPlanFromSubscription } from '@/lib/attendly/plans';
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+let _anthropic: Anthropic | null = null;
+function getAnthropic() {
+  if (!_anthropic) {
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+  }
+  return _anthropic;
+}
 
 function getServiceSupabase() {
   return createClient(
@@ -134,7 +141,7 @@ export async function POST(request: Request) {
     }
 
     // Call Claude Haiku with streaming
-    const stream = anthropic.messages.stream({
+    const stream = getAnthropic().messages.stream({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
       system: business.ai_context || `Você é o atendente virtual de "${business.name}". Responda de forma educada e objetiva.`,
@@ -158,6 +165,7 @@ export async function POST(request: Request) {
           const finalMessage = await stream.finalMessage();
           totalTokens = (finalMessage.usage?.input_tokens || 0) + (finalMessage.usage?.output_tokens || 0);
 
+          let usageInfo = {};
           if (convId && !preview) {
             await supabase.from('attendly_messages').insert({
               conversation_id: convId,
@@ -178,24 +186,51 @@ export async function POST(request: Request) {
 
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ transfer: true, reason: transfer.reason })}\n\n`));
             }
+
+            // Check usage
+            const { data: sub } = await supabase
+              .from('subscriptions')
+              .select('product')
+              .eq('user_id', business.user_id)
+              .in('status', ['active', 'trialing'])
+              .limit(1)
+              .single();
+            const plan = getPlanFromSubscription(sub?.product || null);
+            const usage = await checkUsageLimit(supabase, business_id, plan);
+            if (usage.percentage >= 80) usageInfo = { usage_warning: true, usage_percentage: usage.percentage };
+            if (!usage.withinLimit) usageInfo = { ...usageInfo, overage: true };
           }
 
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true, conversation_id: convId })}\n\n`));
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true, conversation_id: convId, ...usageInfo })}\n\n`));
+
+          // Log before closing
+          const latency = Date.now() - startTime;
+          await supabase.from('attendly_logs').insert({
+            business_id,
+            endpoint: '/api/attendly/chat',
+            channel,
+            tokens_used: totalTokens,
+            latency_ms: latency,
+            status_code: 200,
+          });
+
           controller.close();
         } catch (err) {
+          // Log error before closing
+          const latency = Date.now() - startTime;
+          supabase.from('attendly_logs').insert({
+            business_id,
+            endpoint: '/api/attendly/chat',
+            channel,
+            tokens_used: totalTokens,
+            latency_ms: latency,
+            status_code: 500,
+            error: err instanceof Error ? err.message : 'Stream error',
+          }).then(() => {});
+
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Erro ao processar resposta' })}\n\n`));
           controller.close();
         }
-
-        const latency = Date.now() - startTime;
-        supabase.from('attendly_logs').insert({
-          business_id,
-          endpoint: '/api/attendly/chat',
-          channel,
-          tokens_used: totalTokens,
-          latency_ms: latency,
-          status_code: 200,
-        }).then(() => {});
       },
     });
 
@@ -207,16 +242,6 @@ export async function POST(request: Request) {
       },
     });
   } catch (err) {
-    const latency = Date.now() - startTime;
-    supabase.from('attendly_logs').insert({
-      business_id: '',
-      endpoint: '/api/attendly/chat',
-      channel: '',
-      status_code: 500,
-      latency_ms: latency,
-      error: err instanceof Error ? err.message : 'Unknown error',
-    }).then(() => {});
-
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }
 }

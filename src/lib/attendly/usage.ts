@@ -8,33 +8,10 @@ export async function incrementUsage(
   businessId: string,
   tokensUsed: number
 ) {
-  const period = getCurrentPeriod();
-
-  const { data: existing } = await supabase
-    .from('attendly_usage')
-    .select('id, text_messages, tokens_total')
-    .eq('business_id', businessId)
-    .eq('period', period)
-    .single();
-
-  if (existing) {
-    await supabase
-      .from('attendly_usage')
-      .update({
-        text_messages: existing.text_messages + 1,
-        tokens_total: existing.tokens_total + tokensUsed,
-      })
-      .eq('id', existing.id);
-  } else {
-    await supabase
-      .from('attendly_usage')
-      .insert({
-        business_id: businessId,
-        period,
-        text_messages: 1,
-        tokens_total: tokensUsed,
-      });
-  }
+  await supabase.rpc('increment_usage', {
+    p_business_id: businessId,
+    p_tokens: tokensUsed,
+  });
 }
 
 export async function checkUsageLimit(

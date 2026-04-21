@@ -14,6 +14,9 @@ export async function POST(request: Request) {
     if (!message_id || !text) {
       return NextResponse.json({ error: 'message_id and text required' }, { status: 400 });
     }
+    if (text.length > 5000) {
+      return NextResponse.json({ error: 'Texto muito longo. Máximo 5000 caracteres.' }, { status: 400 });
+    }
 
     const { data: sub } = await supabase
       .from('subscriptions')

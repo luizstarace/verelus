@@ -10,8 +10,14 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const { name, category, phone, address, services, hours, faq } = body;
-    if (!name) {
-      return NextResponse.json({ error: 'Nome do negócio é obrigatório' }, { status: 400 });
+    if (typeof name !== 'string' || name.trim().length === 0 || name.length > 200) {
+      return NextResponse.json({ error: 'Nome deve ter entre 1 e 200 caracteres' }, { status: 400 });
+    }
+    if (services && (!Array.isArray(services) || services.length > 50)) {
+      return NextResponse.json({ error: 'Máximo de 50 serviços' }, { status: 400 });
+    }
+    if (faq && (!Array.isArray(faq) || faq.length > 30)) {
+      return NextResponse.json({ error: 'Máximo de 30 perguntas frequentes' }, { status: 400 });
     }
 
     // Check if business already exists

@@ -53,6 +53,16 @@ export async function PATCH(request: Request) {
       }
     }
 
+    if (updates.name !== undefined && (typeof updates.name !== 'string' || (updates.name as string).length > 200)) {
+      return NextResponse.json({ error: 'Nome deve ter no máximo 200 caracteres' }, { status: 400 });
+    }
+    if (updates.services !== undefined && (!Array.isArray(updates.services) || (updates.services as any[]).length > 50)) {
+      return NextResponse.json({ error: 'Máximo de 50 serviços' }, { status: 400 });
+    }
+    if (updates.faq !== undefined && (!Array.isArray(updates.faq) || (updates.faq as any[]).length > 30)) {
+      return NextResponse.json({ error: 'Máximo de 30 perguntas frequentes' }, { status: 400 });
+    }
+
     // Regenerate ai_context if business data changed
     const dataFields = ['name', 'category', 'phone', 'address', 'services', 'hours', 'faq'];
     const dataChanged = dataFields.some(f => body[f] !== undefined);

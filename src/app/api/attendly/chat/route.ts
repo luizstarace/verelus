@@ -203,6 +203,26 @@ export async function POST(request: Request) {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ transfer: true, reason: transfer.reason })}\n\n`));
             }
 
+            // Send transfer notification email (fire and forget)
+            if (transfer.shouldTransfer) {
+              const { notifyOwnerEmail, buildTransferEmail } = await import('@/lib/attendly/notifications');
+              const { data: ownerUser } = await supabase
+                .from('users')
+                .select('email')
+                .eq('id', business.user_id)
+                .single();
+
+              if (ownerUser?.email) {
+                const emailData = buildTransferEmail(
+                  business.name,
+                  customer_name || 'Visitante',
+                  `${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard/attendly/inbox?id=${convId}`
+                );
+                emailData.to = ownerUser.email;
+                notifyOwnerEmail(emailData).catch(() => {});
+              }
+            }
+
             // Check usage
             const { data: sub } = await supabase
               .from('subscriptions')

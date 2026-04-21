@@ -182,11 +182,10 @@ export default function BillingView() {
           Fazer upgrade
         </a>
         <a
-          href="#"
-          onClick={(e) => { e.preventDefault(); alert('Redirecionamento para Stripe em breve.'); }}
-          className="text-sm text-brand-primary hover:underline"
+          href="/attendly#pricing"
+          className="text-sm text-brand-trust hover:underline"
         >
-          Gerenciar no Stripe
+          Ver planos e fazer upgrade →
         </a>
       </div>
     </div>

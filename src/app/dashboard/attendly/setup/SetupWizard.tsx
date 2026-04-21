@@ -30,15 +30,15 @@ interface ChatMessage {
 }
 
 const CATEGORIES = [
-  { value: 'clinica', label: 'Clinica' },
+  { value: 'clinica', label: 'Clínica' },
   { value: 'restaurante', label: 'Restaurante' },
-  { value: 'salao', label: 'Salao de beleza' },
+  { value: 'salao', label: 'Salão de beleza' },
   { value: 'loja', label: 'Loja' },
-  { value: 'servicos', label: 'Servicos' },
+  { value: 'servicos', label: 'Serviços' },
   { value: 'outro', label: 'Outro' },
 ];
 
-const DAYS = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo'];
+const DAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
 const STEP_TITLES = [
   'Dados do negocio',
@@ -144,7 +144,12 @@ export default function SetupWizard() {
   }
 
   async function handleStep2Next() {
-    const validServices = services.filter((s) => s.name.trim());
+    const validServices = services.filter((s) => s.name.trim()).map((s) => ({
+      name: s.name,
+      price_cents: Math.round(parseFloat(s.price || '0') * 100),
+      duration_min: parseInt(s.duration || '0', 10),
+      description: s.description,
+    }));
     const validFaq = faq.filter((f) => f.question.trim() && f.answer.trim());
     const data = await apiCall('/api/attendly/business', 'PATCH', {
       services: validServices,

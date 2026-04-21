@@ -7,6 +7,7 @@ import { detectTransfer } from '@/lib/attendly/transfer';
 import { incrementUsage, checkUsageLimit } from '@/lib/attendly/usage';
 import { getPlanFromSubscription } from '@/lib/attendly/plans';
 import { corsHeaders, corsResponse } from '@/lib/attendly/cors';
+import { rateLimit, getRateLimitHeaders } from '@/lib/attendly/rate-limit';
 import Anthropic from '@anthropic-ai/sdk';
 
 export async function OPTIONS() { return corsResponse(); }
@@ -27,6 +28,15 @@ function getServiceSupabase() {
 }
 
 export async function POST(request: Request) {
+  const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rl = rateLimit(clientIp, 30, 60000); // 30 requests per minute per IP
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Limite de requisições excedido. Tente novamente em 1 minuto.' },
+      { status: 429, headers: { ...corsHeaders(), ...getRateLimitHeaders(rl.remaining, 30) } }
+    );
+  }
+
   const startTime = Date.now();
   const supabase = getServiceSupabase();
 

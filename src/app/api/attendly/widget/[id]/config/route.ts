@@ -2,6 +2,9 @@ export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { corsHeaders, corsResponse } from '@/lib/attendly/cors';
+
+export async function OPTIONS() { return corsResponse(); }
 
 export async function GET(
   request: Request,
@@ -19,7 +22,7 @@ export async function GET(
     .single();
 
   if (!business || business.status !== 'active') {
-    return NextResponse.json({ error: 'Widget not available' }, { status: 404 });
+    return NextResponse.json({ error: 'Widget not available' }, { status: 404, headers: corsHeaders() });
   }
 
   return NextResponse.json({
@@ -30,6 +33,6 @@ export async function GET(
     position: business.widget_config?.position || 'bottom-right',
     hours: business.hours,
   }, {
-    headers: { 'Cache-Control': 'public, max-age=300' },
+    headers: { 'Cache-Control': 'public, max-age=300', ...corsHeaders() },
   });
 }

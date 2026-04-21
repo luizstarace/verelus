@@ -2,6 +2,9 @@ export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { corsHeaders, corsResponse } from '@/lib/attendly/cors';
+
+export async function OPTIONS() { return corsResponse(); }
 
 export async function POST(request: Request) {
   const supabase = createClient(
@@ -13,7 +16,7 @@ export async function POST(request: Request) {
   const { business_id, customer_name, customer_phone } = body;
 
   if (!business_id || !customer_name) {
-    return NextResponse.json({ error: 'business_id and customer_name required' }, { status: 400 });
+    return NextResponse.json({ error: 'business_id and customer_name required' }, { status: 400, headers: corsHeaders() });
   }
 
   const { data, error } = await supabase
@@ -28,8 +31,8 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: 'Failed to capture lead' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to capture lead' }, { status: 500, headers: corsHeaders() });
   }
 
-  return NextResponse.json({ conversation_id: data.id }, { status: 201 });
+  return NextResponse.json({ conversation_id: data.id }, { status: 201, headers: corsHeaders() });
 }

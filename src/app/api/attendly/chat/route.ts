@@ -6,7 +6,10 @@ import { buildMessageHistory, toClaudeMessages } from '@/lib/attendly/chat';
 import { detectTransfer } from '@/lib/attendly/transfer';
 import { incrementUsage, checkUsageLimit } from '@/lib/attendly/usage';
 import { getPlanFromSubscription } from '@/lib/attendly/plans';
+import { corsHeaders, corsResponse } from '@/lib/attendly/cors';
 import Anthropic from '@anthropic-ai/sdk';
+
+export async function OPTIONS() { return corsResponse(); }
 
 let _anthropic: Anthropic | null = null;
 function getAnthropic() {
@@ -32,7 +35,7 @@ export async function POST(request: Request) {
     const { business_id, conversation_id, message, channel, customer_name, customer_phone, preview } = body;
 
     if (!business_id || !message || !channel) {
-      return NextResponse.json({ error: 'business_id, message, and channel are required' }, { status: 400 });
+      return NextResponse.json({ error: 'business_id, message, and channel are required' }, { status: 400, headers: corsHeaders() });
     }
 
     // Load business
@@ -43,7 +46,7 @@ export async function POST(request: Request) {
       .single();
 
     if (bizErr || !business) {
-      return NextResponse.json({ error: 'Negócio não encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Negócio não encontrado' }, { status: 404, headers: corsHeaders() });
     }
 
     // Check status
@@ -51,10 +54,10 @@ export async function POST(request: Request) {
       return NextResponse.json({
         response: `Este atendente está temporariamente indisponível. Entre em contato diretamente: ${business.phone || 'sem telefone cadastrado'}`,
         paused: true,
-      });
+      }, { status: 503, headers: corsHeaders() });
     }
     if (business.status === 'setup' && !preview) {
-      return NextResponse.json({ error: 'Atendente ainda não foi ativado' }, { status: 403 });
+      return NextResponse.json({ error: 'Atendente ainda não foi ativado' }, { status: 403, headers: corsHeaders() });
     }
 
     // Get or create conversation (skip for preview)
@@ -72,7 +75,7 @@ export async function POST(request: Request) {
           return NextResponse.json({
             response: `Seu atendimento está sendo feito por ${business.name}. Aguarde a resposta.`,
             human_needed: true,
-          });
+          }, { headers: corsHeaders() });
         }
         if (!conv) convId = null;
       }
@@ -140,11 +143,24 @@ export async function POST(request: Request) {
       claudeMessages.push({ role: 'user', content: message });
     }
 
+    // Resolve system prompt (log if fallback used)
+    let systemPrompt = business.ai_context;
+    if (!systemPrompt) {
+      systemPrompt = `Você é o atendente virtual de "${business.name}". Responda de forma educada e objetiva.`;
+      supabase.from('attendly_logs').insert({
+        business_id,
+        endpoint: '/api/attendly/chat',
+        channel,
+        error: 'ai_context is null — using fallback prompt',
+        status_code: 0,
+      }).then(() => {});
+    }
+
     // Call Claude Haiku with streaming
     const stream = getAnthropic().messages.stream({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
-      system: business.ai_context || `Você é o atendente virtual de "${business.name}". Responda de forma educada e objetiva.`,
+      system: systemPrompt,
       messages: claudeMessages,
     });
 
@@ -197,7 +213,7 @@ export async function POST(request: Request) {
               .single();
             const plan = getPlanFromSubscription(sub?.product || null);
             const usage = await checkUsageLimit(supabase, business_id, plan);
-            if (usage.percentage >= 80) usageInfo = { usage_warning: true, usage_percentage: usage.percentage };
+            if (usage.percentage >= 80) usageInfo = { usage_warning: true, usage_percentage: Math.min(usage.percentage, 100) };
             if (!usage.withinLimit) usageInfo = { ...usageInfo, overage: true };
           }
 
@@ -239,9 +255,10 @@ export async function POST(request: Request) {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
+        ...corsHeaders(),
       },
     });
   } catch (err) {
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro interno' }, { status: 500, headers: corsHeaders() });
   }
 }

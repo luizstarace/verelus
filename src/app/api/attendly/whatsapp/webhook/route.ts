@@ -10,12 +10,28 @@ export async function POST(request: Request) {
   );
 
   try {
+    // Verify webhook authenticity
+    const apiKey = request.headers.get('apikey') || '';
+    if (apiKey !== process.env.EVOLUTION_API_KEY) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { instance, data: msgData } = body;
 
     const businessId = instance?.replace('attendly_', '');
     if (!businessId || !msgData?.message?.conversation) {
       return NextResponse.json({ ok: true });
+    }
+
+    const { data: business } = await supabase
+      .from('attendly_businesses')
+      .select('id, status')
+      .eq('id', businessId)
+      .single();
+
+    if (!business || business.status !== 'active') {
+      return NextResponse.json({ ok: true }); // Silently ignore inactive businesses
     }
 
     const customerPhone = msgData.key?.remoteJid?.replace('@s.whatsapp.net', '') || '';

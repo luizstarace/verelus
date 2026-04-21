@@ -14,7 +14,16 @@ function getSupabase() {
 function mapProduct(priceId: string): string {
   const proPriceId = process.env.STRIPE_PRICE_PRO || "";
   const businessPriceId = process.env.STRIPE_PRICE_BUSINESS || "";
+  const attendlyStarter = process.env.STRIPE_PRICE_ATTENDLY_STARTER || "";
+  const attendlyPro = process.env.STRIPE_PRICE_ATTENDLY_PRO || "";
+  const attendlyBusiness = process.env.STRIPE_PRICE_ATTENDLY_BUSINESS || "";
 
+  // Attendly plans
+  if (priceId === attendlyBusiness) return "attendly_business";
+  if (priceId === attendlyPro) return "attendly_pro";
+  if (priceId === attendlyStarter) return "attendly_starter";
+
+  // Legacy plans
   if (priceId === businessPriceId || priceId.includes("business")) {
     return "business";
   }
@@ -22,6 +31,11 @@ function mapProduct(priceId: string): string {
     return "pro";
   }
   return "pro"; // default paid tier
+}
+
+// Check if product is an Attendly plan
+function isAttendlyProduct(product: string): boolean {
+  return product.startsWith("attendly_");
 }
 
 // Map Stripe subscription status to our status
@@ -246,6 +260,14 @@ export async function POST(req: NextRequest) {
           { onConflict: "email" }
         );
 
+        // If Attendly subscription, activate the business
+        if (isAttendlyProduct(productType)) {
+          await supabase
+            .from("attendly_businesses")
+            .update({ status: "active" })
+            .eq("user_id", user.id);
+        }
+
         // Send post-purchase welcome email via Resend
         await sendPurchaseEmail(email.toLowerCase().trim(), productType);
 
@@ -272,11 +294,35 @@ export async function POST(req: NextRequest) {
           { onConflict: "stripe_subscription_id" }
         );
 
+        // Sync Attendly business status with subscription
+        if (isAttendlyProduct(productType)) {
+          const { data: sub } = await supabase
+            .from("subscriptions")
+            .select("user_id")
+            .eq("stripe_subscription_id", event.id)
+            .single();
+
+          if (sub?.user_id) {
+            const bizStatus = status === "active" ? "active" : "paused";
+            await supabase
+              .from("attendly_businesses")
+              .update({ status: bizStatus })
+              .eq("user_id", sub.user_id);
+          }
+        }
+
         break;
       }
 
       case "customer.subscription.deleted": {
         const customerId = event.customer;
+
+        // Get subscription before updating to check if Attendly
+        const { data: existingSub } = await supabase
+          .from("subscriptions")
+          .select("user_id, product")
+          .eq("stripe_subscription_id", event.id)
+          .single();
 
         await supabase.from("subscriptions").upsert(
           {
@@ -288,6 +334,14 @@ export async function POST(req: NextRequest) {
           },
           { onConflict: "stripe_subscription_id" }
         );
+
+        // Pause Attendly business on cancellation
+        if (existingSub && isAttendlyProduct(existingSub.product)) {
+          await supabase
+            .from("attendly_businesses")
+            .update({ status: "paused" })
+            .eq("user_id", existingSub.user_id);
+        }
 
         break;
       }

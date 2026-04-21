@@ -1,0 +1,86 @@
+export const runtime = 'edge';
+
+import { NextResponse } from 'next/server';
+import { requireUser, errorResponse } from '@/lib/api-auth';
+import { buildAiContext } from '@/lib/attendly/ai-context';
+
+export async function GET() {
+  try {
+    const { userId, supabase } = await requireUser();
+
+    const { data, error } = await supabase
+      .from('attendly_businesses')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    if (!data) {
+      return NextResponse.json({ business: null });
+    }
+
+    return NextResponse.json({ business: data });
+  } catch (err) {
+    const { error, status } = errorResponse(err);
+    return NextResponse.json({ error }, { status });
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const { userId, supabase } = await requireUser();
+    const body = await request.json();
+
+    const { data: existing } = await supabase
+      .from('attendly_businesses')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Negócio não encontrado. Use POST /api/attendly/setup.' }, { status: 404 });
+    }
+
+    // Merge updates
+    const updates: Record<string, unknown> = {};
+    const fields = ['name', 'category', 'phone', 'address', 'services', 'hours', 'faq',
+      'voice_id', 'widget_config', 'whatsapp_number', 'owner_whatsapp',
+      'owner_notify_channel', 'onboarding_step', 'status'] as const;
+
+    for (const field of fields) {
+      if (body[field] !== undefined) {
+        updates[field] = body[field];
+      }
+    }
+
+    // Regenerate ai_context if business data changed
+    const dataFields = ['name', 'category', 'phone', 'address', 'services', 'hours', 'faq'];
+    const dataChanged = dataFields.some(f => body[f] !== undefined);
+    if (dataChanged) {
+      const merged = { ...existing, ...updates };
+      updates.ai_context = buildAiContext({
+        name: merged.name,
+        category: merged.category,
+        phone: merged.phone,
+        address: merged.address,
+        services: merged.services,
+        hours: merged.hours,
+        faq: merged.faq,
+      });
+    }
+
+    const { data, error } = await supabase
+      .from('attendly_businesses')
+      .update(updates)
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json({ business: data });
+  } catch (err) {
+    const { error, status } = errorResponse(err);
+    return NextResponse.json({ error }, { status });
+  }
+}

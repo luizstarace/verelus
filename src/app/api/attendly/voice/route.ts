@@ -1,0 +1,97 @@
+export const runtime = 'edge';
+
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { requireUser, errorResponse } from '@/lib/api-auth';
+import { getPlanFromSubscription, getPlanLimits } from '@/lib/attendly/plans';
+
+export async function POST(request: Request) {
+  try {
+    const { userId, supabase } = await requireUser();
+    const body = await request.json();
+    const { message_id, text } = body;
+
+    if (!message_id || !text) {
+      return NextResponse.json({ error: 'message_id and text required' }, { status: 400 });
+    }
+
+    const { data: sub } = await supabase
+      .from('subscriptions')
+      .select('product')
+      .eq('user_id', userId)
+      .in('status', ['active', 'trialing'])
+      .limit(1)
+      .single();
+
+    const plan = getPlanFromSubscription(sub?.product || null);
+    const limits = getPlanLimits(plan);
+
+    if (!limits.voice_enabled) {
+      return NextResponse.json({ error: 'Voz não disponível no seu plano. Faça upgrade.' }, { status: 403 });
+    }
+
+    const { data: business } = await supabase
+      .from('attendly_businesses')
+      .select('id, voice_id')
+      .eq('user_id', userId)
+      .single();
+
+    if (!business) {
+      return NextResponse.json({ error: 'Negócio não encontrado' }, { status: 404 });
+    }
+
+    const voiceId = business.voice_id === 'default' ? '21m00Tcm4TlvDq8ikWAM' : business.voice_id;
+    const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': process.env.ELEVENLABS_API_KEY!,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+      }),
+    });
+
+    if (!ttsRes.ok) {
+      return NextResponse.json({ error: 'Erro ao gerar áudio' }, { status: 502 });
+    }
+
+    const audioBuffer = await ttsRes.arrayBuffer();
+
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const fileName = `voice/${message_id}.mp3`;
+    const { error: uploadErr } = await serviceSupabase.storage
+      .from('attendly-audio')
+      .upload(fileName, audioBuffer, { contentType: 'audio/mpeg' });
+
+    if (uploadErr) throw uploadErr;
+
+    const { data: urlData } = serviceSupabase.storage
+      .from('attendly-audio')
+      .getPublicUrl(fileName);
+
+    await serviceSupabase
+      .from('attendly_messages')
+      .update({ audio_url: urlData.publicUrl })
+      .eq('id', message_id);
+
+    const estimatedSeconds = Math.ceil((text.length / 750) * 60);
+    const period = new Date().toISOString().slice(0, 7) + '-01';
+    await serviceSupabase.rpc('increment_voice_usage', {
+      biz_id: business.id,
+      period_date: period,
+      seconds_to_add: estimatedSeconds,
+    });
+
+    return NextResponse.json({ audio_url: urlData.publicUrl });
+  } catch (err) {
+    const { error, status } = errorResponse(err);
+    return NextResponse.json({ error }, { status });
+  }
+}

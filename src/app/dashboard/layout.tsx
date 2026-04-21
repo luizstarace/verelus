@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import type { User } from '@supabase/supabase-js';
 import { UserTierContext, useUserTierFetch } from '@/lib/use-user-tier';
-import ChatWidget from '@/components/chat-widget';
 import { ToastContainer } from '@/components/ui/Toast';
 
 function getSupabase() {
@@ -22,10 +21,11 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', label: 'Painel', icon: '\u{1F4CB}', tier: 1 },
-  { href: '/dashboard/proposals', label: 'Propostas', icon: '\u{1F4E8}', tier: 1 },
-  { href: '/dashboard/proposals/new', label: 'Nova proposta', icon: '\u{2795}', tier: 1 },
-  { href: '/dashboard/profile', label: 'Perfil', icon: '\u{1F464}', tier: 1 },
+  { href: '/dashboard/attendly', label: 'Visão Geral', icon: '📊', tier: 1 },
+  { href: '/dashboard/attendly/inbox', label: 'Conversas', icon: '💬', tier: 1 },
+  { href: '/dashboard/attendly/setup', label: 'Configurar', icon: '⚙️', tier: 1 },
+  { href: '/dashboard/attendly/settings', label: 'Ajustes', icon: '🔧', tier: 1 },
+  { href: '/dashboard/attendly/billing', label: 'Plano & Uso', icon: '📈', tier: 1 },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -44,6 +44,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const { data: { user: u } } = await supabase.auth.getUser();
       if (!u) {
         window.location.href = '/login';
+        return;
+      }
+      if (window.location.pathname === '/dashboard') {
+        window.location.href = '/dashboard/attendly';
         return;
       }
       setUser(u);
@@ -71,9 +75,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-brand-dark flex items-center justify-center">
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-8 h-8 border-2 border-brand-trust border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-brand-muted">Carregando...</p>
         </div>
       </div>
@@ -82,10 +86,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <UserTierContext.Provider value={tierData}>
-      <div className="min-h-screen bg-brand-dark flex">
+      <div className="min-h-screen bg-brand-bg flex">
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+            className="fixed inset-0 bg-black/30 z-30 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -93,27 +97,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <aside className={`
           fixed lg:sticky top-0 left-0 z-40 h-screen
           ${sidebarOpen ? 'w-60 translate-x-0' : 'w-0 -translate-x-full lg:w-16 lg:translate-x-0'}
-          bg-brand-card border-r border-white/5 flex flex-col
+          bg-white border-r border-brand-border flex flex-col
           transition-all duration-200 overflow-hidden shrink-0
         `}>
-          <div className="p-4 border-b border-white/5">
+          <div className="p-4 border-b border-brand-border">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-full text-left">
               {sidebarOpen ? (
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-xl font-bold font-display text-white tracking-wider">VERELUS</h1>
+                    <h1 className="text-xl font-bold text-brand-primary tracking-tight">Verelus</h1>
                     {!tierData.loading && (
                       <span className={`text-[10px] font-mono uppercase ${
-                        tierData.tier === 'pro' ? 'text-brand-green' : 'text-white/30'
+                        tierData.tier === 'pro' ? 'text-brand-trust' : 'text-brand-muted/50'
                       }`}>
                         {tierData.tier === 'free' ? 'Free' : 'Pro'}
                       </span>
                     )}
                   </div>
-                  <span className="text-white/30 text-xs lg:hidden">&times;</span>
+                  <span className="text-brand-muted/50 text-xs lg:hidden">&times;</span>
                 </div>
               ) : (
-                <span className="text-xl font-bold text-white block text-center">V</span>
+                <span className="text-xl font-bold text-brand-text block text-center">V</span>
               )}
             </button>
           </div>
@@ -131,8 +135,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   }}
                   className={`flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm transition-colors ${
                     isActive
-                      ? 'bg-brand-green/10 text-brand-green'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                      ? 'bg-brand-trust/10 text-brand-trust'
+                      : 'text-brand-muted hover:text-brand-text hover:bg-brand-surface'
                   }`}
                 >
                   <span className="text-base shrink-0">{item.icon}</span>
@@ -142,17 +146,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             })}
           </nav>
 
-          <div className="p-4 border-t border-white/5">
+          <div className="p-4 border-t border-brand-border">
             {sidebarOpen ? (
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-brand-green/20 flex items-center justify-center text-brand-green text-sm font-bold shrink-0">
+                <div className="w-8 h-8 rounded-full bg-brand-trust/20 flex items-center justify-center text-brand-trust text-sm font-bold shrink-0">
                   {(user?.email || '?')[0].toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white truncate">{user?.email}</p>
+                  <p className="text-sm text-brand-text truncate">{user?.email}</p>
                   <button
                     onClick={handleSignOut}
-                    className="text-xs text-white/40 hover:text-red-400 transition-colors"
+                    className="text-xs text-brand-muted hover:text-brand-error transition-colors"
                   >
                     Sair
                   </button>
@@ -161,7 +165,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ) : (
               <button
                 onClick={handleSignOut}
-                className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-red-400 transition-colors mx-auto"
+                className="w-8 h-8 rounded-full bg-brand-surface flex items-center justify-center text-brand-muted hover:text-brand-error transition-colors mx-auto"
                 title="Sair"
               >
                 &#x23FB;
@@ -171,24 +175,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </aside>
 
         <main className="flex-1 overflow-auto min-w-0">
-          <div className="sticky top-0 z-20 bg-brand-dark/80 backdrop-blur-md border-b border-white/5 px-4 py-3 flex items-center gap-3 lg:hidden">
+          <div className="sticky top-0 z-20 bg-brand-bg/80 backdrop-blur-md border-b border-brand-border px-4 py-3 flex items-center gap-3 lg:hidden">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 text-white/60 hover:text-white transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-brand-surface text-brand-muted hover:text-brand-text transition-colors"
             >
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M3 5h12M3 9h12M3 13h12" />
               </svg>
             </button>
-            <h1 className="text-sm font-display text-white tracking-wider">VERELUS</h1>
+            <h1 className="text-sm font-bold text-brand-primary tracking-tight">Verelus</h1>
             {!tierData.loading && tierData.tier === 'pro' && (
-              <span className="text-[9px] font-mono uppercase ml-auto text-brand-green">Pro</span>
+              <span className="text-[9px] font-mono uppercase ml-auto text-brand-trust">Pro</span>
             )}
           </div>
           {children}
         </main>
       </div>
-    <ChatWidget />
     <ToastContainer />
     </UserTierContext.Provider>
   );

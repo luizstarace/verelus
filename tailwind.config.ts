@@ -35,8 +35,8 @@ const config: Config = {
       },
       keyframes: {
         glow: {
-          "0%": { boxShadow: "0 0 20px rgba(0,245,160,0.1)" },
-          "100%": { boxShadow: "0 0 40px rgba(0,245,160,0.3)" },
+          "0%": { boxShadow: "0 0 20px rgba(59,130,246,0.1)" },
+          "100%": { boxShadow: "0 0 40px rgba(59,130,246,0.3)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },

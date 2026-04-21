@@ -31,11 +31,11 @@ export default function Home() {
         </span>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6">
           Produtos com IA que trabalham{' '}
-          <span className="text-brand-trust">enquanto voce descansa</span>
+          <span className="text-brand-trust">enquanto você descansa</span>
         </h1>
         <p className="text-lg text-brand-muted max-w-2xl leading-relaxed">
-          A Verelus cria ferramentas inteligentes para pequenas e medias empresas.
-          Cada produto resolve um problema real do dia a dia com inteligencia artificial.
+          A Verelus cria ferramentas inteligentes para pequenas e médias empresas.
+          Cada produto resolve um problema real do dia a dia com inteligência artificial.
         </p>
       </section>
 
@@ -70,8 +70,8 @@ export default function Home() {
               </div>
             </div>
             <p className="text-brand-muted leading-relaxed mb-6">
-              IA que responde seus clientes no WhatsApp e no seu site como se fosse voce.
-              Sem robo, sem espera. Seu negocio atendendo 24 horas por dia, 7 dias por semana.
+              IA que responde seus clientes no WhatsApp e no seu site como se fosse você.
+              Sem robô, sem espera. Seu negócio atendendo 24 horas por dia, 7 dias por semana.
             </p>
             <Link
               href="/attendly"
@@ -95,7 +95,7 @@ export default function Home() {
           <h2 className="text-2xl font-bold mb-3">Novos produtos a caminho</h2>
           <p className="text-brand-muted max-w-xl mx-auto leading-relaxed">
             Estamos desenvolvendo novas ferramentas com IA para ajudar PMEs a vender mais,
-            organizar melhor e crescer com menos esforco. Fique de olho.
+            organizar melhor e crescer com menos esforço. Fique de olho.
           </p>
         </div>
       </section>

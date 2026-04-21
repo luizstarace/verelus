@@ -121,3 +121,13 @@ CREATE TABLE attendly_logs (
 
 CREATE INDEX idx_logs_date ON attendly_logs (created_at DESC);
 CREATE INDEX idx_logs_business ON attendly_logs (business_id, created_at DESC);
+
+-- RPC: increment message count (avoids race conditions)
+CREATE OR REPLACE FUNCTION increment_message_count(conv_id uuid)
+RETURNS void AS $$
+BEGIN
+  UPDATE attendly_conversations
+  SET message_count = message_count + 1
+  WHERE id = conv_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

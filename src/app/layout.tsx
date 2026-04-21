@@ -2,21 +2,21 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Verelus — 11 ferramentas para musicos independentes",
+  title: "Verelus — Produtos com IA para o seu negócio",
   description:
-    "Bio, rider, contrato, cache, pitch kit, growth tracker e mais. Ferramentas profissionais por R$29/mes, feitas pro musico independente brasileiro.",
+    "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
   openGraph: {
-    title: "Verelus — 11 ferramentas para musicos independentes",
+    title: "Verelus — Produtos com IA para o seu negócio",
     description:
-      "Bio adaptativa, rider tecnico, contrato de show, calculadora de cache, pitch kit, growth tracker. R$29/mes.",
+      "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
     type: "website",
     url: "https://verelus.com",
     siteName: "Verelus",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verelus — 11 ferramentas para musicos independentes",
-    description: "Ferramentas profissionais por R$29/mes. Feito pro mercado BR.",
+    title: "Verelus — Produtos com IA para o seu negócio",
+    description: "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
   },
   robots: "index, follow",
 };
@@ -27,16 +27,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className="dark">
+    <html lang="pt-BR" className="">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans antialiased noise-bg bg-brand-dark text-brand-text">{children}</body>
+      <body className="font-sans antialiased bg-brand-bg text-brand-text">{children}</body>
     </html>
   );
 }

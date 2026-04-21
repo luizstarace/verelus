@@ -16,10 +16,12 @@ export function buildMessageHistory(messages: MessageForHistory[]): MessageForHi
 }
 
 export function toClaudeMessages(messages: MessageForHistory[]): ClaudeMessage[] {
-  return messages.map(m => ({
-    role: m.role === 'customer' ? 'user' : 'assistant',
-    content: m.content,
-  }));
+  return messages
+    .filter(m => m.role !== 'human')
+    .map(m => ({
+      role: m.role === 'customer' ? 'user' : 'assistant',
+      content: m.content,
+    }));
 }
 
 export function getCurrentPeriod(): string {

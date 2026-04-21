@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildMessageHistory, getCurrentPeriod } from '@/lib/attendly/chat';
+import { buildMessageHistory, getCurrentPeriod, toClaudeMessages } from '@/lib/attendly/chat';
 
 describe('buildMessageHistory', () => {
   it('returns last 20 messages', () => {
@@ -31,6 +31,31 @@ describe('buildMessageHistory', () => {
     const result = buildMessageHistory(messages);
     expect(result).toHaveLength(2);
     expect(result.every(m => m.role !== 'human')).toBe(true);
+  });
+});
+
+describe('toClaudeMessages', () => {
+  it('maps customer to user and assistant to assistant', () => {
+    const messages = [
+      { role: 'customer' as const, content: 'oi' },
+      { role: 'assistant' as const, content: 'olá!' },
+    ];
+    const result = toClaudeMessages(messages);
+    expect(result).toEqual([
+      { role: 'user', content: 'oi' },
+      { role: 'assistant', content: 'olá!' },
+    ]);
+  });
+
+  it('filters out human messages', () => {
+    const messages = [
+      { role: 'customer' as const, content: 'oi' },
+      { role: 'human' as const, content: 'resposta do dono' },
+      { role: 'assistant' as const, content: 'ok' },
+    ];
+    const result = toClaudeMessages(messages);
+    expect(result).toHaveLength(2);
+    expect(result.every(m => m.role === 'user' || m.role === 'assistant')).toBe(true);
   });
 });
 

@@ -80,31 +80,28 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-dark flex items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-brand-green/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-brand-purple/5 rounded-full blur-[120px] pointer-events-none" />
-
+    <div className="min-h-screen bg-brand-surface flex items-center justify-center px-4 relative overflow-hidden">
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-10">
           <a href="/" className="inline-block">
-            <h1 className="text-5xl font-bold font-display text-white tracking-wider">VERELUS</h1>
+            <h1 className="text-3xl font-bold text-brand-text tracking-tight">Verelus</h1>
           </a>
-          <p className="text-brand-muted mt-2 text-sm">Music Intelligence Platform</p>
+          <p className="text-brand-muted mt-2 text-sm">Produtos com IA para o seu negócio</p>
         </div>
 
-        <div className="bg-brand-surface/80 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl shadow-black/20">
-          <h2 className="text-xl font-semibold text-white mb-6">Definir nova senha</h2>
+        <div className="bg-white shadow-xl border border-brand-border rounded-2xl p-8">
+          <h2 className="text-xl font-semibold text-brand-text mb-6">Definir nova senha</h2>
 
           {sessionOk === null && !error && (
-            <p className="text-white/60 text-sm mb-4">Validando link de recuperacao...</p>
+            <p className="text-brand-muted text-sm mb-4">Validando link de recuperacao...</p>
           )}
           {sessionOk === true && (
-            <p className="text-brand-green/70 text-sm mb-4">Link valido. Defina sua nova senha abaixo.</p>
+            <p className="text-brand-trust text-sm mb-4">Link valido. Defina sua nova senha abaixo.</p>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="password" className="block text-sm text-white/60 mb-1.5">Nova senha</label>
+              <label htmlFor="password" className="block text-brand-text text-sm font-medium mb-1.5">Nova senha</label>
               <input
                 id="password"
                 type="password"
@@ -114,11 +111,11 @@ export default function ResetPasswordPage() {
                 required
                 minLength={6}
                 disabled={sessionOk === false}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors disabled:opacity-50"
+                className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-brand-text placeholder-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-trust/20 focus:border-brand-trust transition-colors disabled:opacity-50"
               />
             </div>
             <div>
-              <label htmlFor="confirm" className="block text-sm text-white/60 mb-1.5">Confirmar senha</label>
+              <label htmlFor="confirm" className="block text-brand-text text-sm font-medium mb-1.5">Confirmar senha</label>
               <input
                 id="confirm"
                 type="password"
@@ -128,18 +125,18 @@ export default function ResetPasswordPage() {
                 required
                 minLength={6}
                 disabled={sessionOk === false}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors disabled:opacity-50"
+                className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-brand-text placeholder-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-trust/20 focus:border-brand-trust transition-colors disabled:opacity-50"
               />
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm">
+              <div className="bg-brand-error/10 border border-brand-error/20 rounded-xl p-3 text-brand-error text-sm">
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="bg-brand-green/10 border border-brand-green/20 rounded-xl p-3 text-brand-green text-sm">
+              <div className="bg-brand-trust/10 border border-brand-trust/20 rounded-xl p-3 text-brand-trust text-sm">
                 {message}
               </div>
             )}
@@ -147,20 +144,20 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading || sessionOk !== true}
-              className="w-full px-4 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-brand-green/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 bg-brand-cta text-white font-bold rounded-xl hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Salvando...' : 'Salvar nova senha'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <a href="/login" className="text-brand-green/70 hover:text-brand-green text-sm transition-colors">
+            <a href="/login" className="text-brand-trust hover:text-brand-trust text-sm transition-colors">
               Voltar para login
             </a>
           </div>
         </div>
 
-        <p className="text-center text-white/20 text-xs mt-8">
+        <p className="text-center text-brand-muted text-xs mt-8">
           &copy; 2026 Verelus. Todos os direitos reservados.
         </p>
       </div>

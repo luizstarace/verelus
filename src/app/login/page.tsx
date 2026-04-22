@@ -92,23 +92,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-dark flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background orbs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-brand-green/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-brand-purple/5 rounded-full blur-[120px] pointer-events-none" />
-
+    <div className="min-h-screen bg-brand-surface flex items-center justify-center px-4 relative overflow-hidden">
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-10">
           <a href="/" className="inline-block">
-            <h1 className="text-5xl font-bold font-display text-white tracking-wider">VERELUS</h1>
+            <h1 className="text-3xl font-bold text-brand-text tracking-tight">Verelus</h1>
           </a>
-          <p className="text-brand-muted mt-2 text-sm">Music Intelligence Platform</p>
+          <p className="text-brand-muted mt-2 text-sm">Produtos com IA para o seu negócio</p>
         </div>
 
         {/* Card */}
-        <div className="bg-brand-surface/80 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl shadow-black/20">
-          <h2 className="text-xl font-semibold text-white mb-6">
+        <div className="bg-white shadow-xl border border-brand-border rounded-2xl p-8">
+          <h2 className="text-xl font-semibold text-brand-text mb-6">
             {mode === 'signup' ? 'Criar conta' : mode === 'reset' ? 'Recuperar senha' : 'Entrar'}
           </h2>
 
@@ -117,7 +113,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10 transition mb-6 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border-2 border-brand-border rounded-xl text-brand-text hover:bg-brand-surface hover:border-brand-muted/50 transition mb-6 disabled:opacity-50"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
@@ -131,16 +127,16 @@ export default function LoginPage() {
 
           {mode !== 'reset' && (
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-white/30 text-sm">ou</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-brand-muted/30" />
+            <span className="text-brand-muted text-sm">ou</span>
+            <div className="flex-1 h-px bg-brand-muted/30" />
           </div>
           )}
 
           {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm text-white/60 mb-1.5">Email</label>
+              <label htmlFor="email" className="block text-brand-text text-sm font-medium mb-1.5">Email</label>
               <input
                 id="email"
                 type="email"
@@ -148,18 +144,18 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors"
+                className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-brand-text placeholder-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-trust/20 focus:border-brand-trust transition-colors"
               />
             </div>
             {mode !== 'reset' && (
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="password" className="block text-sm text-white/60">Senha</label>
+                  <label htmlFor="password" className="block text-brand-text text-sm font-medium">Senha</label>
                   {mode === 'signin' && (
                     <button
                       type="button"
                       onClick={() => { setMode('reset'); setError(''); setMessage(''); }}
-                      className="text-xs text-brand-green/70 hover:text-brand-green transition-colors"
+                      className="text-xs text-brand-trust hover:text-brand-trust transition-colors"
                     >
                       Esqueci minha senha
                     </button>
@@ -173,19 +169,19 @@ export default function LoginPage() {
                   placeholder={mode === 'signup' ? 'Crie uma senha (min. 6 caracteres)' : 'Sua senha'}
                   required
                   minLength={6}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-green/50 transition-colors"
+                  className="w-full bg-brand-bg border border-brand-border rounded-xl px-4 py-3 text-brand-text placeholder-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-trust/20 focus:border-brand-trust transition-colors"
                 />
               </div>
             )}
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm">
+              <div className="bg-brand-error/10 border border-brand-error/20 rounded-xl p-3 text-brand-error text-sm">
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="bg-brand-green/10 border border-brand-green/20 rounded-xl p-3 text-brand-green text-sm">
+              <div className="bg-brand-trust/10 border border-brand-trust/20 rounded-xl p-3 text-brand-trust text-sm">
                 {message}
               </div>
             )}
@@ -193,7 +189,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-4 py-3 bg-gradient-to-r from-brand-green to-brand-green/80 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-brand-green/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 bg-brand-cta text-white font-bold rounded-xl hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Aguarde...' : mode === 'signup' ? 'Criar conta' : mode === 'reset' ? 'Enviar email de recuperação' : 'Entrar'}
             </button>
@@ -204,14 +200,14 @@ export default function LoginPage() {
             {mode === 'reset' ? (
               <button
                 onClick={() => { setMode('signin'); setError(''); setMessage(''); }}
-                className="text-brand-green/70 hover:text-brand-green text-sm transition-colors"
+                className="text-brand-trust hover:text-brand-trust text-sm transition-colors"
               >
                 Voltar para login
               </button>
             ) : (
               <button
                 onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setError(''); setMessage(''); }}
-                className="text-brand-green/70 hover:text-brand-green text-sm transition-colors"
+                className="text-brand-trust hover:text-brand-trust text-sm transition-colors"
               >
                 {mode === 'signup' ? 'Já tem conta? Entre aqui' : 'Novo por aqui? Crie sua conta'}
               </button>
@@ -220,7 +216,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-white/20 text-xs mt-8">
+        <p className="text-center text-brand-muted text-xs mt-8">
           &copy; 2026 Verelus. Todos os direitos reservados.
         </p>
       </div>

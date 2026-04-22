@@ -13,9 +13,9 @@ export function rateLimit(
 
   if (!entry || now > entry.resetAt) {
     if (rateMap.size >= MAX_ENTRIES) {
-      for (const [k, v] of rateMap) {
+      rateMap.forEach((v, k) => {
         if (now > v.resetAt) rateMap.delete(k);
-      }
+      });
     }
     rateMap.set(ip, { count: 1, resetAt: now + windowMs });
     return { allowed: true, remaining: limit - 1 };

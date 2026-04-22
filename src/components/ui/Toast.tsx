@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { subscribeToasts, type ToastEntry } from '@/lib/use-toast';
 
 const VARIANT_CLASS: Record<ToastEntry['variant'], string> = {
-  success: 'bg-brand-green/10 border-brand-green/30 text-brand-green',
-  error: 'bg-red-500/10 border-red-500/30 text-red-300',
-  info: 'bg-white/5 border-white/20 text-white',
+  success: 'bg-brand-trust/10 border-brand-trust/30 text-brand-trust',
+  error: 'bg-brand-error/10 border-brand-error/30 text-brand-error',
+  info: 'bg-brand-surface border-brand-border text-brand-text',
 };
 
 export function ToastContainer() {

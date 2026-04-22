@@ -9,10 +9,10 @@ import { useToast } from '@/lib/use-toast';
 import type { ProposalWithAnalytics, DashboardSummary } from '@/lib/types/proposals';
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
-  draft: { label: 'Rascunho', cls: 'bg-white/10 text-white/60' },
+  draft: { label: 'Rascunho', cls: 'bg-brand-surface text-brand-muted' },
   sent: { label: 'Enviada', cls: 'bg-blue-500/15 text-blue-400' },
   viewed: { label: 'Visualizada', cls: 'bg-yellow-500/15 text-yellow-400' },
-  accepted: { label: 'Aceita', cls: 'bg-brand-green/15 text-brand-green' },
+  accepted: { label: 'Aceita', cls: 'bg-brand-trust/15 text-brand-trust' },
   expired: { label: 'Expirada', cls: 'bg-red-500/15 text-red-400' },
 };
 
@@ -84,10 +84,10 @@ export default function ProposalsDashboard() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-white">Propostas</h1>
+        <h1 className="text-2xl font-bold text-brand-text">Propostas</h1>
         <Link
           href="/dashboard/proposals/new"
-          className="px-4 py-2 rounded-xl bg-brand-green text-black text-sm font-bold hover:brightness-110 transition"
+          className="px-4 py-2 rounded-xl bg-brand-cta text-white text-sm font-bold hover:brightness-110 transition"
         >
           Nova proposta
         </Link>
@@ -96,21 +96,21 @@ export default function ProposalsDashboard() {
       {/* Summary bar */}
       {summary && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          <div className="bg-brand-surface rounded-xl p-4 border border-white/10">
+          <div className="bg-brand-surface rounded-xl p-4 border border-brand-border">
             <p className="text-xs text-brand-muted mb-1">Total</p>
-            <p className="text-2xl font-bold text-white">{summary.total_proposals}</p>
+            <p className="text-2xl font-bold text-brand-text">{summary.total_proposals}</p>
           </div>
-          <div className="bg-brand-surface rounded-xl p-4 border border-white/10">
+          <div className="bg-brand-surface rounded-xl p-4 border border-brand-border">
             <p className="text-xs text-brand-muted mb-1">Abertas</p>
-            <p className="text-2xl font-bold text-white">{summary.open_proposals}</p>
+            <p className="text-2xl font-bold text-brand-text">{summary.open_proposals}</p>
           </div>
-          <div className="bg-brand-surface rounded-xl p-4 border border-white/10">
+          <div className="bg-brand-surface rounded-xl p-4 border border-brand-border">
             <p className="text-xs text-brand-muted mb-1">Pipeline</p>
-            <p className="text-2xl font-bold text-brand-green">{formatCurrency(summary.pipeline_cents)}</p>
+            <p className="text-2xl font-bold text-brand-trust">{formatCurrency(summary.pipeline_cents)}</p>
           </div>
-          <div className="bg-brand-surface rounded-xl p-4 border border-white/10">
+          <div className="bg-brand-surface rounded-xl p-4 border border-brand-border">
             <p className="text-xs text-brand-muted mb-1">Taxa de aceite</p>
-            <p className="text-2xl font-bold text-white">{summary.acceptance_rate}%</p>
+            <p className="text-2xl font-bold text-brand-text">{summary.acceptance_rate}%</p>
           </div>
         </div>
       )}
@@ -136,7 +136,7 @@ export default function ProposalsDashboard() {
             return (
               <div
                 key={p.id}
-                className="bg-brand-surface rounded-xl p-5 border border-white/10 hover:border-white/20 transition"
+                className="bg-brand-surface rounded-xl p-5 border border-brand-border hover:border-brand-border transition"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   {/* Left: info */}
@@ -144,7 +144,7 @@ export default function ProposalsDashboard() {
                     <div className="flex items-center gap-2 mb-1">
                       <Link
                         href={`/dashboard/proposals/${p.id}`}
-                        className="text-white font-bold hover:text-brand-green transition truncate"
+                        className="text-brand-text font-bold hover:text-brand-trust transition truncate"
                       >
                         {p.project_title}
                       </Link>
@@ -154,8 +154,8 @@ export default function ProposalsDashboard() {
                     </div>
                     <div className="flex items-center gap-3 text-xs text-brand-muted">
                       <span>{p.client_name}</span>
-                      <span className="text-white/30">|</span>
-                      <span className="text-brand-green font-medium">{formatCurrency(p.price_cents)}</span>
+                      <span className="text-brand-muted/50">|</span>
+                      <span className="text-brand-trust font-medium">{formatCurrency(p.price_cents)}</span>
                     </div>
                     {p.view_count > 0 && (
                       <p className="text-[11px] text-brand-muted mt-1.5">
@@ -169,14 +169,14 @@ export default function ProposalsDashboard() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => handleCopyLink(p.slug)}
-                      className="px-3 py-1.5 rounded-lg border border-white/10 text-xs text-white/60 hover:text-white hover:border-white/20 transition"
+                      className="px-3 py-1.5 rounded-lg border border-brand-border text-xs text-brand-muted hover:text-brand-text hover:border-brand-border transition"
                       title="Copiar link"
                     >
                       Copiar link
                     </button>
                     <Link
                       href={`/dashboard/proposals/${p.id}`}
-                      className="px-3 py-1.5 rounded-lg bg-white/5 text-xs text-white/60 hover:text-white hover:bg-white/10 transition"
+                      className="px-3 py-1.5 rounded-lg bg-brand-surface text-xs text-brand-muted hover:text-brand-text hover:bg-brand-surface transition"
                     >
                       Detalhes
                     </Link>

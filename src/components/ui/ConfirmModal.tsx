@@ -17,13 +17,13 @@ export function ConfirmModal({ open, title, message, confirmLabel = 'Confirmar',
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
-      <div className="relative bg-brand-surface border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-        <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+      <div className="relative bg-brand-surface border border-brand-border rounded-2xl p-6 max-w-sm w-full shadow-lg">
+        <h3 className="text-lg font-bold text-brand-text mb-2">{title}</h3>
         <p className="text-sm text-brand-muted mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg border border-white/10 text-white/60 text-sm hover:text-white hover:border-white/20 transition"
+            className="px-4 py-2 rounded-lg border border-brand-border text-brand-muted text-sm hover:text-brand-text hover:border-brand-border transition"
           >
             {cancelLabel}
           </button>
@@ -32,7 +32,7 @@ export function ConfirmModal({ open, title, message, confirmLabel = 'Confirmar',
             className={`px-4 py-2 rounded-lg text-sm font-bold transition ${
               danger
                 ? 'bg-red-500 text-white hover:bg-red-600'
-                : 'bg-brand-green text-black hover:brightness-110'
+                : 'bg-brand-cta text-white hover:brightness-110'
             }`}
           >
             {confirmLabel}

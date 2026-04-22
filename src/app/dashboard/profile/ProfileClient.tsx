@@ -85,11 +85,11 @@ export default function ProfileClient() {
   }
 
   const inputCls =
-    'w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-brand-green/50 placeholder-white/30';
+    'w-full px-4 py-2.5 bg-brand-surface border border-brand-border rounded-xl text-brand-text text-sm focus:outline-none focus:border-brand-trust/50 placeholder-brand-muted/50';
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-white mb-2">Seu perfil</h1>
+      <h1 className="text-2xl font-bold text-brand-text mb-2">Seu perfil</h1>
       <p className="text-sm text-brand-muted mb-8">
         Esses dados aparecem no cabecalho de toda proposta que voce envia.
       </p>
@@ -102,7 +102,7 @@ export default function ProfileClient() {
 
       <form onSubmit={handleSave} className="space-y-5">
         <div>
-          <label className="block text-sm text-white/70 mb-1.5">Nome de exibicao *</label>
+          <label className="block text-sm text-brand-muted mb-1.5">Nome de exibicao *</label>
           <input
             type="text"
             required
@@ -114,7 +114,7 @@ export default function ProfileClient() {
         </div>
 
         <div>
-          <label className="block text-sm text-white/70 mb-1.5">Titulo / Cargo</label>
+          <label className="block text-sm text-brand-muted mb-1.5">Titulo / Cargo</label>
           <input
             type="text"
             value={title}
@@ -126,7 +126,7 @@ export default function ProfileClient() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-white/70 mb-1.5">Email de contato</label>
+            <label className="block text-sm text-brand-muted mb-1.5">Email de contato</label>
             <input
               type="email"
               value={email}
@@ -136,7 +136,7 @@ export default function ProfileClient() {
             />
           </div>
           <div>
-            <label className="block text-sm text-white/70 mb-1.5">Telefone</label>
+            <label className="block text-sm text-brand-muted mb-1.5">Telefone</label>
             <input
               type="tel"
               value={phone}
@@ -148,7 +148,7 @@ export default function ProfileClient() {
         </div>
 
         <div>
-          <label className="block text-sm text-white/70 mb-1.5">Website</label>
+          <label className="block text-sm text-brand-muted mb-1.5">Website</label>
           <input
             type="url"
             value={website}
@@ -159,7 +159,7 @@ export default function ProfileClient() {
         </div>
 
         <div>
-          <label className="block text-sm text-white/70 mb-1.5">URL do avatar</label>
+          <label className="block text-sm text-brand-muted mb-1.5">URL do avatar</label>
           <input
             type="url"
             value={avatarUrl}
@@ -172,7 +172,7 @@ export default function ProfileClient() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-3 rounded-xl bg-brand-green text-black font-bold text-sm hover:brightness-110 transition disabled:opacity-50"
+          className="w-full py-3 rounded-xl bg-brand-cta text-white font-bold text-sm hover:brightness-110 transition disabled:opacity-50"
         >
           {saving ? 'Salvando...' : 'Salvar perfil'}
         </button>

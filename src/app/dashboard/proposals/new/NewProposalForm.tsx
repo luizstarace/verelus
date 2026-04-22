@@ -94,11 +94,11 @@ export default function NewProposalForm() {
   }
 
   const inputCls =
-    'w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-brand-green/50 placeholder-white/30';
+    'w-full px-4 py-2.5 bg-brand-surface border border-brand-border rounded-xl text-brand-text text-sm focus:outline-none focus:border-brand-trust/50 placeholder-brand-muted/50';
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-white mb-2">Nova proposta</h1>
+      <h1 className="text-2xl font-bold text-brand-text mb-2">Nova proposta</h1>
       <p className="text-sm text-brand-muted mb-8">
         Preencha os dados e envie uma proposta profissional ao seu cliente.
       </p>
@@ -112,7 +112,7 @@ export default function NewProposalForm() {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Client name */}
         <div>
-          <label className="block text-sm text-white/70 mb-1.5">Nome do cliente *</label>
+          <label className="block text-sm text-brand-muted mb-1.5">Nome do cliente *</label>
           <input
             type="text"
             required
@@ -125,7 +125,7 @@ export default function NewProposalForm() {
 
         {/* Project title */}
         <div>
-          <label className="block text-sm text-white/70 mb-1.5">Titulo do projeto *</label>
+          <label className="block text-sm text-brand-muted mb-1.5">Titulo do projeto *</label>
           <input
             type="text"
             required
@@ -139,13 +139,13 @@ export default function NewProposalForm() {
         {/* Scope */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-sm text-white/70">Escopo / Entregaveis *</label>
+            <label className="text-sm text-brand-muted">Escopo / Entregaveis *</label>
             {userIsPro && (
               <button
                 type="button"
                 onClick={handleAISuggest}
                 disabled={aiLoading || !projectTitle.trim()}
-                className="text-xs text-brand-green hover:text-brand-green/80 disabled:opacity-40 transition font-medium"
+                className="text-xs text-brand-trust hover:text-brand-trust/80 disabled:opacity-40 transition font-medium"
               >
                 {aiLoading ? 'Gerando...' : '\u2728 Sugerir com IA'}
               </button>
@@ -164,7 +164,7 @@ export default function NewProposalForm() {
         {/* Price */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-white/70 mb-1.5">Valor (R$) *</label>
+            <label className="block text-sm text-brand-muted mb-1.5">Valor (R$) *</label>
             <input
               type="number"
               required
@@ -177,7 +177,7 @@ export default function NewProposalForm() {
             />
           </div>
           <div>
-            <label className="block text-sm text-white/70 mb-1.5">Prazo (dias) *</label>
+            <label className="block text-sm text-brand-muted mb-1.5">Prazo (dias) *</label>
             <input
               type="number"
               required
@@ -195,7 +195,7 @@ export default function NewProposalForm() {
         <button
           type="button"
           onClick={() => setShowOptional(!showOptional)}
-          className="text-xs text-brand-muted hover:text-white transition"
+          className="text-xs text-brand-muted hover:text-brand-text transition"
         >
           {showOptional ? '\u25B2 Ocultar campos opcionais' : '\u25BC Mais campos (email, pagamento, validade)'}
         </button>
@@ -203,7 +203,7 @@ export default function NewProposalForm() {
         {showOptional && (
           <div className="space-y-4 pt-2">
             <div>
-              <label className="block text-sm text-white/70 mb-1.5">Email do cliente</label>
+              <label className="block text-sm text-brand-muted mb-1.5">Email do cliente</label>
               <input
                 type="email"
                 value={clientEmail}
@@ -213,7 +213,7 @@ export default function NewProposalForm() {
               />
             </div>
             <div>
-              <label className="block text-sm text-white/70 mb-1.5">Condicoes de pagamento</label>
+              <label className="block text-sm text-brand-muted mb-1.5">Condicoes de pagamento</label>
               <input
                 type="text"
                 value={paymentTerms}
@@ -223,7 +223,7 @@ export default function NewProposalForm() {
               />
             </div>
             <div>
-              <label className="block text-sm text-white/70 mb-1.5">Valida ate</label>
+              <label className="block text-sm text-brand-muted mb-1.5">Valida ate</label>
               <input
                 type="date"
                 value={validUntil}
@@ -238,7 +238,7 @@ export default function NewProposalForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full py-3 rounded-xl bg-brand-green text-black font-bold text-sm hover:brightness-110 transition disabled:opacity-50"
+          className="w-full py-3 rounded-xl bg-brand-cta text-white font-bold text-sm hover:brightness-110 transition disabled:opacity-50"
         >
           {submitting ? 'Criando...' : 'Criar proposta'}
         </button>

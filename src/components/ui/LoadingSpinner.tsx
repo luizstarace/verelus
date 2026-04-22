@@ -12,7 +12,7 @@ const SIZE_CLASS = {
 export function LoadingSpinner({ size = 'md', label }: Props) {
   return (
     <div className="flex items-center justify-center gap-3">
-      <div className={`${SIZE_CLASS[size]} border-brand-green border-t-transparent rounded-full animate-spin`} />
+      <div className={`${SIZE_CLASS[size]} border-brand-trust border-t-transparent rounded-full animate-spin`} />
       {label && <span className="text-sm text-brand-muted">{label}</span>}
     </div>
   );

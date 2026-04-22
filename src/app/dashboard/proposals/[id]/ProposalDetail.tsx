@@ -10,10 +10,10 @@ import { useToast } from '@/lib/use-toast';
 import type { Proposal, ProposalView, ProposalAccept } from '@/lib/types/proposals';
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
-  draft: { label: 'Rascunho', cls: 'bg-white/10 text-white/60' },
+  draft: { label: 'Rascunho', cls: 'bg-brand-surface text-brand-muted' },
   sent: { label: 'Enviada', cls: 'bg-blue-500/15 text-blue-400' },
   viewed: { label: 'Visualizada', cls: 'bg-yellow-500/15 text-yellow-400' },
-  accepted: { label: 'Aceita', cls: 'bg-brand-green/15 text-brand-green' },
+  accepted: { label: 'Aceita', cls: 'bg-brand-trust/15 text-brand-trust' },
   expired: { label: 'Expirada', cls: 'bg-red-500/15 text-red-400' },
 };
 
@@ -132,16 +132,16 @@ export default function ProposalDetail({ id }: Props) {
       {/* Back link */}
       <Link
         href="/dashboard/proposals"
-        className="text-xs text-brand-muted hover:text-white transition mb-6 inline-block"
+        className="text-xs text-brand-muted hover:text-brand-text transition mb-6 inline-block"
       >
         &larr; Voltar para propostas
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Proposal preview */}
-        <div className="lg:col-span-2 bg-brand-surface rounded-2xl p-6 border border-white/10">
+        <div className="lg:col-span-2 bg-brand-surface rounded-2xl p-6 border border-brand-border">
           <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-xl font-bold text-white flex-1">{proposal.project_title}</h1>
+            <h1 className="text-xl font-bold text-brand-text flex-1">{proposal.project_title}</h1>
             <span className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded-full shrink-0 ${badge.cls}`}>
               {badge.label}
             </span>
@@ -150,7 +150,7 @@ export default function ProposalDetail({ id }: Props) {
           <div className="space-y-4 text-sm">
             <div>
               <span className="text-brand-muted">Cliente:</span>{' '}
-              <span className="text-white">{proposal.client_name}</span>
+              <span className="text-brand-text">{proposal.client_name}</span>
               {proposal.client_email && (
                 <span className="text-brand-muted ml-2">({proposal.client_email})</span>
               )}
@@ -158,41 +158,41 @@ export default function ProposalDetail({ id }: Props) {
 
             <div>
               <span className="text-brand-muted">Valor:</span>{' '}
-              <span className="text-brand-green font-bold text-lg">{formatCurrency(proposal.price_cents)}</span>
+              <span className="text-brand-trust font-bold text-lg">{formatCurrency(proposal.price_cents)}</span>
             </div>
 
             <div>
               <span className="text-brand-muted">Prazo:</span>{' '}
-              <span className="text-white">{proposal.deadline_days} dias</span>
+              <span className="text-brand-text">{proposal.deadline_days} dias</span>
             </div>
 
             {proposal.valid_until && (
               <div>
                 <span className="text-brand-muted">Valida ate:</span>{' '}
-                <span className="text-white">{new Date(proposal.valid_until).toLocaleDateString('pt-BR')}</span>
+                <span className="text-brand-text">{new Date(proposal.valid_until).toLocaleDateString('pt-BR')}</span>
               </div>
             )}
 
             {proposal.payment_terms && (
               <div>
                 <span className="text-brand-muted">Pagamento:</span>{' '}
-                <span className="text-white">{proposal.payment_terms}</span>
+                <span className="text-brand-text">{proposal.payment_terms}</span>
               </div>
             )}
 
             <div>
               <p className="text-brand-muted mb-2">Escopo:</p>
-              <div className="bg-white/5 rounded-xl p-4 text-white/80 whitespace-pre-wrap text-sm leading-relaxed">
+              <div className="bg-brand-surface rounded-xl p-4 text-brand-muted whitespace-pre-wrap text-sm leading-relaxed">
                 {proposal.scope}
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-white/10">
+          <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-brand-border">
             <button
               onClick={handleCopyLink}
-              className="px-4 py-2 rounded-lg border border-white/10 text-sm text-white/60 hover:text-white hover:border-white/20 transition"
+              className="px-4 py-2 rounded-lg border border-brand-border text-sm text-brand-muted hover:text-brand-text hover:border-brand-border transition"
             >
               Copiar link
             </button>
@@ -206,7 +206,7 @@ export default function ProposalDetail({ id }: Props) {
             )}
             <button
               onClick={() => setConfirmDelete(true)}
-              className="px-4 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition ml-auto"
+              className="px-4 py-2 rounded-lg text-sm text-brand-error hover:bg-brand-error/10 transition ml-auto"
             >
               Excluir
             </button>
@@ -216,21 +216,21 @@ export default function ProposalDetail({ id }: Props) {
         {/* Right: Analytics panel */}
         <div className="space-y-4">
           {/* Stats */}
-          <div className="bg-brand-surface rounded-2xl p-5 border border-white/10">
-            <h2 className="text-sm font-bold text-white mb-4">Analytics</h2>
+          <div className="bg-brand-surface rounded-2xl p-5 border border-brand-border">
+            <h2 className="text-sm font-bold text-brand-text mb-4">Analytics</h2>
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-brand-muted">Visualizacoes</span>
-                <span className="text-white font-medium">{views.length}</span>
+                <span className="text-brand-text font-medium">{views.length}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-brand-muted">Tempo total</span>
-                <span className="text-white font-medium">{totalMin}min</span>
+                <span className="text-brand-text font-medium">{totalMin}min</span>
               </div>
               {views.length > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-brand-muted">Ultima visualizacao</span>
-                  <span className="text-white font-medium text-xs">
+                  <span className="text-brand-text font-medium text-xs">
                     {formatDate(views[0].viewed_at)}
                   </span>
                 </div>
@@ -240,9 +240,9 @@ export default function ProposalDetail({ id }: Props) {
 
           {/* Accept info */}
           {accept && (
-            <div className="bg-brand-green/10 rounded-2xl p-5 border border-brand-green/20">
-              <h2 className="text-sm font-bold text-brand-green mb-2">Aceita!</h2>
-              <p className="text-sm text-white/80">
+            <div className="bg-brand-trust/10 rounded-2xl p-5 border border-brand-trust/20">
+              <h2 className="text-sm font-bold text-brand-trust mb-2">Aceita!</h2>
+              <p className="text-sm text-brand-muted">
                 Por: {accept.acceptor_name}
               </p>
               <p className="text-xs text-brand-muted mt-1">
@@ -253,13 +253,13 @@ export default function ProposalDetail({ id }: Props) {
 
           {/* Views list */}
           {views.length > 0 && (
-            <div className="bg-brand-surface rounded-2xl p-5 border border-white/10">
-              <h2 className="text-sm font-bold text-white mb-3">Visualizacoes</h2>
+            <div className="bg-brand-surface rounded-2xl p-5 border border-brand-border">
+              <h2 className="text-sm font-bold text-brand-text mb-3">Visualizacoes</h2>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {views.map((v) => (
                   <div key={v.id} className="text-xs text-brand-muted flex justify-between">
                     <span>{formatDate(v.viewed_at)}</span>
-                    <span className="text-white/60">{Math.round(v.duration_seconds / 60)}min</span>
+                    <span className="text-brand-muted">{Math.round(v.duration_seconds / 60)}min</span>
                   </div>
                 ))}
               </div>

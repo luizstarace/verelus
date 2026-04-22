@@ -1,12 +1,7 @@
+// Cloudflare Workers/Pages runtime disallows setInterval in global scope,
+// so expired entries are cleaned opportunistically inside rateLimit().
 const rateMap = new Map<string, { count: number; resetAt: number }>();
-
-// Clean expired entries periodically
-setInterval(() => {
-  const now = Date.now();
-  rateMap.forEach((val, key) => {
-    if (now > val.resetAt) rateMap.delete(key);
-  });
-}, 60000);
+const MAX_ENTRIES = 10000;
 
 export function rateLimit(
   ip: string,
@@ -14,11 +9,15 @@ export function rateLimit(
   windowMs: number
 ): { allowed: boolean; remaining: number } {
   const now = Date.now();
-  const key = ip;
-  const entry = rateMap.get(key);
+  const entry = rateMap.get(ip);
 
   if (!entry || now > entry.resetAt) {
-    rateMap.set(key, { count: 1, resetAt: now + windowMs });
+    if (rateMap.size >= MAX_ENTRIES) {
+      for (const [k, v] of rateMap) {
+        if (now > v.resetAt) rateMap.delete(k);
+      }
+    }
+    rateMap.set(ip, { count: 1, resetAt: now + windowMs });
     return { allowed: true, remaining: limit - 1 };
   }
 

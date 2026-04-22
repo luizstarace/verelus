@@ -105,6 +105,12 @@ export default function SettingsView() {
   const [notifyChannel, setNotifyChannel] = useState<'email' | 'whatsapp' | 'both'>('email');
   const [ownerWhatsapp, setOwnerWhatsapp] = useState('');
 
+  // WhatsApp connection state
+  const [waQrCode, setWaQrCode] = useState<string | null>(null);
+  const [waConnecting, setWaConnecting] = useState(false);
+  const [waState, setWaState] = useState<string>('unknown');
+  const [waPolling, setWaPolling] = useState(false);
+
   function syncFormState(b: any) {
     setName(b.name || '');
     setCategory(b.category || '');
@@ -191,6 +197,76 @@ export default function SettingsView() {
   async function handleSaveNotifications() {
     await saveBusiness({ owner_notify_channel: notifyChannel, owner_whatsapp: ownerWhatsapp });
   }
+
+  // WhatsApp
+  async function handleWhatsAppConnect() {
+    setWaConnecting(true);
+    setWaQrCode(null);
+    try {
+      const res = await fetch('/api/attendly/whatsapp/connect', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Erro ao conectar WhatsApp');
+        return;
+      }
+      if (data.qrcode) {
+        setWaQrCode(data.qrcode);
+        setWaPolling(true);
+      } else {
+        showToast('QR code indispon\u00edvel. Tente novamente.');
+      }
+    } catch {
+      showToast('Erro ao conectar WhatsApp');
+    } finally {
+      setWaConnecting(false);
+    }
+  }
+
+  async function handleWhatsAppDisconnect() {
+    if (!confirm('Desconectar o WhatsApp deste neg\u00f3cio?')) return;
+    setWaConnecting(true);
+    try {
+      const res = await fetch('/api/attendly/whatsapp/connect', { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        showToast(data.error || 'Erro ao desconectar');
+        return;
+      }
+      setWaQrCode(null);
+      setWaState('close');
+      await fetchBusiness();
+      showToast('WhatsApp desconectado');
+    } catch {
+      showToast('Erro ao desconectar');
+    } finally {
+      setWaConnecting(false);
+    }
+  }
+
+  // Poll connection status while QR is shown
+  useEffect(() => {
+    if (!waPolling) return;
+    let cancelled = false;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/attendly/whatsapp/status');
+        const data = await res.json();
+        if (cancelled) return;
+        setWaState(data.state || 'unknown');
+        if (data.connected) {
+          setWaPolling(false);
+          setWaQrCode(null);
+          await fetchBusiness();
+          showToast('WhatsApp conectado!');
+        }
+      } catch {}
+    }, 3000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [waPolling]);
 
   // Service helpers
   function addService() {
@@ -552,14 +628,56 @@ export default function SettingsView() {
                 <span className="text-sm text-brand-muted">({business.whatsapp_number})</span>
               )}
             </div>
-            <button
-              onClick={() => showToast('Integra\u00e7\u00e3o WhatsApp em breve!')}
-              className="bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition"
-            >
-              {business.whatsapp_number ? 'Reconectar WhatsApp' : 'Conectar WhatsApp'}
-            </button>
+            {waQrCode && (
+              <div className="mb-4 p-4 bg-white rounded-lg border border-brand-border inline-block">
+                <p className="text-sm text-brand-text mb-2 font-medium">Escaneie com o WhatsApp do seu celular:</p>
+                <img
+                  src={waQrCode.startsWith('data:') ? waQrCode : `data:image/png;base64,${waQrCode}`}
+                  alt="QR Code WhatsApp"
+                  className="w-64 h-64"
+                />
+                <p className="text-xs text-brand-muted mt-2">
+                  WhatsApp &gt; Configura\u00e7\u00f5es &gt; Aparelhos conectados &gt; Conectar um aparelho
+                </p>
+                {waState && waState !== 'open' && (
+                  <p className="text-xs text-brand-muted mt-1">Status: {waState}</p>
+                )}
+              </div>
+            )}
+
+            <div className="flex gap-3 flex-wrap">
+              {!business.whatsapp_number && (
+                <button
+                  onClick={handleWhatsAppConnect}
+                  disabled={waConnecting}
+                  className="bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
+                >
+                  {waConnecting ? 'Conectando...' : waQrCode ? 'Gerar novo QR' : 'Conectar WhatsApp'}
+                </button>
+              )}
+              {business.whatsapp_number && (
+                <>
+                  <button
+                    onClick={handleWhatsAppConnect}
+                    disabled={waConnecting}
+                    className="bg-brand-surface border border-brand-border text-brand-text px-6 py-2 rounded-lg text-sm font-medium hover:bg-brand-border/30 disabled:opacity-50 transition"
+                  >
+                    Reconectar
+                  </button>
+                  <button
+                    onClick={handleWhatsAppDisconnect}
+                    disabled={waConnecting}
+                    className="bg-brand-error text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
+                  >
+                    Desconectar
+                  </button>
+                </>
+              )}
+            </div>
+
             <p className="text-xs text-brand-muted mt-3">
-              A integra\u00e7\u00e3o com WhatsApp Business API ser\u00e1 disponibilizada em breve.
+              Conex\u00e3o via Evolution API (Baileys). O atendente IA responder\u00e1 automaticamente
+              as mensagens recebidas neste n\u00famero.
             </p>
           </div>
         </div>

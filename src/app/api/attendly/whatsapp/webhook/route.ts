@@ -4,9 +4,29 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { rateLimit, getRateLimitHeaders } from '@/lib/attendly/rate-limit';
 
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || 'http://localhost:8080';
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
+
+async function sendWhatsAppMessage(instanceName: string, toJid: string, text: string) {
+  if (!text.trim()) return;
+  try {
+    await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
+      method: 'POST',
+      headers: {
+        'apikey': EVOLUTION_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        number: toJid,
+        text,
+      }),
+    });
+  } catch {}
+}
+
 export async function POST(request: Request) {
   const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const rl = rateLimit(clientIp, 60, 60000); // 60 requests per minute per IP
+  const rl = rateLimit(clientIp, 60, 60000);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: 'Rate limit exceeded' },
@@ -20,17 +40,42 @@ export async function POST(request: Request) {
   );
 
   try {
-    // Verify webhook authenticity
     const apiKey = request.headers.get('apikey') || '';
     if (apiKey !== process.env.EVOLUTION_API_KEY) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { instance, data: msgData } = body;
+    const event = body.event || '';
+    const instance: string = body.instance || '';
+    const msgData = body.data;
 
-    const businessId = instance?.replace('attendly_', '');
-    if (!businessId || !msgData?.message?.conversation) {
+    if (!instance.startsWith('attendly_')) {
+      return NextResponse.json({ ok: true });
+    }
+    const businessId = instance.replace('attendly_', '');
+
+    // Ignore non-message events (CONNECTION_UPDATE etc.)
+    if (event && event !== 'messages.upsert' && event !== 'MESSAGES_UPSERT') {
+      return NextResponse.json({ ok: true });
+    }
+
+    // Ignore our own outbound messages
+    if (msgData?.key?.fromMe) {
+      return NextResponse.json({ ok: true });
+    }
+
+    const messageText: string =
+      msgData?.message?.conversation ||
+      msgData?.message?.extendedTextMessage?.text ||
+      '';
+    if (!messageText) {
+      return NextResponse.json({ ok: true });
+    }
+
+    const remoteJid: string = msgData?.key?.remoteJid || '';
+    const customerPhone = remoteJid.replace(/@s\.whatsapp\.net$/, '').replace(/@c\.us$/, '');
+    if (!customerPhone) {
       return NextResponse.json({ ok: true });
     }
 
@@ -41,14 +86,6 @@ export async function POST(request: Request) {
       .single();
 
     if (!business || business.status !== 'active') {
-      return NextResponse.json({ ok: true }); // Silently ignore inactive businesses
-    }
-
-    const customerPhone = msgData.key?.remoteJid?.replace('@s.whatsapp.net', '') || '';
-    const messageText = msgData.message?.conversation ||
-      msgData.message?.extendedTextMessage?.text || '';
-
-    if (!messageText) {
       return NextResponse.json({ ok: true });
     }
 
@@ -60,34 +97,40 @@ export async function POST(request: Request) {
         message: messageText,
         channel: 'whatsapp',
         customer_phone: customerPhone,
+        customer_name: msgData?.pushName || null,
       }),
     });
 
-    if (chatRes.ok && chatRes.body) {
-      const reader = chatRes.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '';
+    if (!chatRes.ok || !chatRes.body) {
+      return NextResponse.json({ ok: true });
+    }
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const parsed = JSON.parse(line.slice(6));
-              if (parsed.text) fullText += parsed.text;
-            } catch {}
-          }
+    const reader = chatRes.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      for (const line of chunk.split('\n')) {
+        if (line.startsWith('data: ')) {
+          try {
+            const parsed = JSON.parse(line.slice(6));
+            if (parsed.text) fullText += parsed.text;
+          } catch {}
         }
       }
+    }
 
-      return NextResponse.json({ response: fullText });
+    // Strip the [TRANSFER] tag — customer shouldn't see it
+    const cleanText = fullText.replace(/\[TRANSFER\]/g, '').trim();
+    if (cleanText) {
+      await sendWhatsAppMessage(instance, remoteJid, cleanText);
     }
 
     return NextResponse.json({ ok: true });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Webhook processing error' }, { status: 500 });
   }
 }

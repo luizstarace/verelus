@@ -3,9 +3,9 @@ const rateMap = new Map<string, { count: number; resetAt: number }>();
 // Clean expired entries periodically
 setInterval(() => {
   const now = Date.now();
-  for (const [key, val] of rateMap) {
+  rateMap.forEach((val, key) => {
     if (now > val.resetAt) rateMap.delete(key);
-  }
+  });
 }, 60000);
 
 export function rateLimit(

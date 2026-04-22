@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 14 (App Router), Supabase (PostgreSQL + Auth + Storage + RLS), Stripe (subscriptions + usage metering), Claude Haiku 4.5 (streaming), ElevenLabs API, Resend, n8n, Evolution API, Tailwind CSS, Vanilla JS (widget).
 
-**Spec:** `docs/superpowers/specs/2026-04-18-attendly-design.md`
+**Spec:** `Attendly/docs/spec.md`
 
 ---
 

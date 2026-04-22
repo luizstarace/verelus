@@ -1,7 +1,7 @@
+export const runtime = "edge";
+
 import { NextResponse } from "next/server";
 import { collectBriefingData, formatBriefingEmail } from "@/lib/briefing";
-
-export const runtime = "edge";
 
 /**
  * POST /api/briefing/daily

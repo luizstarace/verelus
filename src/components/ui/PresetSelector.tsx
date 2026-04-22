@@ -23,7 +23,7 @@ export function PresetSelector<T>({ presets, onSelect, label = 'Comecar com um p
             type="button"
             onClick={() => onSelect(p.values)}
             title={p.description}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium border border-brand-border bg-brand-surface text-brand-muted hover:bg-brand-surface hover:text-brand-text hover:border-brand-border transition-all"
           >
             {p.label}
           </button>

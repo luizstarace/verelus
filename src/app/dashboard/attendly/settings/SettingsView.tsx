@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 
 interface Service {
   name: string;
-  price_cents: number;
-  duration_min: number;
+  price: string;
+  duration: string;
   description: string;
 }
 
@@ -26,8 +26,8 @@ interface Business {
   category: string | null;
   phone: string | null;
   address: string | null;
-  services: Service[];
-  hours: Record<string, { open: string; close: string }>;
+  services: any[];
+  hours: any;
   faq: Faq[];
   widget_config: WidgetConfig;
   whatsapp_number: string | null;
@@ -36,10 +36,10 @@ interface Business {
 }
 
 const TABS = [
-  { id: 'business', label: 'Dados do negocio' },
+  { id: 'business', label: 'Dados do neg\u00f3cio' },
   { id: 'widget', label: 'Widget' },
   { id: 'whatsapp', label: 'WhatsApp' },
-  { id: 'notifications', label: 'Notificacoes' },
+  { id: 'notifications', label: 'Notifica\u00e7\u00f5es' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -50,9 +50,35 @@ const DAYS = [
   { key: 'wed', label: 'Qua' },
   { key: 'thu', label: 'Qui' },
   { key: 'fri', label: 'Sex' },
-  { key: 'sat', label: 'Sab' },
+  { key: 'sat', label: 'S\u00e1b' },
   { key: 'sun', label: 'Dom' },
 ];
+
+function normalizeHours(h: any): Record<string, { open: string; close: string }> {
+  if (!h || typeof h !== 'object') return {};
+  // If it's already a Record with day keys
+  if (h.mon || h.tue || h.wed || h.thu || h.fri || h.sat || h.sun) return h;
+  // If it's an array (from SetupWizard)
+  if (Array.isArray(h)) {
+    const result: Record<string, { open: string; close: string }> = {};
+    for (const entry of h) {
+      if (entry.enabled && entry.day) {
+        result[entry.day] = { open: entry.open || '08:00', close: entry.close || '18:00' };
+      }
+    }
+    return result;
+  }
+  return h;
+}
+
+function convertServicesFromApi(raw: any[]): Service[] {
+  return (raw || []).map((s: any) => ({
+    name: s.name || '',
+    price: String((s.price_cents || 0) / 100),
+    duration: String(s.duration_min || 0),
+    description: s.description || '',
+  }));
+}
 
 export default function SettingsView() {
   const [tab, setTab] = useState<TabId>('business');
@@ -71,13 +97,28 @@ export default function SettingsView() {
   const [faq, setFaq] = useState<Faq[]>([]);
 
   // Widget state
-  const [widgetColor, setWidgetColor] = useState('#2563eb');
+  const [widgetColor, setWidgetColor] = useState('#1e3a5f');
   const [widgetPosition, setWidgetPosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
-  const [widgetGreeting, setWidgetGreeting] = useState('Ola! Como posso ajudar?');
+  const [widgetGreeting, setWidgetGreeting] = useState('Ol\u00e1! Como posso ajudar?');
 
   // Notifications state
   const [notifyChannel, setNotifyChannel] = useState<'email' | 'whatsapp' | 'both'>('email');
   const [ownerWhatsapp, setOwnerWhatsapp] = useState('');
+
+  function syncFormState(b: any) {
+    setName(b.name || '');
+    setCategory(b.category || '');
+    setPhone(b.phone || '');
+    setAddress(b.address || '');
+    setServices(convertServicesFromApi(b.services));
+    setHours(normalizeHours(b.hours || {}));
+    setFaq(b.faq || []);
+    setWidgetColor(b.widget_config?.color || '#1e3a5f');
+    setWidgetPosition(b.widget_config?.position || 'bottom-right');
+    setWidgetGreeting(b.widget_config?.greeting || 'Ol\u00e1! Como posso ajudar?');
+    setNotifyChannel(b.owner_notify_channel || 'email');
+    setOwnerWhatsapp(b.owner_whatsapp || '');
+  }
 
   useEffect(() => {
     fetchBusiness();
@@ -91,18 +132,7 @@ export default function SettingsView() {
       const b = data.business as Business | null;
       if (b) {
         setBusiness(b);
-        setName(b.name || '');
-        setCategory(b.category || '');
-        setPhone(b.phone || '');
-        setAddress(b.address || '');
-        setServices(b.services || []);
-        setHours(b.hours || {});
-        setFaq(b.faq || []);
-        setWidgetColor(b.widget_config?.color || '#2563eb');
-        setWidgetPosition(b.widget_config?.position || 'bottom-right');
-        setWidgetGreeting(b.widget_config?.greeting || 'Ola! Como posso ajudar?');
-        setNotifyChannel(b.owner_notify_channel || 'email');
-        setOwnerWhatsapp(b.owner_whatsapp || '');
+        syncFormState(b);
       }
     } catch (err) {
       console.error('Error fetching business:', err);
@@ -113,7 +143,7 @@ export default function SettingsView() {
 
   function showToast(msg: string) {
     setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 5000);
   }
 
   async function saveBusiness(body: Record<string, unknown>) {
@@ -127,6 +157,7 @@ export default function SettingsView() {
       if (!res.ok) throw new Error('Save failed');
       const data = await res.json();
       setBusiness(data.business);
+      syncFormState(data.business);
       showToast('Salvo com sucesso!');
     } catch (err) {
       console.error('Error saving:', err);
@@ -137,7 +168,20 @@ export default function SettingsView() {
   }
 
   async function handleSaveBusiness() {
-    await saveBusiness({ name, category, phone, address, services, hours, faq });
+    await saveBusiness({
+      name,
+      category,
+      phone,
+      address,
+      services: services.filter(s => s.name.trim()).map(s => ({
+        name: s.name,
+        price_cents: Math.round(parseFloat(s.price || '0') * 100),
+        duration_min: parseInt(s.duration || '0', 10),
+        description: s.description,
+      })),
+      hours,
+      faq,
+    });
   }
 
   async function handleSaveWidget() {
@@ -150,12 +194,12 @@ export default function SettingsView() {
 
   // Service helpers
   function addService() {
-    setServices([...services, { name: '', price_cents: 0, duration_min: 30, description: '' }]);
+    setServices([...services, { name: '', price: '0', duration: '30', description: '' }]);
   }
   function removeService(idx: number) {
     setServices(services.filter((_, i) => i !== idx));
   }
-  function updateService(idx: number, field: keyof Service, value: string | number) {
+  function updateService(idx: number, field: keyof Service, value: string) {
     setServices(services.map((s, i) => i === idx ? { ...s, [field]: value } : s));
   }
 
@@ -189,7 +233,7 @@ export default function SettingsView() {
   }
 
   if (!business) {
-    return <div className="p-6 text-brand-muted">Nenhum negocio configurado. Complete o setup primeiro.</div>;
+    return <div className="p-6 text-brand-muted">Nenhum neg\u00f3cio configurado. Complete o setup primeiro.</div>;
   }
 
   return (
@@ -200,7 +244,7 @@ export default function SettingsView() {
         </div>
       )}
 
-      <h1 className="text-2xl font-bold text-brand-text mb-6">Configuracoes</h1>
+      <h1 className="text-2xl font-bold text-brand-text mb-6">Configura\u00e7\u00f5es</h1>
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-brand-border mb-6 overflow-x-auto">
@@ -219,7 +263,7 @@ export default function SettingsView() {
         ))}
       </div>
 
-      {/* Tab: Dados do negocio */}
+      {/* Tab: Dados do neg\u00f3cio */}
       {tab === 'business' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -237,7 +281,7 @@ export default function SettingsView() {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full border border-brand-border rounded-lg px-3 py-2 text-sm text-brand-text bg-white"
-                placeholder="Ex: Barbearia, Clinica, Restaurante"
+                placeholder="Ex: Barbearia, Cl\u00ednica, Restaurante"
               />
             </div>
             <div>
@@ -250,7 +294,7 @@ export default function SettingsView() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-brand-text mb-1">Endereco</label>
+              <label className="block text-sm font-medium text-brand-text mb-1">Endere\u00e7o</label>
               <input
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
@@ -261,54 +305,67 @@ export default function SettingsView() {
 
           {/* Services */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-brand-text">Servicos</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-brand-text">Servi\u00e7os</h3>
               <button onClick={addService} className="text-sm text-brand-primary hover:underline">+ Adicionar</button>
             </div>
-            {services.length === 0 && <p className="text-sm text-brand-muted">Nenhum servico cadastrado.</p>}
-            {services.map((s, idx) => (
-              <div key={idx} className="border border-brand-border rounded-lg p-3 mb-2 space-y-2">
-                <div className="flex items-center justify-between">
+            {services.length === 0 && <p className="text-sm text-brand-muted">Nenhum servi\u00e7o cadastrado.</p>}
+            <div className="space-y-3">
+              {services.map((s, idx) => (
+                <div key={idx} className="bg-brand-surface rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <input
+                      value={s.name}
+                      onChange={(e) => updateService(idx, 'name', e.target.value)}
+                      placeholder="Nome do servi\u00e7o"
+                      className="flex-1 border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
+                    />
+                    <button
+                      onClick={() => removeService(idx)}
+                      className="ml-2 text-brand-error hover:bg-brand-error/10 rounded p-1"
+                      title="Remover servi\u00e7o"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-brand-muted">R$</span>
+                      <input
+                        type="text"
+                        value={s.price}
+                        onChange={(e) => updateService(idx, 'price', e.target.value)}
+                        placeholder="Pre\u00e7o (R$)"
+                        className="flex-1 border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
+                      />
+                    </div>
+                    <input
+                      type="number"
+                      value={s.duration}
+                      onChange={(e) => updateService(idx, 'duration', e.target.value)}
+                      placeholder="Dura\u00e7\u00e3o (min)"
+                      className="border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
+                    />
+                  </div>
                   <input
-                    value={s.name}
-                    onChange={(e) => updateService(idx, 'name', e.target.value)}
-                    placeholder="Nome do servico"
-                    className="flex-1 border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
+                    value={s.description}
+                    onChange={(e) => updateService(idx, 'description', e.target.value)}
+                    placeholder="Descri\u00e7\u00e3o"
+                    className="w-full border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
                   />
-                  <button onClick={() => removeService(idx)} className="ml-2 text-brand-error text-sm hover:underline">Remover</button>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="number"
-                    value={s.price_cents}
-                    onChange={(e) => updateService(idx, 'price_cents', Number(e.target.value))}
-                    placeholder="Preco (centavos)"
-                    className="border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
-                  />
-                  <input
-                    type="number"
-                    value={s.duration_min}
-                    onChange={(e) => updateService(idx, 'duration_min', Number(e.target.value))}
-                    placeholder="Duracao (min)"
-                    className="border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
-                  />
-                </div>
-                <input
-                  value={s.description}
-                  onChange={(e) => updateService(idx, 'description', e.target.value)}
-                  placeholder="Descricao"
-                  className="w-full border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
-                />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Business Hours */}
           <div>
-            <h3 className="text-sm font-medium text-brand-text mb-2">Horario de funcionamento</h3>
-            <div className="space-y-2">
+            <h3 className="text-sm font-medium text-brand-text mb-2">Hor\u00e1rios de funcionamento</h3>
+            <div className="space-y-1">
               {DAYS.map((day) => (
-                <div key={day.key} className="flex items-center gap-3">
+                <div key={day.key} className="flex items-center gap-3 py-1">
                   <label className="flex items-center gap-2 w-16">
                     <input
                       type="checkbox"
@@ -319,21 +376,21 @@ export default function SettingsView() {
                     <span className="text-sm text-brand-text">{day.label}</span>
                   </label>
                   {hours[day.key] && (
-                    <>
+                    <div className="flex items-center gap-2">
                       <input
                         type="time"
                         value={hours[day.key].open}
                         onChange={(e) => updateHour(day.key, 'open', e.target.value)}
                         className="border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
                       />
-                      <span className="text-brand-muted text-sm">ate</span>
+                      <span className="text-brand-muted text-sm">at\u00e9</span>
                       <input
                         type="time"
                         value={hours[day.key].close}
                         onChange={(e) => updateHour(day.key, 'close', e.target.value)}
                         className="border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
                       />
-                    </>
+                    </div>
                   )}
                 </div>
               ))}
@@ -342,31 +399,41 @@ export default function SettingsView() {
 
           {/* FAQ */}
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-brand-text">Perguntas frequentes</h3>
               <button onClick={addFaq} className="text-sm text-brand-primary hover:underline">+ Adicionar</button>
             </div>
             {faq.length === 0 && <p className="text-sm text-brand-muted">Nenhuma FAQ cadastrada.</p>}
-            {faq.map((f, idx) => (
-              <div key={idx} className="border border-brand-border rounded-lg p-3 mb-2 space-y-2">
-                <div className="flex items-center justify-between">
-                  <input
-                    value={f.question}
-                    onChange={(e) => updateFaq(idx, 'question', e.target.value)}
-                    placeholder="Pergunta"
-                    className="flex-1 border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
+            <div className="space-y-3">
+              {faq.map((f, idx) => (
+                <div key={idx} className="bg-brand-surface rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <input
+                      value={f.question}
+                      onChange={(e) => updateFaq(idx, 'question', e.target.value)}
+                      placeholder="Pergunta"
+                      className="flex-1 border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
+                    />
+                    <button
+                      onClick={() => removeFaq(idx)}
+                      className="ml-2 text-brand-error hover:bg-brand-error/10 rounded p-1"
+                      title="Remover FAQ"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <textarea
+                    value={f.answer}
+                    onChange={(e) => updateFaq(idx, 'answer', e.target.value)}
+                    placeholder="Resposta"
+                    rows={2}
+                    className="w-full border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white resize-y"
                   />
-                  <button onClick={() => removeFaq(idx)} className="ml-2 text-brand-error text-sm hover:underline">Remover</button>
                 </div>
-                <textarea
-                  value={f.answer}
-                  onChange={(e) => updateFaq(idx, 'answer', e.target.value)}
-                  placeholder="Resposta"
-                  rows={2}
-                  className="w-full border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white resize-y"
-                />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           <button
@@ -423,7 +490,7 @@ export default function SettingsView() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-brand-text mb-1">Posicao</label>
+              <label className="block text-sm font-medium text-brand-text mb-1">Posi\u00e7\u00e3o</label>
               <select
                 value={widgetPosition}
                 onChange={(e) => setWidgetPosition(e.target.value as 'bottom-right' | 'bottom-left')}
@@ -435,7 +502,7 @@ export default function SettingsView() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-brand-text mb-1">Mensagem de saudacao</label>
+            <label className="block text-sm font-medium text-brand-text mb-1">Mensagem de sauda\u00e7\u00e3o</label>
             <input
               value={widgetGreeting}
               onChange={(e) => setWidgetGreeting(e.target.value)}
@@ -445,17 +512,17 @@ export default function SettingsView() {
 
           {/* Code snippet */}
           <div>
-            <h3 className="text-sm font-medium text-brand-text mb-2">Codigo de instalacao</h3>
+            <h3 className="text-sm font-medium text-brand-text mb-2">C\u00f3digo de instala\u00e7\u00e3o</h3>
             <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative">
               <code>{`<script src="https://verelus.com/widget.js" data-business="${business.id}" async></script>`}</code>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(`<script src="https://verelus.com/widget.js" data-business="${business.id}" async></script>`);
-                  showToast('Codigo copiado!');
+                  showToast('C\u00f3digo copiado!');
                 }}
                 className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded transition"
               >
-                Copiar codigo
+                Copiar c\u00f3digo
               </button>
             </div>
           </div>
@@ -486,23 +553,23 @@ export default function SettingsView() {
               )}
             </div>
             <button
-              onClick={() => showToast('Integracao WhatsApp em breve!')}
+              onClick={() => showToast('Integra\u00e7\u00e3o WhatsApp em breve!')}
               className="bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition"
             >
               {business.whatsapp_number ? 'Reconectar WhatsApp' : 'Conectar WhatsApp'}
             </button>
             <p className="text-xs text-brand-muted mt-3">
-              A integracao com WhatsApp Business API sera disponibilizada em breve.
+              A integra\u00e7\u00e3o com WhatsApp Business API ser\u00e1 disponibilizada em breve.
             </p>
           </div>
         </div>
       )}
 
-      {/* Tab: Notificacoes */}
+      {/* Tab: Notifica\u00e7\u00f5es */}
       {tab === 'notifications' && (
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-brand-text mb-1">Canal de notificacao</label>
+            <label className="block text-sm font-medium text-brand-text mb-1">Canal de notifica\u00e7\u00e3o</label>
             <select
               value={notifyChannel}
               onChange={(e) => setNotifyChannel(e.target.value as 'email' | 'whatsapp' | 'both')}
@@ -516,7 +583,7 @@ export default function SettingsView() {
 
           {(notifyChannel === 'whatsapp' || notifyChannel === 'both') && (
             <div>
-              <label className="block text-sm font-medium text-brand-text mb-1">WhatsApp do proprietario</label>
+              <label className="block text-sm font-medium text-brand-text mb-1">WhatsApp do propriet\u00e1rio</label>
               <input
                 value={ownerWhatsapp}
                 onChange={(e) => setOwnerWhatsapp(e.target.value)}
@@ -524,7 +591,7 @@ export default function SettingsView() {
                 className="w-full border border-brand-border rounded-lg px-3 py-2 text-sm text-brand-text bg-white max-w-sm"
               />
               <p className="text-xs text-brand-muted mt-1">
-                Numero para receber notificacoes de conversas que precisam de atencao humana.
+                N\u00famero para receber notifica\u00e7\u00f5es de conversas que precisam de aten\u00e7\u00e3o humana.
               </p>
             </div>
           )}

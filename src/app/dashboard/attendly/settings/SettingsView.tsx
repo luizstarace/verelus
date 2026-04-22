@@ -39,6 +39,7 @@ const TABS = [
   { id: 'business', label: 'Dados do neg\u00f3cio' },
   { id: 'widget', label: 'Widget' },
   { id: 'whatsapp', label: 'WhatsApp' },
+  { id: 'voice', label: 'Voz' },
   { id: 'notifications', label: 'Notifica\u00e7\u00f5es' },
 ] as const;
 
@@ -110,6 +111,12 @@ export default function SettingsView() {
   const [waConnecting, setWaConnecting] = useState(false);
   const [waState, setWaState] = useState<string>('unknown');
   const [waPolling, setWaPolling] = useState(false);
+
+  // Voice test state
+  const [voiceText, setVoiceText] = useState('Ol\u00e1! Eu sou o atendente virtual do seu neg\u00f3cio. Como posso ajudar?');
+  const [voiceTesting, setVoiceTesting] = useState(false);
+  const [voiceAudioUrl, setVoiceAudioUrl] = useState<string | null>(null);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
 
   function syncFormState(b: any) {
     setName(b.name || '');
@@ -213,7 +220,7 @@ export default function SettingsView() {
         setWaQrCode(data.qrcode);
         setWaPolling(true);
       } else {
-        showToast('QR code indispon\u00edvel. Tente novamente.');
+        showToast('QR code indisponível. Tente novamente.');
       }
     } catch {
       showToast('Erro ao conectar WhatsApp');
@@ -223,7 +230,7 @@ export default function SettingsView() {
   }
 
   async function handleWhatsAppDisconnect() {
-    if (!confirm('Desconectar o WhatsApp deste neg\u00f3cio?')) return;
+    if (!confirm('Desconectar o WhatsApp deste negócio?')) return;
     setWaConnecting(true);
     try {
       const res = await fetch('/api/attendly/whatsapp/connect', { method: 'DELETE' });
@@ -240,6 +247,31 @@ export default function SettingsView() {
       showToast('Erro ao desconectar');
     } finally {
       setWaConnecting(false);
+    }
+  }
+
+  async function handleTestVoice() {
+    setVoiceTesting(true);
+    setVoiceError(null);
+    setVoiceAudioUrl(null);
+    try {
+      const res = await fetch('/api/attendly/voice/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: voiceText }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setVoiceError(data.error || 'Erro ao gerar \u00e1udio');
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setVoiceAudioUrl(url);
+    } catch {
+      setVoiceError('Erro de rede');
+    } finally {
+      setVoiceTesting(false);
     }
   }
 
@@ -679,6 +711,49 @@ export default function SettingsView() {
               Conex\u00e3o via Evolution API (Baileys). O atendente IA responder\u00e1 automaticamente
               as mensagens recebidas neste n\u00famero.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Tab: Voz */}
+      {tab === 'voice' && (
+        <div className="space-y-6">
+          <div className="bg-brand-surface border border-brand-border rounded-lg p-6">
+            <h3 className="text-sm font-medium text-brand-text mb-2">Testar voz do atendente</h3>
+            <p className="text-xs text-brand-muted mb-4">
+              Voz dispon\u00edvel nos planos Pro e Business. O \u00e1udio usa a voz configurada
+              no seu neg\u00f3cio (ElevenLabs).
+            </p>
+            <textarea
+              value={voiceText}
+              onChange={(e) => setVoiceText(e.target.value)}
+              maxLength={500}
+              rows={3}
+              className="w-full border border-brand-border rounded-lg px-3 py-2 text-sm text-brand-text bg-white mb-3"
+              placeholder="Texto para testar a voz (at\u00e9 500 caracteres)"
+            />
+            <div className="text-xs text-brand-muted mb-3">
+              {voiceText.length}/500 caracteres
+            </div>
+            <button
+              onClick={handleTestVoice}
+              disabled={voiceTesting || !voiceText.trim()}
+              className="bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
+            >
+              {voiceTesting ? 'Gerando...' : 'Testar voz'}
+            </button>
+
+            {voiceError && (
+              <div className="mt-4 p-3 bg-brand-error/10 border border-brand-error/30 rounded-lg text-sm text-brand-error">
+                {voiceError}
+              </div>
+            )}
+
+            {voiceAudioUrl && (
+              <div className="mt-4">
+                <audio controls autoPlay src={voiceAudioUrl} className="w-full" />
+              </div>
+            )}
           </div>
         </div>
       )}

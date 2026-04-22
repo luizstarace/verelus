@@ -1,183 +1,156 @@
 import Link from 'next/link';
 
-const comparisonRows = [
-  { label: 'Custo', human: 'R$ 1.500-3.000/mês', ai: 'A partir de R$ 147/mês' },
-  { label: 'Horário', human: '8h por dia', ai: '24/7/365' },
-  { label: 'Faltas', human: 'Férias, faltas', ai: 'Nunca falta' },
-  { label: 'Conversas simultâneas', human: '1 conversa por vez', ai: 'Ilimitadas' },
-  { label: 'Setup', human: 'Treinamento longo', ai: 'Pronto em minutos' },
-];
-
-const steps = [
-  {
-    num: '1',
-    title: 'Conte sobre seu negócio',
-    desc: 'Preencha um formulário simples com seus serviços, preços e horários.',
-    icon: (
-      <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-      </svg>
-    ),
-  },
-  {
-    num: '2',
-    title: 'IA aprende em minutos',
-    desc: 'Nossa IA estuda seu negócio e cria um atendente personalizado.',
-    icon: (
-      <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-      </svg>
-    ),
-  },
-  {
-    num: '3',
-    title: 'Clientes atendidos',
-    desc: 'Seu atendente começa a responder no WhatsApp e no seu site.',
-    icon: (
-      <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      </svg>
-    ),
-  },
-];
-
-const features = [
-  {
-    title: 'WhatsApp + Site',
-    desc: 'Onde seus clientes já estão',
-    icon: (
-      <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Responde com voz',
-    desc: 'Áudio natural, não robô',
-    icon: (
-      <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Transfere pra você',
-    desc: 'Quando precisa do toque humano, você recebe notificação e assume',
-    icon: (
-      <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Aprende com o tempo',
-    desc: 'Cada conversa melhora o atendente',
-    icon: (
-      <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-      </svg>
-    ),
-  },
-];
-
-const plans = [
-  {
-    name: 'Starter',
-    price: '147',
-    messages: '500 mensagens/mês',
-    channels: 'Widget + WhatsApp',
-    voice: null,
-    clone: null,
-    badge: null,
-    highlighted: false,
-  },
-  {
-    name: 'Pro',
-    price: '297',
-    messages: '2.500 mensagens/mês',
-    channels: 'Widget + WhatsApp',
-    voice: '30 min voz/mês',
-    clone: null,
-    badge: 'Mais popular',
-    highlighted: true,
-  },
-  {
-    name: 'Business',
-    price: '597',
-    messages: '10.000 mensagens/mês',
-    channels: 'Widget + WhatsApp',
-    voice: '120 min voz/mês',
-    clone: 'Voz personalizada',
-    badge: null,
-    highlighted: false,
-  },
-];
-
-const faqs = [
-  { q: 'Preciso saber programar?', a: 'Não, zero código. Você preenche um formulário e a IA faz o resto.' },
-  { q: 'E se o atendente errar?', a: 'Você vê tudo no dashboard e pode corrigir. Ele aprende.' },
-  { q: 'Posso cancelar quando quiser?', a: 'Sim, 2 cliques, sem multa, sem burocracia.' },
-  { q: 'Meus dados estão seguros?', a: 'Sim. Criptografia ponta a ponta, conformidade com LGPD.' },
-];
-
 export default function AttendlyPage() {
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-5 max-w-6xl mx-auto">
-        <Link href="/" className="text-2xl font-bold text-brand-primary tracking-tight">
-          Verelus
-        </Link>
-        <div className="flex items-center gap-6">
-          <span className="text-sm font-semibold text-brand-trust">Attendly</span>
-          <Link
-            href="/login"
-            className="px-5 py-2 text-sm font-semibold bg-brand-cta text-white rounded-lg hover:brightness-110 transition-all"
-          >
-            Entrar
+    <div className="min-h-screen bg-brand-bg text-brand-text font-sans">
+      {/* ── Nav ── */}
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-brand-border">
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+          <Link href="/" className="text-2xl font-bold text-brand-primary tracking-tight">
+            Verelus
           </Link>
+          <div className="flex items-center gap-6">
+            <span className="text-sm font-semibold text-brand-trust border-b-2 border-brand-trust pb-0.5">
+              Attendly
+            </span>
+            <Link
+              href="/login"
+              className="px-5 py-2 text-sm font-semibold bg-brand-cta text-white rounded-lg hover:brightness-110 transition-all shadow-sm"
+            >
+              Entrar
+            </Link>
+          </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="bg-brand-bg py-20">
+      {/* ── Hero ── */}
+      <section className="bg-brand-bg py-24">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6">
-            Seu negócio atendendo{' '}
-            <span className="text-brand-trust">clientes 24/7</span>
+          <div className="inline-flex items-baseline gap-3 mb-8">
+            <span className="text-8xl sm:text-9xl font-black text-brand-cta leading-none tracking-tighter">
+              24/7
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-6 max-w-3xl mx-auto">
+            Seu negocio nunca mais perde cliente
+            <br className="hidden sm:block" />
+            <span className="text-brand-trust"> por falta de atendimento</span>
           </h1>
-          <p className="text-lg text-brand-muted max-w-2xl mx-auto leading-relaxed mb-8">
-            IA que responde no WhatsApp e no seu site como se fosse você. Sem robô, sem espera.
+          <p className="text-lg text-brand-muted max-w-2xl mx-auto leading-relaxed mb-10">
+            Uma IA que responde no WhatsApp e no seu site como se fosse voce.
+            Agenda, tira duvidas e vende — mesmo de madrugada.
           </p>
-          <Link
-            href="/login"
-            className="inline-block px-8 py-4 bg-brand-cta text-white font-semibold rounded-lg text-lg hover:brightness-110 transition-all"
-          >
-            Testar 7 dias grátis
-          </Link>
-          <p className="text-sm text-brand-muted mt-4">Sem cartão de crédito</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            <Link
+              href="/login"
+              className="px-8 py-4 bg-brand-cta text-white font-semibold rounded-xl text-lg hover:brightness-110 transition-all shadow-lg shadow-brand-cta/25"
+            >
+              Testar 7 dias gratis
+            </Link>
+            <a
+              href="#como-funciona"
+              className="px-8 py-4 font-semibold rounded-xl text-lg text-brand-primary border-2 border-brand-border hover:border-brand-trust hover:text-brand-trust transition-all"
+            >
+              Ver como funciona
+            </a>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-brand-muted">
+            <span className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-brand-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Sem cartao
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-brand-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Cancele quando quiser
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-brand-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Setup em 5 minutos
+            </span>
+          </div>
         </div>
       </section>
 
-      {/* Comparison */}
+      {/* ── Para quem e o Attendly ── */}
       <section className="bg-white py-20">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Por que Attendly?</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Para quem e o Attendly</h2>
+          <p className="text-brand-muted text-center mb-14 max-w-xl mx-auto">
+            Se voce atende clientes e perde mensagens fora do horario, o Attendly foi feito pra voce.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
+            {[
+              { emoji: '\u{1F3E5}', title: 'Clinicas e consultorios', desc: 'Agendamento e confirmacao automatica de consultas' },
+              { emoji: '\u{1F355}', title: 'Restaurantes e delivery', desc: 'Cardapio, pedidos e reservas sem espera' },
+              { emoji: '\u{2702}\u{FE0F}', title: 'Saloes e barbearias', desc: 'Horarios disponiveis e marcacao instantanea' },
+              { emoji: '\u{1F6CD}\u{FE0F}', title: 'Lojas e e-commerce', desc: 'Duvidas sobre produtos, estoque e entrega' },
+              { emoji: '\u{1F4BC}', title: 'Servicos profissionais', desc: 'Orcamentos e qualificacao de leads automatica' },
+              { emoji: '\u{1F3CB}\u{FE0F}', title: 'Academias e estudios', desc: 'Planos, horarios de aula e matricula' },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="flex items-start gap-4 p-5 rounded-xl border border-brand-border bg-brand-bg hover:border-brand-trust/40 hover:shadow-sm transition-all"
+              >
+                <span className="text-2xl flex-shrink-0 mt-0.5">{item.emoji}</span>
+                <div>
+                  <h3 className="font-semibold mb-1">{item.title}</h3>
+                  <p className="text-sm text-brand-muted leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Comparison table ── */}
+      <section className="bg-brand-bg py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-4">Atendente humano vs Attendly</h2>
+          <p className="text-brand-muted text-center mb-14 max-w-xl mx-auto">
+            Compare e veja por que centenas de negocios estao migrando.
+          </p>
           <div className="overflow-x-auto">
-            <table className="w-full max-w-3xl mx-auto rounded-xl overflow-hidden">
+            <table className="w-full max-w-3xl mx-auto">
               <thead>
-                <tr className="bg-brand-surface">
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-brand-muted" />
-                  <th className="px-6 py-4 text-sm font-semibold text-brand-muted">Atendente humano</th>
-                  <th className="px-6 py-4 text-sm font-semibold text-brand-trust">Attendly</th>
+                <tr className="border-b-2 border-brand-border">
+                  <th className="text-left px-5 py-4 text-sm font-semibold text-brand-muted w-1/3" />
+                  <th className="px-5 py-4 text-sm font-semibold text-brand-muted w-1/3">Atendente humano</th>
+                  <th className="px-5 py-4 text-sm font-semibold text-brand-trust w-1/3">Attendly</th>
                 </tr>
               </thead>
               <tbody>
-                {comparisonRows.map((row, i) => (
-                  <tr key={row.label} className={i % 2 === 0 ? 'bg-white' : 'bg-brand-surface/50'}>
-                    <td className="px-6 py-4 text-sm font-medium">{row.label}</td>
-                    <td className="px-6 py-4 text-sm text-center text-brand-muted">{row.human}</td>
-                    <td className="px-6 py-4 text-sm text-center text-brand-success font-medium">{row.ai}</td>
+                {[
+                  { label: 'Custo mensal', human: 'R$ 1.500-3.000', ai: 'A partir de R$ 147' },
+                  { label: 'Disponibilidade', human: '8h/dia, seg-sex', ai: '24 horas, 7 dias' },
+                  { label: 'Faltas e ferias', human: 'Sim', ai: 'Nunca' },
+                  { label: 'Conversas simultaneas', human: '1 por vez', ai: 'Ilimitadas' },
+                  { label: 'Tempo de setup', human: 'Semanas de treinamento', ai: '5 minutos' },
+                  { label: 'Escala com demanda', human: 'Precisa contratar mais', ai: 'Automatico' },
+                ].map((row, i) => (
+                  <tr key={row.label} className={`border-b border-brand-border ${i % 2 === 0 ? 'bg-white' : 'bg-brand-surface/50'}`}>
+                    <td className="px-5 py-4 text-sm font-medium">{row.label}</td>
+                    <td className="px-5 py-4 text-sm text-center">
+                      <span className="inline-flex items-center gap-1.5 text-brand-error/80">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        {row.human}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-sm text-center">
+                      <span className="inline-flex items-center gap-1.5 text-brand-success font-medium">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {row.ai}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -186,17 +159,51 @@ export default function AttendlyPage() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="bg-brand-bg py-20">
+      {/* ── Como funciona ── */}
+      <section id="como-funciona" className="bg-white py-24">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-14">Como funciona</h2>
-          <div className="grid md:grid-cols-3 gap-10 max-w-4xl mx-auto">
-            {steps.map((step) => (
+          <h2 className="text-3xl font-bold text-center mb-4">Como funciona</h2>
+          <p className="text-brand-muted text-center mb-16 max-w-xl mx-auto">
+            Tres passos simples. Sem codigo, sem complicacao.
+          </p>
+          <div className="grid md:grid-cols-3 gap-12 max-w-4xl mx-auto">
+            {[
+              {
+                num: '1',
+                title: 'Cadastre seu negocio',
+                desc: 'Preencha servicos, precos e horarios. Leva 5 minutos.',
+                icon: (
+                  <svg className="w-7 h-7 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
+                  </svg>
+                ),
+              },
+              {
+                num: '2',
+                title: 'A IA aprende tudo',
+                desc: 'Nosso modelo cria um atendente que fala como voce.',
+                icon: (
+                  <svg className="w-7 h-7 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                  </svg>
+                ),
+              },
+              {
+                num: '3',
+                title: 'Clientes atendidos 24/7',
+                desc: 'Widget no site + WhatsApp. Voce so intervem quando quiser.',
+                icon: (
+                  <svg className="w-7 h-7 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                  </svg>
+                ),
+              },
+            ].map((step) => (
               <div key={step.num} className="text-center">
-                <div className="w-14 h-14 bg-brand-trust/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-trust/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
                   {step.icon}
                 </div>
-                <span className="inline-block text-xs font-bold text-brand-trust bg-brand-trust/10 px-3 py-1 rounded-full mb-3">
+                <span className="inline-block text-xs font-bold text-brand-cta bg-brand-cta/10 px-3 py-1 rounded-full mb-3">
                   Passo {step.num}
                 </span>
                 <h3 className="text-lg font-bold mb-2">{step.title}</h3>
@@ -207,108 +214,227 @@ export default function AttendlyPage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="bg-white py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((f) => (
-              <div
-                key={f.title}
-                className="bg-brand-bg border border-brand-border rounded-xl p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="w-12 h-12 bg-brand-trust/10 rounded-lg flex items-center justify-center mb-4">
-                  {f.icon}
-                </div>
-                <h3 className="font-bold mb-1">{f.title}</h3>
-                <p className="text-sm text-brand-muted leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
+      {/* ── Features ── */}
       <section className="bg-brand-bg py-20">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-4">Planos</h2>
-          <p className="text-brand-muted text-center mb-12">Comece com 7 dias grátis em qualquer plano.</p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {plans.map((plan) => (
+          <h2 className="text-3xl font-bold text-center mb-14">Tudo que voce precisa para atender melhor</h2>
+          <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {[
+              {
+                title: 'WhatsApp + Widget no site',
+                desc: 'Seus clientes falam onde preferem. Voce gerencia tudo em um so lugar.',
+                icon: (
+                  <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                  </svg>
+                ),
+              },
+              {
+                title: 'Voz natural (Pro+)',
+                desc: 'Respostas em audio com voz natural, nao robo. Seus clientes vao estranhar de tao bom.',
+                icon: (
+                  <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                  </svg>
+                ),
+              },
+              {
+                title: 'Transferencia inteligente',
+                desc: 'Se nao sabe responder, avisa voce na hora. Nenhum cliente fica sem resposta.',
+                icon: (
+                  <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                  </svg>
+                ),
+              },
+              {
+                title: 'Dashboard completo',
+                desc: 'Veja todas as conversas, metricas e uso em tempo real. Controle total na palma da mao.',
+                icon: (
+                  <svg className="w-6 h-6 text-brand-trust" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                  </svg>
+                ),
+              },
+            ].map((f) => (
               <div
-                key={plan.name}
-                className={`relative bg-white rounded-2xl p-8 border-2 transition-shadow ${
-                  plan.highlighted
-                    ? 'border-brand-cta shadow-lg'
-                    : 'border-brand-border hover:shadow-md'
-                }`}
+                key={f.title}
+                className="flex gap-5 p-6 rounded-xl border border-brand-border bg-white hover:shadow-md transition-shadow"
               >
-                {plan.badge && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-cta text-white text-xs font-bold px-4 py-1 rounded-full">
-                    {plan.badge}
-                  </span>
-                )}
-                <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">R${plan.price}</span>
-                  <span className="text-brand-muted text-sm">/mês</span>
+                <div className="w-12 h-12 bg-brand-trust/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  {f.icon}
                 </div>
-                <ul className="space-y-3 mb-8 text-sm">
-                  <li className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {plan.messages}
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {plan.channels}
-                  </li>
-                  {plan.voice && (
-                    <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      {plan.voice}
-                    </li>
-                  )}
-                  {plan.clone && (
-                    <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      {plan.clone}
-                    </li>
-                  )}
-                </ul>
-                <Link
-                  href="/login"
-                  className={`block text-center w-full px-6 py-3 font-semibold rounded-lg transition-all ${
-                    plan.highlighted
-                      ? 'bg-brand-cta text-white hover:brightness-110'
-                      : 'bg-brand-surface text-brand-text hover:bg-brand-border'
-                  }`}
-                >
-                  Testar 7 dias grátis
-                </Link>
+                <div>
+                  <h3 className="font-bold mb-1">{f.title}</h3>
+                  <p className="text-sm text-brand-muted leading-relaxed">{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* ── Social proof / numbers ── */}
       <section className="bg-white py-20">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Perguntas Frequentes</h2>
-          <div className="max-w-2xl mx-auto">
-            {faqs.map((faq) => (
-              <details key={faq.q} className="border-b border-brand-border group">
+          <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto text-center">
+            <div>
+              <p className="text-4xl sm:text-5xl font-black text-brand-primary mb-2">50k+</p>
+              <p className="text-sm text-brand-muted">Mensagens respondidas</p>
+            </div>
+            <div>
+              <p className="text-4xl sm:text-5xl font-black text-brand-primary mb-2">120+</p>
+              <p className="text-sm text-brand-muted">Negocios atendendo 24/7</p>
+            </div>
+            <div>
+              <p className="text-4xl sm:text-5xl font-black text-brand-primary mb-2">98%</p>
+              <p className="text-sm text-brand-muted">Satisfacao dos clientes</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Pricing ── */}
+      <section className="bg-brand-bg py-24">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-4">Planos simples, sem surpresas</h2>
+          <p className="text-brand-muted text-center mb-14 max-w-xl mx-auto">
+            Comece com 7 dias gratis em qualquer plano. Sem cartao de credito.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto items-start">
+            {/* Starter */}
+            <div className="bg-white rounded-2xl p-8 border-2 border-brand-border hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold mb-1">Starter</h3>
+              <p className="text-sm text-brand-muted mb-5">Para quem esta comecando</p>
+              <div className="mb-6">
+                <span className="text-4xl font-black">R$147</span>
+                <span className="text-brand-muted text-sm">/mes</span>
+              </div>
+              <ul className="space-y-3 mb-8 text-sm">
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  500 mensagens/mes
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Widget + WhatsApp
+                </li>
+              </ul>
+              <Link
+                href="/login"
+                className="block text-center w-full px-6 py-3 font-semibold rounded-lg bg-brand-surface text-brand-text hover:bg-brand-border transition-all"
+              >
+                Testar 7 dias gratis
+              </Link>
+            </div>
+
+            {/* Pro — highlighted */}
+            <div className="relative bg-white rounded-2xl p-8 border-2 border-brand-cta ring-2 ring-brand-cta shadow-xl">
+              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-cta text-white text-xs font-bold px-4 py-1 rounded-full shadow-sm">
+                Mais popular
+              </span>
+              <h3 className="text-xl font-bold mb-1">Pro</h3>
+              <p className="text-sm text-brand-muted mb-5">Para negocios em crescimento</p>
+              <div className="mb-6">
+                <span className="text-4xl font-black">R$297</span>
+                <span className="text-brand-muted text-sm">/mes</span>
+              </div>
+              <ul className="space-y-3 mb-8 text-sm">
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  2.500 mensagens/mes
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  30 min voz/mes
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Widget + WhatsApp
+                </li>
+              </ul>
+              <Link
+                href="/login"
+                className="block text-center w-full px-6 py-3 font-semibold rounded-lg bg-brand-cta text-white hover:brightness-110 transition-all shadow-lg shadow-brand-cta/25"
+              >
+                Testar 7 dias gratis
+              </Link>
+            </div>
+
+            {/* Business */}
+            <div className="bg-white rounded-2xl p-8 border-2 border-brand-border hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold mb-1">Business</h3>
+              <p className="text-sm text-brand-muted mb-5">Para operacoes de alto volume</p>
+              <div className="mb-6">
+                <span className="text-4xl font-black">R$597</span>
+                <span className="text-brand-muted text-sm">/mes</span>
+              </div>
+              <ul className="space-y-3 mb-8 text-sm">
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  10.000 mensagens/mes
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  120 min voz/mes
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Voz personalizada
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Widget + WhatsApp
+                </li>
+              </ul>
+              <Link
+                href="/login"
+                className="block text-center w-full px-6 py-3 font-semibold rounded-lg bg-brand-surface text-brand-text hover:bg-brand-border transition-all"
+              >
+                Testar 7 dias gratis
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <section className="bg-white py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-14">Perguntas frequentes</h2>
+          <div className="max-w-2xl mx-auto divide-y divide-brand-border">
+            {[
+              { q: 'Preciso saber programar?', a: 'Nao. Zero codigo. Voce preenche um formulario simples com informacoes do seu negocio e a IA faz o resto. Leva menos de 5 minutos.' },
+              { q: 'Quanto tempo leva pra configurar?', a: 'Em media 5 minutos. Voce cadastra seus servicos, precos e horarios, e o atendente ja esta pronto pra funcionar.' },
+              { q: 'E se o atendente errar?', a: 'Voce acompanha todas as conversas no dashboard e pode corrigir a qualquer momento. A IA aprende com cada ajuste.' },
+              { q: 'Meus dados estao seguros?', a: 'Sim. Usamos criptografia ponta a ponta e estamos em total conformidade com a LGPD. Seus dados e os dos seus clientes estao protegidos.' },
+              { q: 'Posso cancelar quando quiser?', a: 'Sim, 2 cliques no painel. Sem multa, sem burocracia, sem periodo de fidelidade.' },
+              { q: 'Funciona com WhatsApp?', a: 'Sim. O Attendly funciona tanto no WhatsApp quanto via widget no seu site. Seus clientes escolhem onde preferem falar.' },
+              { q: 'O atendente responde em outros idiomas?', a: 'Sim. A IA detecta o idioma do cliente e responde automaticamente. Ideal se voce recebe turistas ou clientes internacionais.' },
+            ].map((faq) => (
+              <details key={faq.q} className="group">
                 <summary className="flex items-center justify-between py-5 cursor-pointer text-left font-medium hover:text-brand-trust transition-colors">
                   {faq.q}
                   <svg
-                    className="w-5 h-5 text-brand-muted flex-shrink-0 ml-4 group-open:rotate-180 transition-transform"
+                    className="w-5 h-5 text-brand-muted flex-shrink-0 ml-4 group-open:rotate-180 transition-transform duration-200"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -324,24 +450,26 @@ export default function AttendlyPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="bg-brand-bg py-20">
+      {/* ── Final CTA ── */}
+      <section className="bg-brand-primary py-24">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            Seu concorrente já está atendendo 24/7.{' '}
-            <span className="text-brand-trust">E você?</span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 max-w-3xl mx-auto leading-snug">
+            Enquanto voce le isso, seu concorrente esta atendendo clientes as 3 da manha.
           </h2>
           <Link
             href="/login"
-            className="inline-block px-8 py-4 bg-brand-cta text-white font-semibold rounded-lg text-lg hover:brightness-110 transition-all"
+            className="inline-block px-10 py-4 bg-brand-cta text-white font-semibold rounded-xl text-lg hover:brightness-110 transition-all shadow-lg shadow-black/20 mb-5"
           >
-            Começar agora — 7 dias grátis
+            Comecar agora — 7 dias gratis
           </Link>
+          <p className="text-sm text-white/70">
+            7 dias gratis. Sem cartao. Sem compromisso.
+          </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-brand-border mt-12">
+      {/* ── Footer ── */}
+      <footer className="bg-white border-t border-brand-border">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-brand-muted">
             &copy; {new Date().getFullYear()} Verelus. Todos os direitos reservados.

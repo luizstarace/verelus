@@ -56,6 +56,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Atendente indisponível' }, { status: 404, headers: corsHeaders() });
   }
 
+  // Per-business rate-limit (distributed flood defense on top of IP limit).
+  const bizRl = rateLimit(`lead:${business_id}`, 50, 60000);
+  if (!bizRl.allowed) {
+    return NextResponse.json(
+      { error: 'Muitos leads recentes. Tente novamente em 1 minuto.' },
+      { status: 429, headers: { ...corsHeaders(), ...getRateLimitHeaders(bizRl.remaining, 50) } }
+    );
+  }
+
   const { data, error } = await supabase
     .from('attendly_conversations')
     .insert({

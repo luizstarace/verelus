@@ -564,9 +564,20 @@ export default function SetupWizard() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-brand-text">WhatsApp — Em breve</h3>
+        <h3 className="text-lg font-semibold text-brand-text">Conectar WhatsApp</h3>
         <p className="text-sm text-brand-muted max-w-md mx-auto">
-          A integração com o WhatsApp Business está sendo desenvolvida. Você será notificado quando estiver disponível.
+          A conexão é feita escaneando um QR code com o app do seu celular. Você pode fazer isso agora nas configurações ou deixar para depois.
+        </p>
+        <div className="flex justify-center pt-2">
+          <a
+            href="/dashboard/attendly/settings?tab=whatsapp"
+            className="inline-block bg-brand-trust text-white font-medium px-5 py-2.5 rounded-lg hover:brightness-110 transition"
+          >
+            Conectar agora →
+          </a>
+        </div>
+        <p className="text-xs text-brand-muted pt-2 max-w-md mx-auto">
+          Dica: recomendamos um número dedicado (não o pessoal).
         </p>
       </div>
     );

@@ -8,6 +8,8 @@ import { incrementUsage, checkUsageLimit } from '@/lib/attendly/usage';
 import { getPlanFromSubscription } from '@/lib/attendly/plans';
 import { corsHeaders, corsResponse } from '@/lib/attendly/cors';
 import { rateLimit, getRateLimitHeaders } from '@/lib/attendly/rate-limit';
+import { requireUser } from '@/lib/api-auth';
+import { logAttendly } from '@/lib/attendly/logger';
 import Anthropic from '@anthropic-ai/sdk';
 
 export async function OPTIONS() { return corsResponse(); }
@@ -57,6 +59,39 @@ export async function POST(request: Request) {
 
     if (bizErr || !business) {
       return NextResponse.json({ error: 'Negócio não encontrado' }, { status: 404, headers: corsHeaders() });
+    }
+
+    // Per-business rate-limit (defense against distributed enumeration/flood
+    // on a specific victim's business_id, which the IP limit alone does not
+    // catch). Skipped in preview since owner already auth'd.
+    if (!preview) {
+      const bizRl = rateLimit(`biz:${business_id}`, 500, 60000);
+      if (!bizRl.allowed) {
+        return NextResponse.json(
+          { error: 'Muitas mensagens recentes. Tente novamente em 1 minuto.' },
+          { status: 429, headers: { ...corsHeaders(), ...getRateLimitHeaders(bizRl.remaining, 500) } }
+        );
+      }
+    }
+
+    // Preview mode (wizard/settings test chat) must require the caller to own
+    // this business. Without this check any client could send {preview:true}
+    // and bypass trial + usage gates, racking up LLM cost.
+    if (preview) {
+      try {
+        const { userId } = await requireUser();
+        if (business.user_id !== userId) {
+          return NextResponse.json(
+            { error: 'Preview requer autenticação como dono do negócio.' },
+            { status: 403, headers: corsHeaders() }
+          );
+        }
+      } catch {
+        return NextResponse.json(
+          { error: 'Preview requer autenticação.' },
+          { status: 401, headers: corsHeaders() }
+        );
+      }
     }
 
     const availability = checkBusinessAvailability(business, Boolean(preview));
@@ -318,6 +353,12 @@ export async function POST(request: Request) {
       },
     });
   } catch (err) {
+    await logAttendly(supabase, {
+      endpoint: '/api/attendly/chat',
+      status_code: 500,
+      latency_ms: Date.now() - startTime,
+      error: err,
+    });
     return NextResponse.json({ error: 'Erro interno' }, { status: 500, headers: corsHeaders() });
   }
 }

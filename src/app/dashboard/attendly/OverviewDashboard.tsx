@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 interface OverviewStats {
   msgs_month: number;
   usage_percentage: number;
+  has_active_subscription: boolean;
 }
 
 export default function OverviewDashboard() {
@@ -31,6 +32,7 @@ export default function OverviewDashboard() {
         setStats({
           msgs_month: usageData.text?.used || 0,
           usage_percentage: usageData.text?.percentage || 0,
+          has_active_subscription: Boolean(usageData.has_active_subscription),
         });
       } catch (err) {
         console.error(err);
@@ -55,9 +57,28 @@ export default function OverviewDashboard() {
     );
   }
 
+  const trialInfo = getTrialInfo(business?.trial_ends_at, stats?.has_active_subscription);
+
   return (
     <div className="p-8 space-y-6">
       <h1 className="text-2xl font-bold text-brand-text">Visão Geral</h1>
+
+      {trialInfo && (
+        <div className={`rounded-lg p-4 text-sm flex items-center justify-between gap-4 ${
+          trialInfo.expired
+            ? 'bg-brand-error/10 border border-brand-error/30'
+            : 'bg-brand-trust/10 border border-brand-trust/30'
+        }`}>
+          <span className={trialInfo.expired ? 'text-brand-error font-medium' : 'text-brand-trust font-medium'}>
+            {trialInfo.expired
+              ? 'Seu período de teste expirou. Assine um plano para continuar atendendo.'
+              : `${trialInfo.daysLeft} ${trialInfo.daysLeft === 1 ? 'dia restante' : 'dias restantes'} no teste grátis.`}
+          </span>
+          <a href="/dashboard/attendly/billing" className="shrink-0 bg-brand-cta text-white font-medium px-4 py-1.5 rounded-md hover:brightness-110 transition">
+            {trialInfo.expired ? 'Assinar agora' : 'Ver planos'}
+          </a>
+        </div>
+      )}
 
       {stats && stats.usage_percentage >= 80 && (
         <div className="bg-brand-cta/10 border border-brand-cta/30 rounded-lg p-4 text-sm">
@@ -98,6 +119,19 @@ export default function OverviewDashboard() {
       </div>
     </div>
   );
+}
+
+function getTrialInfo(
+  trialEndsAt: string | null | undefined,
+  hasActiveSubscription: boolean | undefined
+): { daysLeft: number; expired: boolean } | null {
+  if (hasActiveSubscription) return null;
+  if (!trialEndsAt) return null;
+  const end = new Date(trialEndsAt).getTime();
+  const now = Date.now();
+  if (end <= now) return { daysLeft: 0, expired: true };
+  const daysLeft = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+  return { daysLeft, expired: false };
 }
 
 function StatCard({ label, value }: { label: string; value: string | number }) {

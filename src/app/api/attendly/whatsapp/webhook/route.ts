@@ -1,30 +1,74 @@
 export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { rateLimit, getRateLimitHeaders } from '@/lib/attendly/rate-limit';
 import { isInsideBusinessHours } from '@/lib/attendly/hours';
 import { phoneVariants, timingSafeEqual } from '@/lib/attendly/phone';
+import { logAttendly } from '@/lib/attendly/logger';
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
 
-async function sendWhatsAppMessage(instanceName: string, toJid: string, text: string) {
-  if (!text.trim()) return;
-  if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return;
-  try {
-    await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
-      method: 'POST',
-      headers: {
-        'apikey': EVOLUTION_API_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        number: toJid,
-        text,
-      }),
+async function sendWhatsAppMessage(
+  supabase: SupabaseClient,
+  businessId: string,
+  instanceName: string,
+  toJid: string,
+  text: string
+): Promise<{ ok: boolean; status: number; error?: unknown }> {
+  if (!text.trim()) return { ok: true, status: 0 };
+  if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+    await logAttendly(supabase, {
+      business_id: businessId,
+      endpoint: '/api/attendly/whatsapp/send',
+      channel: 'whatsapp',
+      status_code: 0,
+      error: 'EVOLUTION_API_URL or EVOLUTION_API_KEY missing',
     });
-  } catch {}
+    return { ok: false, status: 0, error: 'env_missing' };
+  }
+
+  // Retry on transient 5xx / network errors. Cap total wait < 2s so we stay
+  // within CF Workers wall-clock budget.
+  const BACKOFFS_MS = [150, 500]; // 3 tries total (initial + 2 retries)
+  let lastStatus = 0;
+  let lastErr: unknown = null;
+
+  for (let attempt = 0; attempt <= BACKOFFS_MS.length; attempt++) {
+    try {
+      const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
+        method: 'POST',
+        headers: {
+          'apikey': EVOLUTION_API_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ number: toJid, text }),
+      });
+      lastStatus = res.status;
+      if (res.ok) return { ok: true, status: res.status };
+      // 4xx is not retryable (bad input, auth) — bail out
+      if (res.status >= 400 && res.status < 500) {
+        lastErr = `Evolution returned ${res.status}`;
+        break;
+      }
+      lastErr = `Evolution returned ${res.status}`;
+    } catch (err) {
+      lastErr = err;
+    }
+    if (attempt < BACKOFFS_MS.length) {
+      await new Promise((r) => setTimeout(r, BACKOFFS_MS[attempt]));
+    }
+  }
+
+  await logAttendly(supabase, {
+    business_id: businessId,
+    endpoint: '/api/attendly/whatsapp/send',
+    channel: 'whatsapp',
+    status_code: lastStatus || 502,
+    error: lastErr,
+  });
+  return { ok: false, status: lastStatus, error: lastErr };
 }
 
 export async function POST(request: Request) {
@@ -79,6 +123,29 @@ export async function POST(request: Request) {
     // Ignore our own outbound messages
     if (msgData?.key?.fromMe) {
       return NextResponse.json({ ok: true });
+    }
+
+    // Idempotency: dedupe by WhatsApp message id. Evolution retries on failure;
+    // without this we'd reply twice to the same inbound message.
+    const eventId: string = msgData?.key?.id || '';
+    if (eventId) {
+      const { error: dupErr } = await supabase
+        .from('attendly_evolution_events_processed')
+        .insert({ event_id: eventId });
+      if (dupErr) {
+        // 23505 = unique_violation => already processed, stop silently
+        if ((dupErr as { code?: string }).code === '23505') {
+          return NextResponse.json({ ok: true, deduped: true });
+        }
+        // Other errors: log and continue processing (fail-open to avoid dropping msgs)
+        await logAttendly(supabase, {
+          business_id: businessId,
+          endpoint: '/api/attendly/whatsapp/webhook',
+          channel: 'whatsapp',
+          status_code: 0,
+          error: dupErr,
+        });
+      }
     }
 
     const messageText: string =
@@ -157,11 +224,17 @@ export async function POST(request: Request) {
     // Strip the [TRANSFER] tag — customer shouldn't see it
     const cleanText = fullText.replace(/\[TRANSFER\]/g, '').trim();
     if (cleanText) {
-      await sendWhatsAppMessage(instance, remoteJid, cleanText);
+      await sendWhatsAppMessage(supabase, businessId, instance, remoteJid, cleanText);
     }
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (err) {
+    await logAttendly(supabase, {
+      endpoint: '/api/attendly/whatsapp/webhook',
+      channel: 'whatsapp',
+      status_code: 500,
+      error: err,
+    });
     return NextResponse.json({ error: 'Webhook processing error' }, { status: 500 });
   }
 }

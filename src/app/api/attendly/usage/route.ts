@@ -21,7 +21,7 @@ export async function GET() {
 
     const { data: sub } = await supabase
       .from('subscriptions')
-      .select('product')
+      .select('product, status')
       .eq('user_id', userId)
       .in('status', ['active', 'trialing'])
       .order('created_at', { ascending: false })
@@ -30,6 +30,8 @@ export async function GET() {
 
     const plan = getPlanFromSubscription(sub?.product || null);
     const limits = getPlanLimits(plan);
+
+    const hasActiveSubscription = Boolean(sub);
 
     const period = getCurrentPeriod();
     const { data: usage } = await supabase
@@ -49,6 +51,8 @@ export async function GET() {
     return NextResponse.json({
       plan,
       period,
+      has_active_subscription: hasActiveSubscription,
+      subscription_status: sub?.status || null,
       text: {
         used: textUsed,
         limit: limits.text_messages,

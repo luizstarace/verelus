@@ -42,6 +42,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Negócio não encontrado' }, { status: 404 });
     }
 
+    // Verify the message belongs to this user's business before we spend
+    // ElevenLabs credits + overwrite storage objects keyed by message_id.
+    const { data: messageRow } = await supabase
+      .from('attendly_messages')
+      .select('id, conversation_id')
+      .eq('id', message_id)
+      .single();
+
+    if (!messageRow?.conversation_id) {
+      return NextResponse.json({ error: 'Mensagem não encontrada' }, { status: 404 });
+    }
+
+    const { data: convRow } = await supabase
+      .from('attendly_conversations')
+      .select('business_id')
+      .eq('id', messageRow.conversation_id)
+      .single();
+
+    if (!convRow || convRow.business_id !== business.id) {
+      return NextResponse.json({ error: 'Mensagem não encontrada' }, { status: 404 });
+    }
+
     const voiceId = business.voice_id === 'default' ? '21m00Tcm4TlvDq8ikWAM' : business.voice_id;
     const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: 'POST',

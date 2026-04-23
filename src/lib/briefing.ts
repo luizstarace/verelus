@@ -147,7 +147,7 @@ export function formatBriefingEmail(data: DailyBriefingData): string {
       </div>
 
       <div style="background:#12151e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.05);">
-        <h2 style="color:#00f5a0;font-size:16px;margin:0 0 12px;">Usuarios</h2>
+        <h2 style="color:#00f5a0;font-size:16px;margin:0 0 12px;">Usuários</h2>
         <table style="width:100%;color:#e8eaf0;font-size:14px;">
           <tr><td>Total</td><td style="text-align:right;font-weight:bold;">${data.users.total}</td></tr>
           <tr><td>Novos hoje</td><td style="text-align:right;font-weight:bold;color:#00f5a0;">${data.users.new_today > 0 ? "+" : ""}${data.users.new_today}</td></tr>
@@ -171,8 +171,8 @@ export function formatBriefingEmail(data: DailyBriefingData): string {
       <div style="background:#12151e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.05);">
         <h2 style="color:#00f5a0;font-size:16px;margin:0 0 12px;">IA & Engajamento</h2>
         <table style="width:100%;color:#e8eaf0;font-size:14px;">
-          <tr><td>Geracoes IA hoje</td><td style="text-align:right;">${data.ai_usage.generations_today}</td></tr>
-          <tr><td>Geracoes IA semana</td><td style="text-align:right;">${data.ai_usage.generations_week}</td></tr>
+          <tr><td>Gerações IA hoje</td><td style="text-align:right;">${data.ai_usage.generations_today}</td></tr>
+          <tr><td>Gerações IA semana</td><td style="text-align:right;">${data.ai_usage.generations_week}</td></tr>
           <tr><td>Page views hoje</td><td style="text-align:right;">${data.engagement.page_views_today}</td></tr>
           <tr><td>Features usadas hoje</td><td style="text-align:right;">${data.engagement.feature_uses_today}</td></tr>
         </table>
@@ -182,12 +182,12 @@ export function formatBriefingEmail(data: DailyBriefingData): string {
         data.errors.total_24h > 0
           ? `
       <div style="background:#12151e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid ${data.errors.critical > 0 ? "#ef4444" : "rgba(255,255,255,0.05)"};">
-        <h2 style="color:${data.errors.critical > 0 ? "#ef4444" : "#f5a623"};font-size:16px;margin:0 0 12px;">Erros (ultimas 24h)</h2>
+        <h2 style="color:${data.errors.critical > 0 ? "#ef4444" : "#f5a623"};font-size:16px;margin:0 0 12px;">Erros (últimas 24h)</h2>
         <table style="width:100%;color:#e8eaf0;font-size:14px;">
           <tr><td>Total</td><td style="text-align:right;">${data.errors.total_24h}</td></tr>
-          <tr><td>Criticos</td><td style="text-align:right;${data.errors.critical > 0 ? "color:#ef4444;font-weight:bold;" : ""}">${data.errors.critical}</td></tr>
+          <tr><td>Críticos</td><td style="text-align:right;${data.errors.critical > 0 ? "color:#ef4444;font-weight:bold;" : ""}">${data.errors.critical}</td></tr>
           <tr><td>Altos</td><td style="text-align:right;">${data.errors.high}</td></tr>
-          <tr><td>Nao resolvidos (total)</td><td style="text-align:right;">${data.errors.unresolved}</td></tr>
+          <tr><td>Não resolvidos (total)</td><td style="text-align:right;">${data.errors.unresolved}</td></tr>
         </table>
       </div>
       `

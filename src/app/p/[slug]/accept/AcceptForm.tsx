@@ -38,7 +38,7 @@ export function AcceptForm({ slug }: { slug: string }) {
         const res = await fetch(`/api/proposals/public/${slug}`);
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          setError(data.error ?? 'Proposta nao encontrada');
+          setError(data.error ?? 'Proposta não encontrada');
           setLoading(false);
           return;
         }
@@ -77,7 +77,7 @@ export function AcceptForm({ slug }: { slug: string }) {
 
       setSuccess(true);
     } catch {
-      setSubmitError('Erro de conexao. Tente novamente.');
+      setSubmitError('Erro de conexão. Tente novamente.');
       setSubmitting(false);
     }
   }
@@ -93,7 +93,7 @@ export function AcceptForm({ slug }: { slug: string }) {
   if (error || !proposal) {
     return (
       <div className="min-h-screen bg-[#fafafa] flex items-center justify-center" style={{ fontFamily: 'system-ui, sans-serif' }}>
-        <p className="text-gray-500 text-sm">{error ?? 'Proposta nao encontrada'}</p>
+        <p className="text-gray-500 text-sm">{error ?? 'Proposta não encontrada'}</p>
       </div>
     );
   }

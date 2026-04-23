@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
         supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }).then(({ error: setErr }) => {
           if (setErr) {
             setSessionOk(false);
-            setError('Link invalido ou expirado. Solicite um novo pela pagina de login.');
+            setError('Link inválido ou expirado. Solicite um novo pela página de login.');
           } else {
             setSessionOk(true);
             // Clean hash from URL for cleanliness
@@ -45,7 +45,7 @@ export default function ResetPasswordPage() {
     supabase.auth.getSession().then(({ data }) => {
       setSessionOk(!!data.session);
       if (!data.session) {
-        setError('Nenhuma sessao de recuperacao ativa. Solicite um novo link pela pagina de login.');
+        setError('Nenhuma sessão de recuperação ativa. Solicite um novo link pela página de login.');
       }
     });
   }, []);

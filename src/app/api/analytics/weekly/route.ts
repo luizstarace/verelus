@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
     const metricsJson = JSON.stringify(metrics, null, 2);
 
-    let reportContent = "Relatorio indisponivel — ANTHROPIC_API_KEY nao configurada.";
+    let reportContent = "Relatório indisponível — ANTHROPIC_API_KEY não configurada.";
 
     if (anthropicKey) {
       const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
@@ -77,43 +77,43 @@ export async function POST(request: NextRequest) {
           messages: [
             {
               role: "user",
-              content: `Voce e o Growth Analyst do Verelus, uma plataforma SaaS de inteligencia musical com IA para artistas independentes brasileiros. Planos: Free, Pro (R$29,90/mes), Business (R$79,90/mes).
+              content: `Você é o Growth Analyst do Verelus, uma plataforma SaaS de inteligência musical com IA para artistas independentes brasileiros. Planos: Free, Pro (R$29,90/mês), Business (R$79,90/mês).
 
-Aqui estao as metricas da ultima semana e do ultimo mes:
+Aqui estão as métricas da última semana e do último mês:
 
 ${metricsJson}
 
-Com base nesses dados, gere um relatorio estrategico COMPLETO em portugues brasileiro com as seguintes secoes:
+Com base nesses dados, gere um relatório estratégico COMPLETO em português brasileiro com as seguintes seções:
 
-## 1. Analise do Funil de Conversao
-- Identifique gargalos no funil (visitante → signup → ativacao → conversao)
+## 1. Análise do Funil de Conversão
+- Identifique gargalos no funil (visitante → signup → ativação → conversão)
 - Compare as taxas com benchmarks SaaS (visitor-to-signup: 2-5%, signup-to-activation: 20-40%, activation-to-conversion: 3-10%)
-- Sugira acoes especificas para melhorar cada etapa
+- Sugira ações específicas para melhorar cada etapa
 
 ## 2. Features para Priorizar
 - Analise o ranking de uso de features
 - Identifique features subutilizadas que podem ter potencial
 - Recomende o que desenvolver/melhorar em seguida baseado nos dados
 
-## 3. Sugestoes de Pricing
-- Analise ARPU, distribuicao por plano e growth rate
-- Sugira ajustes de pricing ou novas estrategias de monetizacao
-- Considere o mercado brasileiro de musicos independentes
+## 3. Sugestões de Pricing
+- Analise ARPU, distribuição por plano e growth rate
+- Sugira ajustes de pricing ou novas estratégias de monetização
+- Considere o mercado brasileiro de músicos independentes
 
-## 4. Acoes de Growth Recomendadas
-- Liste 5 acoes concretas priorizadas por impacto e facilidade
-- Inclua metricas-alvo para cada acao
-- Considere retencao, aquisicao e monetizacao
+## 4. Ações de Growth Recomendadas
+- Liste 5 ações concretas priorizadas por impacto e facilidade
+- Inclua métricas-alvo para cada ação
+- Considere retenção, aquisição e monetização
 
 ## 5. Riscos Identificados
-- Analise churn rate e tendencias de retencao por coorte
+- Analise churn rate e tendências de retenção por coorte
 - Identifique custo de IA vs receita
-- Alerte sobre qualquer metrica preocupante
+- Alerte sobre qualquer métrica preocupante
 
 ## 6. Resumo Executivo (3 bullet points)
-- O mais importante que precisa de atencao esta semana
+- O mais importante que precisa de atenção esta semana
 
-Seja direto, use numeros, e foque em acoes que um founder solo pode executar.`,
+Seja direto, use números, e foque em ações que um founder solo pode executar.`,
             },
           ],
         }),

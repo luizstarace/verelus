@@ -28,7 +28,7 @@ export async function POST(
       .single();
 
     if (!proposal) {
-      return NextResponse.json({ error: 'Proposta nao encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Proposta não encontrada' }, { status: 404 });
     }
 
     if (proposal.status === 'accepted') {

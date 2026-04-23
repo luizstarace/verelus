@@ -67,31 +67,31 @@ async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: s
             </div>
 
             <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 30px; margin-bottom: 24px; border: 1px solid #262626;">
-              <h2 style="color: #f5f5f5; margin: 0 0 16px; font-size: 22px;">Ola, ${name.replace(/[<>&"']/g, '')}!</h2>
+              <h2 style="color: #f5f5f5; margin: 0 0 16px; font-size: 22px;">Olá, ${name.replace(/[<>&"']/g, '')}!</h2>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0 0 16px;">
-                Voce agora faz parte da comunidade <strong style="color: #60a5fa;">Verelus</strong> — a newsletter semanal de inteligencia musical.
+                Você agora faz parte da comunidade <strong style="color: #60a5fa;">Verelus</strong> — a newsletter semanal de inteligência musical.
               </p>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0;">
-                Toda <strong>segunda-feira</strong>, voce vai receber direto no seu email:
+                Toda <strong>segunda-feira</strong>, você vai receber direto no seu email:
               </p>
             </div>
 
             <div style="margin-bottom: 24px;">
               <div style="margin-bottom: 12px;">
-                <strong style="color: #f5f5f5;">Top 3 Noticias</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">As historias mais importantes da industria musical</p>
+                <strong style="color: #f5f5f5;">Top 3 Notícias</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">As histórias mais importantes da indústria musical</p>
               </div>
               <div style="margin-bottom: 12px;">
                 <strong style="color: #f5f5f5;">Oportunidade de Sync</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Dicas acionaveis de licenciamento para a semana</p>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Dicas acionáveis de licenciamento para a semana</p>
               </div>
               <div style="margin-bottom: 12px;">
-                <strong style="color: #f5f5f5;">Tendencias de Mercado</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Insights baseados em dados sobre a industria</p>
+                <strong style="color: #f5f5f5;">Tendências de Mercado</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Insights baseados em dados sobre a indústria</p>
               </div>
               <div>
                 <strong style="color: #f5f5f5;">Ferramenta da Semana</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Recursos curados para musicos independentes</p>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Recursos curados para músicos independentes</p>
               </div>
             </div>
 

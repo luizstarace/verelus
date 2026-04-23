@@ -100,7 +100,7 @@ export default function ChatWidget() {
       } else {
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: data.reply || 'Desculpe, nao consegui responder.' },
+          { role: 'assistant', content: data.reply || 'Desculpe, não consegui responder.' },
         ]);
       }
     } catch {

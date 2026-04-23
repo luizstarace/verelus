@@ -18,7 +18,7 @@ export async function GET(
       .single();
 
     if (!proposal) {
-      return NextResponse.json({ error: 'Proposta nao encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Proposta não encontrada' }, { status: 404 });
     }
 
     const { data: views } = await supabase
@@ -92,7 +92,7 @@ export async function PUT(
 
     if (dbErr) throw dbErr;
     if (!proposal) {
-      return NextResponse.json({ error: 'Proposta nao encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Proposta não encontrada' }, { status: 404 });
     }
 
     return NextResponse.json({ proposal });

@@ -59,14 +59,14 @@ export async function POST(request: Request) {
       const discordMessage = [
         `**Verelus Daily Briefing** - ${new Date().toLocaleDateString("pt-BR")}`,
         "",
-        `**Usuarios:** ${data.users.total} total | +${data.users.new_today} hoje | ${data.users.active_today} ativos`,
+        `**Usuários:** ${data.users.total} total | +${data.users.new_today} hoje | ${data.users.active_today} ativos`,
         `**MRR Estimado:** R$ ${mrr.toLocaleString("pt-BR")}`,
         `**Assinantes:** ${data.subscriptions.total_active} ativos (${data.subscriptions.pro} Pro, ${data.subscriptions.business} Business)`,
         `**Novos hoje:** +${data.subscriptions.new_today} | Cancelamentos: ${data.subscriptions.canceled_today}`,
-        `**IA:** ${data.ai_usage.generations_today} geracoes hoje | ${data.ai_usage.generations_week} na semana`,
+        `**IA:** ${data.ai_usage.generations_today} gerações hoje | ${data.ai_usage.generations_week} na semana`,
         `**Engajamento:** ${data.engagement.page_views_today} views | ${data.engagement.feature_uses_today} features`,
         data.errors.total_24h > 0
-          ? `**Erros 24h:** ${data.errors.total_24h} total | ${data.errors.critical} criticos | ${data.errors.unresolved} nao resolvidos`
+          ? `**Erros 24h:** ${data.errors.total_24h} total | ${data.errors.critical} críticos | ${data.errors.unresolved} não resolvidos`
           : `**Erros 24h:** Nenhum`,
       ].join("\n");
 

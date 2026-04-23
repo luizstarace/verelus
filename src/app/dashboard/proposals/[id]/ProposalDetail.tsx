@@ -52,7 +52,7 @@ export default function ProposalDetail({ id }: Props) {
     setError('');
     try {
       const res = await fetch(`/api/proposals/${id}`);
-      if (!res.ok) throw new Error('Proposta nao encontrada');
+      if (!res.ok) throw new Error('Proposta não encontrada');
       const data = await res.json();
       setProposal(data.proposal);
       setViews(data.views ?? []);
@@ -118,7 +118,7 @@ export default function ProposalDetail({ id }: Props) {
   if (error || !proposal) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <ErrorMessage message={error || 'Proposta nao encontrada'} onRetry={fetchData} />
+        <ErrorMessage message={error || 'Proposta não encontrada'} onRetry={fetchData} />
       </div>
     );
   }
@@ -272,7 +272,7 @@ export default function ProposalDetail({ id }: Props) {
       <ConfirmModal
         open={confirmDelete}
         title="Excluir proposta"
-        message={`Tem certeza que deseja excluir "${proposal.project_title}"? Esta acao nao pode ser desfeita.`}
+        message={`Tem certeza que deseja excluir "${proposal.project_title}"? Esta ação não pode ser desfeita.`}
         confirmLabel={deleting ? 'Excluindo...' : 'Excluir'}
         danger
         onConfirm={handleDelete}

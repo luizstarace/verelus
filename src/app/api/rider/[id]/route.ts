@@ -19,12 +19,12 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       .single();
 
     if (!generation) {
-      return new NextResponse('Rider nao encontrado', { status: 404 });
+      return new NextResponse('Rider não encontrado', { status: 404 });
     }
 
     const pdfBase64 = (generation.output as { pdf_base64?: string })?.pdf_base64;
     if (!pdfBase64) {
-      return new NextResponse('PDF nao disponivel', { status: 404 });
+      return new NextResponse('PDF não disponível', { status: 404 });
     }
 
     // Decodifica base64 para binario

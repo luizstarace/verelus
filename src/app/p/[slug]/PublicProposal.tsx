@@ -64,7 +64,7 @@ export function PublicProposal({ slug }: { slug: string }) {
         const res = await fetch(`/api/proposals/public/${slug}`);
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          setError(data.error ?? 'Proposta nao encontrada');
+          setError(data.error ?? 'Proposta não encontrada');
           setLoading(false);
           return;
         }
@@ -144,7 +144,7 @@ export function PublicProposal({ slug }: { slug: string }) {
   if (error || !proposal) {
     return (
       <div className="min-h-screen bg-[#fafafa] flex items-center justify-center" style={{ fontFamily: 'system-ui, sans-serif' }}>
-        <p className="text-gray-500 text-sm">{error ?? 'Proposta nao encontrada'}</p>
+        <p className="text-gray-500 text-sm">{error ?? 'Proposta não encontrada'}</p>
       </div>
     );
   }
@@ -201,7 +201,7 @@ export function PublicProposal({ slug }: { slug: string }) {
         {/* Scope */}
         <div className="mb-10">
           <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            O que esta incluido
+            O que está incluído
           </h2>
           <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
             {proposal.scope}

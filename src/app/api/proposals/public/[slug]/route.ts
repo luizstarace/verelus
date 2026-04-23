@@ -22,7 +22,7 @@ export async function GET(
       .single();
 
     if (!proposal) {
-      return NextResponse.json({ error: 'Proposta nao encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Proposta não encontrada' }, { status: 404 });
     }
 
     // fetch owner profile (do not expose user_id to the response)

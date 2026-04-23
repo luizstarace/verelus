@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     const systemPrompt = SYSTEM_PROMPTS[type] + (artistContext
-      ? `\n\nVoce esta gerando conteudo para o seguinte artista. Use essas informacoes para personalizar o resultado:${artistContext}`
+      ? `\n\nVocê está gerando conteúdo para o seguinte artista. Use essas informações para personalizar o resultado:${artistContext}`
       : '');
     let userPrompt = '';
 

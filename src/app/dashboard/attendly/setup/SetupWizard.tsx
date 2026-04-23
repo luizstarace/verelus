@@ -599,10 +599,10 @@ export default function SetupWizard() {
     if (step === 1) nextAction = handleStep1Next;
     else if (step === 2) nextAction = handleStep2Next;
     else if (isStep3) {
-      nextLabel = 'Tudo certo, proximo';
+      nextLabel = 'Tudo certo, próximo';
       nextAction = () => setStep(4);
     } else if (isStep4) {
-      nextLabel = 'Proximo';
+      nextLabel = 'Próximo';
       nextAction = handleStep4Next;
     } else {
       nextLabel = 'Finalizar';

@@ -42,7 +42,7 @@ export default function NewProposalForm() {
         setError(data.error);
       }
     } catch {
-      setError('Erro ao gerar sugestao com IA');
+      setError('Erro ao gerar sugestão com IA');
     } finally {
       setAiLoading(false);
     }
@@ -55,7 +55,7 @@ export default function NewProposalForm() {
 
     const priceCents = Math.round(parseFloat(priceReais) * 100);
     if (!Number.isFinite(priceCents) || priceCents < 100) {
-      setError('Preco deve ser pelo menos R$ 1,00');
+      setError('Preço deve ser pelo menos R$ 1,00');
       setSubmitting(false);
       return;
     }
@@ -88,7 +88,7 @@ export default function NewProposalForm() {
 
       router.push(`/dashboard/proposals/${data.proposal.id}`);
     } catch {
-      setError('Erro de conexao. Tente novamente.');
+      setError('Erro de conexão. Tente novamente.');
       setSubmitting(false);
     }
   }

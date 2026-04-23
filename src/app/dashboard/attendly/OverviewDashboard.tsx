@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react';
 
 interface OverviewStats {
-  msgs_today: number;
   msgs_month: number;
   usage_percentage: number;
-  avg_satisfaction: number;
 }
 
 export default function OverviewDashboard() {
@@ -31,10 +29,8 @@ export default function OverviewDashboard() {
         setBusiness(bizData.business);
         setConversations(convData.conversations || []);
         setStats({
-          msgs_today: 0,
           msgs_month: usageData.text?.used || 0,
           usage_percentage: usageData.text?.percentage || 0,
-          avg_satisfaction: 0,
         });
       } catch (err) {
         console.error(err);
@@ -70,11 +66,10 @@ export default function OverviewDashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Msgs hoje" value={stats?.msgs_today || 0} />
-        <StatCard label="Msgs este mês" value={stats?.msgs_month || 0} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard label="Mensagens este mês" value={stats?.msgs_month || 0} />
         <StatCard label="Uso do plano" value={`${stats?.usage_percentage || 0}%`} />
-        <StatCard label="Satisfação" value={stats?.avg_satisfaction ? `${stats.avg_satisfaction}/5` : '—'} />
+        <StatCard label="Conversas recentes" value={conversations.length} />
       </div>
 
       <div>

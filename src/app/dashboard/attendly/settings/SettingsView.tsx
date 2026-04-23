@@ -94,6 +94,32 @@ function convertServicesFromApi(raw: any[]): Service[] {
   }));
 }
 
+// Accepts "1.50", "1,50", "R$ 1,50", " 10 " and similar.
+function parseBRPrice(raw: string): number {
+  const cleaned = String(raw)
+    .replace(/[^\d,.-]/g, '')
+    .replace(/\.(?=\d{3}(\D|$))/g, '') // strip thousand separators like "1.234,50"
+    .replace(',', '.');
+  const n = parseFloat(cleaned);
+  return isFinite(n) && n > 0 ? n : 0;
+}
+
+const WA_STATE_LABEL: Record<string, string> = {
+  open: 'Conectado',
+  close: 'Desconectado',
+  closed: 'Desconectado',
+  connecting: 'Conectando...',
+  qr: 'Aguardando leitura do QR',
+  qrReadError: 'Erro ao ler QR — gere um novo',
+  refused: 'Conexão recusada',
+  not_configured: 'Evolution API não configurada',
+  unknown: 'Estado desconhecido',
+};
+
+function translateWaState(state: string): string {
+  return WA_STATE_LABEL[state] || state;
+}
+
 export default function SettingsView() {
   const [tab, setTab] = useState<TabId>('business');
   const [business, setBusiness] = useState<Business | null>(null);
@@ -190,8 +216,9 @@ export default function SettingsView() {
       });
       if (!res.ok) throw new Error('Save failed');
       const data = await res.json();
+      // Update canonical state but keep the user's form values as-is.
+      // Calling syncFormState here would wipe unsaved edits in other tabs.
       setBusiness(data.business);
-      syncFormState(data.business);
       showToast('Salvo com sucesso!');
     } catch (err) {
       console.error('Error saving:', err);
@@ -202,6 +229,10 @@ export default function SettingsView() {
   }
 
   async function handleSaveBusiness() {
+    if (!name.trim()) {
+      showToast('Nome do negócio é obrigatório.');
+      return;
+    }
     await saveBusiness({
       name,
       category,
@@ -209,8 +240,8 @@ export default function SettingsView() {
       address,
       services: services.filter(s => s.name.trim()).map(s => ({
         name: s.name,
-        price_cents: Math.round(parseFloat(s.price || '0') * 100),
-        duration_min: parseInt(s.duration || '0', 10),
+        price_cents: Math.round(parseBRPrice(s.price) * 100),
+        duration_min: Math.max(0, parseInt(s.duration || '0', 10) || 0),
         description: s.description,
       })),
       hours,
@@ -406,7 +437,7 @@ export default function SettingsView() {
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-brand-success text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-pulse">
+        <div className="fixed top-4 right-4 z-50 bg-brand-success text-white px-4 py-2 rounded-lg shadow-lg text-sm">
           {toast}
         </div>
       )}
@@ -510,6 +541,7 @@ export default function SettingsView() {
                     </div>
                     <input
                       type="number"
+                      min={0}
                       value={s.duration}
                       onChange={(e) => updateService(idx, 'duration', e.target.value)}
                       placeholder="Duração (min)"
@@ -750,7 +782,7 @@ export default function SettingsView() {
                   WhatsApp &gt; Configurações &gt; Aparelhos conectados &gt; Conectar um aparelho
                 </p>
                 {waState && waState !== 'open' && (
-                  <p className="text-xs text-brand-muted mt-1">Status: {waState}</p>
+                  <p className="text-xs text-brand-muted mt-1">Status: {translateWaState(waState)}</p>
                 )}
               </div>
             )}
@@ -811,8 +843,9 @@ export default function SettingsView() {
             <div>
               <h3 className="text-sm font-semibold text-brand-text mb-1">Filtros de atendimento</h3>
               <p className="text-xs text-brand-muted">
-                Limita quando e para quem a IA responde. Qualquer mensagem filtrada cai no seu
-                WhatsApp normal sem resposta automática.
+                Controla quando e para quem a IA responde automaticamente. Mensagens
+                filtradas continuam chegando no seu WhatsApp normalmente — só não recebem
+                resposta automática.
               </p>
             </div>
 

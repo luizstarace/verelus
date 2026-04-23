@@ -3,8 +3,29 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+type Check = { ok: boolean; latency_ms: number; error?: string };
+
+const REQUIRED_ENV = [
+  'ANTHROPIC_API_KEY',
+  'NEXT_PUBLIC_SUPABASE_URL',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+  'RESEND_API_KEY',
+  'CRON_SECRET',
+  'FOUNDER_EMAIL',
+  'NEXT_PUBLIC_APP_URL',
+  'STRIPE_PRICE_ATTENDLY_STARTER',
+  'STRIPE_PRICE_ATTENDLY_PRO',
+  'STRIPE_PRICE_ATTENDLY_BUSINESS',
+  'ELEVENLABS_API_KEY',
+  'EVOLUTION_API_URL',
+  'EVOLUTION_API_KEY',
+] as const;
+
 export async function GET() {
-  const checks: Record<string, { ok: boolean; latency_ms: number; error?: string }> = {};
+  const checks: Record<string, Check> = {};
 
   const sbStart = Date.now();
   try {
@@ -38,11 +59,48 @@ export async function GET() {
     checks.claude = { ok: false, latency_ms: Date.now() - aiStart, error: String(err) };
   }
 
-  const allOk = Object.values(checks).every(c => c.ok);
+  const elStart = Date.now();
+  try {
+    const key = process.env.ELEVENLABS_API_KEY;
+    if (!key) throw new Error('ELEVENLABS_API_KEY not set');
+    const res = await fetch('https://api.elevenlabs.io/v1/user', {
+      headers: { 'xi-api-key': key },
+    });
+    checks.elevenlabs = { ok: res.ok, latency_ms: Date.now() - elStart };
+  } catch (err) {
+    checks.elevenlabs = { ok: false, latency_ms: Date.now() - elStart, error: String(err) };
+  }
 
-  return NextResponse.json({
-    status: allOk ? 'healthy' : 'degraded',
-    timestamp: new Date().toISOString(),
-    checks,
-  }, { status: allOk ? 200 : 503 });
+  const evStart = Date.now();
+  try {
+    const url = process.env.EVOLUTION_API_URL;
+    const key = process.env.EVOLUTION_API_KEY;
+    if (!url || !key) throw new Error('EVOLUTION_API_URL/KEY not set');
+    const res = await fetch(`${url}/instance/fetchInstances`, {
+      headers: { apikey: key },
+    });
+    checks.evolution = { ok: res.ok, latency_ms: Date.now() - evStart };
+  } catch (err) {
+    checks.evolution = { ok: false, latency_ms: Date.now() - evStart, error: String(err) };
+  }
+
+  // Env presence — only reports whether keys are set, never their values.
+  const env: Record<string, boolean> = {};
+  for (const k of REQUIRED_ENV) env[k] = Boolean(process.env[k]);
+  const envMissing = REQUIRED_ENV.filter((k) => !env[k]);
+
+  const allChecksOk = Object.values(checks).every((c) => c.ok);
+  const allEnvSet = envMissing.length === 0;
+  const healthy = allChecksOk && allEnvSet;
+
+  return NextResponse.json(
+    {
+      status: healthy ? 'healthy' : 'degraded',
+      timestamp: new Date().toISOString(),
+      checks,
+      env,
+      env_missing: envMissing,
+    },
+    { status: healthy ? 200 : 503 }
+  );
 }

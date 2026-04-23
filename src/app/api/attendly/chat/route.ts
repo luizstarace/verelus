@@ -76,9 +76,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'preview mode requires business.status=setup' }, { status: 400, headers: corsHeaders() });
     }
 
-    // Hard gate: enforce usage limits BEFORE calling Claude, so an abuser cannot
-    // rack up LLM cost by spamming after limit is exhausted. Preview mode skips
-    // (it's the owner testing in the wizard, already rate-limited by IP).
+    // Hard gate: enforce usage limits + trial expiry BEFORE calling Claude, so an
+    // abuser cannot rack up LLM cost by spamming after limit is exhausted. Preview
+    // mode skips (it's the owner testing in the wizard, already rate-limited by IP).
     if (!preview) {
       const { data: sub } = await supabase
         .from('subscriptions')
@@ -87,6 +87,17 @@ export async function POST(request: Request) {
         .in('status', ['active', 'trialing'])
         .limit(1)
         .single();
+
+      // Trial enforcement: if no paid subscription AND trial has expired, block.
+      if (!sub) {
+        if (business.trial_ends_at && new Date(business.trial_ends_at) < new Date()) {
+          return NextResponse.json({
+            error: 'Seu período de trial expirou. Faça upgrade pra continuar.',
+            trial_expired: true,
+          }, { status: 402, headers: corsHeaders() });
+        }
+      }
+
       const plan = getPlanFromSubscription(sub?.product || null);
       const usage = await checkUsageLimit(supabase, business_id, plan);
       if (!usage.withinLimit) {

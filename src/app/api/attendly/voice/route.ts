@@ -71,17 +71,23 @@ export async function POST(request: Request) {
     const fileName = `voice/${message_id}.mp3`;
     const { error: uploadErr } = await serviceSupabase.storage
       .from('attendly-audio')
-      .upload(fileName, audioBuffer, { contentType: 'audio/mpeg' });
+      .upload(fileName, audioBuffer, { contentType: 'audio/mpeg', upsert: true });
 
     if (uploadErr) throw uploadErr;
 
-    const { data: urlData } = serviceSupabase.storage
+    // Signed URL with 1h TTL — LGPD-friendly: audio is customer PII and should not
+    // be permanently public. Client re-fetches for replay via the same endpoint.
+    const { data: signed, error: signErr } = await serviceSupabase.storage
       .from('attendly-audio')
-      .getPublicUrl(fileName);
+      .createSignedUrl(fileName, 60 * 60);
+
+    if (signErr || !signed?.signedUrl) {
+      return NextResponse.json({ error: 'Erro ao gerar URL do áudio' }, { status: 500 });
+    }
 
     await serviceSupabase
       .from('attendly_messages')
-      .update({ audio_url: urlData.publicUrl })
+      .update({ audio_url: signed.signedUrl })
       .eq('id', message_id);
 
     const estimatedSeconds = Math.ceil((text.length / 750) * 60);
@@ -92,7 +98,7 @@ export async function POST(request: Request) {
       seconds_to_add: estimatedSeconds,
     });
 
-    return NextResponse.json({ audio_url: urlData.publicUrl });
+    return NextResponse.json({ audio_url: signed.signedUrl });
   } catch (err) {
     const { error, status } = errorResponse(err);
     return NextResponse.json({ error }, { status });

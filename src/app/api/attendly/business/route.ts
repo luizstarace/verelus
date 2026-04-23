@@ -79,6 +79,13 @@ export async function PATCH(request: Request) {
         .filter((n) => n.length >= 10 && n.length <= 15);
     }
 
+    // On first transition to 'active' (wizard finalize), start 7-day trial.
+    // Landing promises "7 dias grátis sem cartão" — this is where we deliver on it.
+    if (updates.status === 'active' && existing.status !== 'active' && !existing.trial_ends_at) {
+      const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      updates.trial_ends_at = trialEnd.toISOString();
+    }
+
     // Regenerate ai_context if business data changed
     const dataFields = ['name', 'category', 'phone', 'address', 'services', 'hours', 'faq'];
     const dataChanged = dataFields.some(f => body[f] !== undefined);

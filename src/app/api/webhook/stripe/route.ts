@@ -162,12 +162,38 @@ export async function POST(req: NextRequest) {
     const computedSig = Array.from(new Uint8Array(signatureBuffer))
       .map(b => b.toString(16).padStart(2, '0')).join('');
 
-    if (computedSig !== expectedSig) {
+    // Constant-time comparison of signatures
+    let sigMatch = computedSig.length === expectedSig.length;
+    if (sigMatch) {
+      let diff = 0;
+      for (let i = 0; i < computedSig.length; i++) {
+        diff |= computedSig.charCodeAt(i) ^ expectedSig.charCodeAt(i);
+      }
+      sigMatch = diff === 0;
+    }
+    if (!sigMatch) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
     const supabase = getSupabase();
     const body = JSON.parse(rawBody);
+
+    // Idempotency: Stripe retries webhooks on failure (up to 3×). Dedup by event.id
+    // so we don't send 3 welcome emails or double-update subscriptions.
+    const eventId = (body as { id?: string }).id;
+    if (eventId) {
+      const { error: dupErr } = await supabase
+        .from('stripe_events_processed')
+        .insert({ event_id: eventId });
+      if (dupErr) {
+        // PG unique constraint violation code is "23505"
+        if ((dupErr as { code?: string }).code === '23505') {
+          return NextResponse.json({ ok: true, deduped: true });
+        }
+        // Any other insert error: log and keep going (don't block on observability errors)
+        console.error('stripe_events_processed insert failed:', dupErr);
+      }
+    }
     // Stripe webhook event structure
     const { type, data } = body as {
       type: string;
@@ -214,11 +240,16 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: "No customer email" }, { status: 400 });
         }
 
-        // Fetch subscription to get the price ID (checkout session doesn't include line items directly)
+        // Fetch subscription to get price ID AND period fields (checkout.session.completed
+        // does NOT carry current_period_*; those live on the subscription object).
         let priceId = "";
+        let subPeriodStart: number | null = null;
+        let subPeriodEnd: number | null = null;
         if (event.subscription) {
           const sub = await getSubscriptionDetails(event.subscription);
           priceId = sub.items?.data?.[0]?.price?.id || "";
+          subPeriodStart = typeof sub.current_period_start === "number" ? sub.current_period_start : null;
+          subPeriodEnd = typeof sub.current_period_end === "number" ? sub.current_period_end : null;
         }
         const productType = mapProduct(priceId);
 
@@ -243,8 +274,8 @@ export async function POST(req: NextRequest) {
             payment_provider: "stripe",
             stripe_subscription_id: subscriptionId,
             stripe_customer_id: customerId,
-            current_period_start: event.current_period_start ? new Date(event.current_period_start * 1000).toISOString() : new Date().toISOString(),
-            current_period_end: event.current_period_end ? new Date(event.current_period_end * 1000).toISOString() : null,
+            current_period_start: subPeriodStart ? new Date(subPeriodStart * 1000).toISOString() : new Date().toISOString(),
+            current_period_end: subPeriodEnd ? new Date(subPeriodEnd * 1000).toISOString() : null,
             canceled_at: null,
           },
           { onConflict: "stripe_subscription_id" }

@@ -2,11 +2,23 @@ export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
 import { requireUser, errorResponse } from '@/lib/api-auth';
-import { getPlanFromSubscription, getPlanLimits } from '@/lib/attendly/plans';
+import { rateLimit, getRateLimitHeaders } from '@/lib/attendly/rate-limit';
 
 export async function POST(request: Request) {
   try {
     const { userId, supabase } = await requireUser();
+
+    // Preview endpoint is open to all plans so users on Starter/trial can
+    // hear the voice before deciding to upgrade. Plan gating still applies
+    // to /api/attendly/voice (runtime synthesis for chat replies).
+    const rl = rateLimit(`voice-test:${userId}`, 10, 3600_000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Muitos testes seguidos. Tente novamente em 1 hora.' },
+        { status: 429, headers: getRateLimitHeaders(rl.remaining, 10) }
+      );
+    }
+
     const body = await request.json().catch(() => ({}));
     const text = typeof body.text === 'string' ? body.text : '';
 
@@ -15,24 +27,6 @@ export async function POST(request: Request) {
     }
     if (text.length > 500) {
       return NextResponse.json({ error: 'Texto de teste máximo 500 caracteres' }, { status: 400 });
-    }
-
-    const { data: sub } = await supabase
-      .from('subscriptions')
-      .select('product')
-      .eq('user_id', userId)
-      .in('status', ['active', 'trialing'])
-      .limit(1)
-      .single();
-
-    const plan = getPlanFromSubscription(sub?.product || null);
-    const limits = getPlanLimits(plan);
-
-    if (!limits.voice_enabled) {
-      return NextResponse.json(
-        { error: 'Voz não disponível no plano Starter. Faça upgrade para Pro ou Business.' },
-        { status: 403 }
-      );
     }
 
     const { data: business } = await supabase

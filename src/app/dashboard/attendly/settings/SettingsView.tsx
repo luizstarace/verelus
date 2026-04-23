@@ -39,11 +39,11 @@ interface Business {
 }
 
 const TABS = [
-  { id: 'business', label: 'Dados do neg\u00f3cio' },
+  { id: 'business', label: 'Dados do negócio' },
   { id: 'widget', label: 'Widget' },
   { id: 'whatsapp', label: 'WhatsApp' },
   { id: 'voice', label: 'Voz' },
-  { id: 'notifications', label: 'Notifica\u00e7\u00f5es' },
+  { id: 'notifications', label: 'Notificações' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -54,7 +54,7 @@ const DAYS = [
   { key: 'wed', label: 'Qua' },
   { key: 'thu', label: 'Qui' },
   { key: 'fri', label: 'Sex' },
-  { key: 'sat', label: 'S\u00e1b' },
+  { key: 'sat', label: 'Sáb' },
   { key: 'sun', label: 'Dom' },
 ];
 
@@ -113,7 +113,7 @@ export default function SettingsView() {
   // Widget state
   const [widgetColor, setWidgetColor] = useState('#1e3a5f');
   const [widgetPosition, setWidgetPosition] = useState<'bottom-right' | 'bottom-left'>('bottom-right');
-  const [widgetGreeting, setWidgetGreeting] = useState('Ol\u00e1! Como posso ajudar?');
+  const [widgetGreeting, setWidgetGreeting] = useState('Olá! Como posso ajudar?');
 
   // Notifications state
   const [notifyChannel, setNotifyChannel] = useState<'email' | 'whatsapp' | 'both'>('email');
@@ -131,7 +131,7 @@ export default function SettingsView() {
   const [waHoursOnly, setWaHoursOnly] = useState(false);
 
   // Voice test state
-  const [voiceText, setVoiceText] = useState('Ol\u00e1! Eu sou o atendente virtual do seu neg\u00f3cio. Como posso ajudar?');
+  const [voiceText, setVoiceText] = useState('Olá! Eu sou o atendente virtual do seu negócio. Como posso ajudar?');
   const [voiceTesting, setVoiceTesting] = useState(false);
   const [voiceAudioUrl, setVoiceAudioUrl] = useState<string | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
@@ -146,7 +146,7 @@ export default function SettingsView() {
     setFaq(b.faq || []);
     setWidgetColor(b.widget_config?.color || '#1e3a5f');
     setWidgetPosition(b.widget_config?.position || 'bottom-right');
-    setWidgetGreeting(b.widget_config?.greeting || 'Ol\u00e1! Como posso ajudar?');
+    setWidgetGreeting(b.widget_config?.greeting || 'Olá! Como posso ajudar?');
     setNotifyChannel(b.owner_notify_channel || 'email');
     setOwnerWhatsapp(b.owner_whatsapp || '');
     setWaWhitelistEnabled(!!b.whatsapp_whitelist_enabled);
@@ -321,7 +321,7 @@ export default function SettingsView() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setVoiceError(data.error || 'Erro ao gerar \u00e1udio');
+        setVoiceError(data.error || 'Erro ao gerar áudio');
         return;
       }
       const blob = await res.blob();
@@ -400,7 +400,7 @@ export default function SettingsView() {
   }
 
   if (!business) {
-    return <div className="p-6 text-brand-muted">Nenhum neg\u00f3cio configurado. Complete o setup primeiro.</div>;
+    return <div className="p-6 text-brand-muted">Nenhum negócio configurado. Complete o setup primeiro.</div>;
   }
 
   return (
@@ -411,7 +411,7 @@ export default function SettingsView() {
         </div>
       )}
 
-      <h1 className="text-2xl font-bold text-brand-text mb-6">Configura\u00e7\u00f5es</h1>
+      <h1 className="text-2xl font-bold text-brand-text mb-6">Configurações</h1>
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-brand-border mb-6 overflow-x-auto">
@@ -430,7 +430,7 @@ export default function SettingsView() {
         ))}
       </div>
 
-      {/* Tab: Dados do neg\u00f3cio */}
+      {/* Tab: Dados do negócio */}
       {tab === 'business' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -448,7 +448,7 @@ export default function SettingsView() {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full border border-brand-border rounded-lg px-3 py-2 text-sm text-brand-text bg-white"
-                placeholder="Ex: Barbearia, Cl\u00ednica, Restaurante"
+                placeholder="Ex: Barbearia, Clínica, Restaurante"
               />
             </div>
             <div>
@@ -461,7 +461,7 @@ export default function SettingsView() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-brand-text mb-1">Endere\u00e7o</label>
+              <label className="block text-sm font-medium text-brand-text mb-1">Endereço</label>
               <input
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
@@ -473,10 +473,10 @@ export default function SettingsView() {
           {/* Services */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-brand-text">Servi\u00e7os</h3>
+              <h3 className="text-sm font-medium text-brand-text">Serviços</h3>
               <button onClick={addService} className="text-sm text-brand-primary hover:underline">+ Adicionar</button>
             </div>
-            {services.length === 0 && <p className="text-sm text-brand-muted">Nenhum servi\u00e7o cadastrado.</p>}
+            {services.length === 0 && <p className="text-sm text-brand-muted">Nenhum serviço cadastrado.</p>}
             <div className="space-y-3">
               {services.map((s, idx) => (
                 <div key={idx} className="bg-brand-surface rounded-lg p-4 space-y-3">
@@ -484,13 +484,13 @@ export default function SettingsView() {
                     <input
                       value={s.name}
                       onChange={(e) => updateService(idx, 'name', e.target.value)}
-                      placeholder="Nome do servi\u00e7o"
+                      placeholder="Nome do serviço"
                       className="flex-1 border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
                     />
                     <button
                       onClick={() => removeService(idx)}
                       className="ml-2 text-brand-error hover:bg-brand-error/10 rounded p-1"
-                      title="Remover servi\u00e7o"
+                      title="Remover serviço"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -504,7 +504,7 @@ export default function SettingsView() {
                         type="text"
                         value={s.price}
                         onChange={(e) => updateService(idx, 'price', e.target.value)}
-                        placeholder="Pre\u00e7o (R$)"
+                        placeholder="Preço (R$)"
                         className="flex-1 border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
                       />
                     </div>
@@ -512,14 +512,14 @@ export default function SettingsView() {
                       type="number"
                       value={s.duration}
                       onChange={(e) => updateService(idx, 'duration', e.target.value)}
-                      placeholder="Dura\u00e7\u00e3o (min)"
+                      placeholder="Duração (min)"
                       className="border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
                     />
                   </div>
                   <input
                     value={s.description}
                     onChange={(e) => updateService(idx, 'description', e.target.value)}
-                    placeholder="Descri\u00e7\u00e3o"
+                    placeholder="Descrição"
                     className="w-full border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
                   />
                 </div>
@@ -529,7 +529,7 @@ export default function SettingsView() {
 
           {/* Business Hours */}
           <div>
-            <h3 className="text-sm font-medium text-brand-text mb-2">Hor\u00e1rios de funcionamento</h3>
+            <h3 className="text-sm font-medium text-brand-text mb-2">Horários de funcionamento</h3>
             <div className="space-y-1">
               {DAYS.map((day) => (
                 <div key={day.key} className="flex items-center gap-3 py-1">
@@ -550,7 +550,7 @@ export default function SettingsView() {
                         onChange={(e) => updateHour(day.key, 'open', e.target.value)}
                         className="border border-brand-border rounded px-2 py-1 text-sm text-brand-text bg-white"
                       />
-                      <span className="text-brand-muted text-sm">at\u00e9</span>
+                      <span className="text-brand-muted text-sm">até</span>
                       <input
                         type="time"
                         value={hours[day.key].close}
@@ -657,7 +657,7 @@ export default function SettingsView() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-brand-text mb-1">Posi\u00e7\u00e3o</label>
+              <label className="block text-sm font-medium text-brand-text mb-1">Posição</label>
               <select
                 value={widgetPosition}
                 onChange={(e) => setWidgetPosition(e.target.value as 'bottom-right' | 'bottom-left')}
@@ -669,7 +669,7 @@ export default function SettingsView() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-brand-text mb-1">Mensagem de sauda\u00e7\u00e3o</label>
+            <label className="block text-sm font-medium text-brand-text mb-1">Mensagem de saudação</label>
             <input
               value={widgetGreeting}
               onChange={(e) => setWidgetGreeting(e.target.value)}
@@ -679,17 +679,17 @@ export default function SettingsView() {
 
           {/* Code snippet */}
           <div>
-            <h3 className="text-sm font-medium text-brand-text mb-2">C\u00f3digo de instala\u00e7\u00e3o</h3>
+            <h3 className="text-sm font-medium text-brand-text mb-2">Código de instalação</h3>
             <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative">
               <code>{`<script src="https://verelus.com/widget.js" data-business="${business.id}" async></script>`}</code>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(`<script src="https://verelus.com/widget.js" data-business="${business.id}" async></script>`);
-                  showToast('C\u00f3digo copiado!');
+                  showToast('Código copiado!');
                 }}
                 className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded transition"
               >
-                Copiar c\u00f3digo
+                Copiar código
               </button>
             </div>
           </div>
@@ -747,7 +747,7 @@ export default function SettingsView() {
                   className="w-64 h-64"
                 />
                 <p className="text-xs text-brand-muted mt-2">
-                  WhatsApp &gt; Configura\u00e7\u00f5es &gt; Aparelhos conectados &gt; Conectar um aparelho
+                  WhatsApp &gt; Configurações &gt; Aparelhos conectados &gt; Conectar um aparelho
                 </p>
                 {waState && waState !== 'open' && (
                   <p className="text-xs text-brand-muted mt-1">Status: {waState}</p>
@@ -802,8 +802,8 @@ export default function SettingsView() {
             </div>
 
             <p className="text-xs text-brand-muted mt-3">
-              Conex\u00e3o via Evolution API (Baileys). O atendente IA responder\u00e1 automaticamente
-              as mensagens recebidas neste n\u00famero.
+              Conexão via Evolution API (Baileys). O atendente IA responderá automaticamente
+              as mensagens recebidas neste número.
             </p>
           </div>
 
@@ -913,8 +913,9 @@ export default function SettingsView() {
           <div className="bg-brand-surface border border-brand-border rounded-lg p-6">
             <h3 className="text-sm font-medium text-brand-text mb-2">Testar voz do atendente</h3>
             <p className="text-xs text-brand-muted mb-4">
-              Voz dispon\u00edvel nos planos Pro e Business. O \u00e1udio usa a voz configurada
-              no seu neg\u00f3cio (ElevenLabs).
+              Gere uma amostra para ouvir a voz que o atendente usará nas respostas
+              (ElevenLabs). O envio automático de áudio nos chats é liberado nos
+              planos Pro e Business.
             </p>
             <textarea
               value={voiceText}
@@ -922,7 +923,7 @@ export default function SettingsView() {
               maxLength={500}
               rows={3}
               className="w-full border border-brand-border rounded-lg px-3 py-2 text-sm text-brand-text bg-white mb-3"
-              placeholder="Texto para testar a voz (at\u00e9 500 caracteres)"
+              placeholder="Texto para testar a voz (até 500 caracteres)"
             />
             <div className="text-xs text-brand-muted mb-3">
               {voiceText.length}/500 caracteres
@@ -950,11 +951,11 @@ export default function SettingsView() {
         </div>
       )}
 
-      {/* Tab: Notifica\u00e7\u00f5es */}
+      {/* Tab: Notificações */}
       {tab === 'notifications' && (
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-brand-text mb-1">Canal de notifica\u00e7\u00e3o</label>
+            <label className="block text-sm font-medium text-brand-text mb-1">Canal de notificação</label>
             <select
               value={notifyChannel}
               onChange={(e) => setNotifyChannel(e.target.value as 'email' | 'whatsapp' | 'both')}
@@ -968,7 +969,7 @@ export default function SettingsView() {
 
           {(notifyChannel === 'whatsapp' || notifyChannel === 'both') && (
             <div>
-              <label className="block text-sm font-medium text-brand-text mb-1">WhatsApp do propriet\u00e1rio</label>
+              <label className="block text-sm font-medium text-brand-text mb-1">WhatsApp do proprietário</label>
               <input
                 value={ownerWhatsapp}
                 onChange={(e) => setOwnerWhatsapp(e.target.value)}
@@ -976,7 +977,7 @@ export default function SettingsView() {
                 className="w-full border border-brand-border rounded-lg px-3 py-2 text-sm text-brand-text bg-white max-w-sm"
               />
               <p className="text-xs text-brand-muted mt-1">
-                N\u00famero para receber notifica\u00e7\u00f5es de conversas que precisam de aten\u00e7\u00e3o humana.
+                Número para receber notificações de conversas que precisam de atenção humana.
               </p>
             </div>
           )}

@@ -30,6 +30,18 @@ export async function POST() {
     const instanceName = `attendly_${business.id}`;
     const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/attendly/whatsapp/webhook`;
 
+    // Evolution does not auto-attach auth to outbound webhooks.
+    // The apikey header must be declared here so our webhook route can validate
+    // incoming POSTs.
+    const webhookConfig = {
+      enabled: true,
+      url: webhookUrl,
+      headers: { apikey: EVOLUTION_API_KEY },
+      byEvents: false,
+      base64: false,
+      events: ['MESSAGES_UPSERT', 'CONNECTION_UPDATE'],
+    };
+
     const createRes = await fetch(`${EVOLUTION_API_URL}/instance/create`, {
       method: 'POST',
       headers: {
@@ -40,14 +52,20 @@ export async function POST() {
         instanceName,
         qrcode: true,
         integration: 'WHATSAPP-BAILEYS',
-        webhook: {
-          url: webhookUrl,
-          byEvents: false,
-          base64: false,
-          events: ['MESSAGES_UPSERT', 'CONNECTION_UPDATE'],
-        },
+        webhook: webhookConfig,
       }),
     });
+
+    // Always re-sync webhook config so instances created before the headers fix
+    // get healed on the next connect.
+    await fetch(`${EVOLUTION_API_URL}/webhook/set/${instanceName}`, {
+      method: 'POST',
+      headers: {
+        'apikey': EVOLUTION_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(webhookConfig),
+    }).catch(() => {});
 
     if (createRes.ok) {
       const data = await createRes.json();

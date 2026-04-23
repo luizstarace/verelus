@@ -134,7 +134,26 @@ export default function InboxView() {
         {loading ? (
           <div className="p-4 text-brand-muted text-sm">Carregando...</div>
         ) : conversations.length === 0 ? (
-          <div className="p-4 text-brand-muted text-sm text-center">Nenhuma conversa encontrada.</div>
+          <div className="p-6 text-center space-y-3">
+            <p className="text-brand-text text-sm font-medium">Seu atendente ainda não recebeu mensagens.</p>
+            <p className="text-brand-muted text-xs">
+              Teste o widget no seu site ou conecte o WhatsApp para começar a atender.
+            </p>
+            <div className="flex flex-col gap-2 pt-2">
+              <a
+                href="/dashboard/attendly/settings?tab=whatsapp"
+                className="text-sm bg-brand-trust text-white font-medium px-3 py-1.5 rounded-md hover:brightness-110 transition"
+              >
+                Conectar WhatsApp
+              </a>
+              <a
+                href="/dashboard/attendly/settings?tab=widget"
+                className="text-xs text-brand-trust hover:underline"
+              >
+                ou instalar o widget →
+              </a>
+            </div>
+          </div>
         ) : (
           conversations.map((conv) => (
             <button

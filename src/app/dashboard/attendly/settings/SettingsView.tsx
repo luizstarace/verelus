@@ -771,12 +771,12 @@ export default function SettingsView() {
               )}
             </div>
             {waQrCode && (
-              <div className="mb-4 p-4 bg-white rounded-lg border border-brand-border inline-block">
+              <div className="mb-4 p-4 bg-white rounded-lg border border-brand-border w-full max-w-xs">
                 <p className="text-sm text-brand-text mb-2 font-medium">Escaneie com o WhatsApp do seu celular:</p>
                 <img
                   src={waQrCode.startsWith('data:') ? waQrCode : `data:image/png;base64,${waQrCode}`}
                   alt="QR Code WhatsApp"
-                  className="w-64 h-64"
+                  className="w-full max-w-[256px] h-auto aspect-square mx-auto"
                 />
                 <p className="text-xs text-brand-muted mt-2">
                   WhatsApp &gt; Configurações &gt; Aparelhos conectados &gt; Conectar um aparelho

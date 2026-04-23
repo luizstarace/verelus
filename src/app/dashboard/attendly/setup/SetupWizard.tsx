@@ -378,7 +378,7 @@ export default function SetupWizard() {
               />
               <input
                 className={inputClass}
-                placeholder="Preco (R$)"
+                placeholder="Preço (R$)"
                 value={s.price}
                 onChange={(e) => updateService(i, 'price', e.target.value)}
               />
@@ -391,7 +391,7 @@ export default function SetupWizard() {
               <div className="flex gap-2">
                 <input
                   className={inputClass}
-                  placeholder="Descricao"
+                  placeholder="Descrição"
                   value={s.description}
                   onChange={(e) => updateService(i, 'description', e.target.value)}
                 />
@@ -435,7 +435,7 @@ export default function SetupWizard() {
                       value={h.open}
                       onChange={(e) => updateHour(i, 'open', e.target.value)}
                     />
-                    <span className="text-brand-muted text-sm">ate</span>
+                    <span className="text-brand-muted text-sm">até</span>
                     <input
                       type="time"
                       className={`${inputClass} w-28`}
@@ -537,7 +537,7 @@ export default function SetupWizard() {
     return (
       <div className="space-y-4">
         <p className="text-sm text-brand-muted">
-          Cole o codigo abaixo no HTML do seu site, antes do fechamento da tag{' '}
+          Cole o código abaixo no HTML do seu site, antes do fechamento da tag{' '}
           <code className="bg-brand-surface px-1 py-0.5 rounded text-brand-text font-mono text-xs">&lt;/body&gt;</code>.
         </p>
         <div className="relative">
@@ -549,7 +549,7 @@ export default function SetupWizard() {
             onClick={copyWidgetCode}
             className="absolute top-2 right-2 px-3 py-1 text-xs rounded bg-brand-trust text-white hover:bg-brand-primary transition"
           >
-            {copied ? 'Copiado!' : 'Copiar codigo'}
+            {copied ? 'Copiado!' : 'Copiar código'}
           </button>
         </div>
       </div>
@@ -593,7 +593,7 @@ export default function SetupWizard() {
     const isStep3 = step === 3;
     const isStep4 = step === 4;
 
-    let nextLabel = 'Proximo';
+    let nextLabel = 'Próximo';
     let nextAction: () => void;
 
     if (step === 1) nextAction = handleStep1Next;

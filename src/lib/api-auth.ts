@@ -25,7 +25,7 @@ export async function requireUser(): Promise<AuthenticatedUser> {
     { cookies: { get(name: string) { return cookieStore.get(name)?.value; } } }
   );
   const { data: { user } } = await supabaseAuth.auth.getUser();
-  if (!user) throw new ApiError('Nao autenticado', 401);
+  if (!user) throw new ApiError('Não autenticado', 401);
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,7 +36,7 @@ export async function requireUser(): Promise<AuthenticatedUser> {
     .select('id')
     .eq('email', user.email!.toLowerCase().trim())
     .single();
-  if (!dbUser) throw new ApiError('Usuario nao encontrado', 404);
+  if (!dbUser) throw new ApiError('Usuário não encontrado', 404);
 
   return { userId: dbUser.id, email: user.email!, supabase };
 }

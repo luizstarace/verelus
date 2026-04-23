@@ -56,8 +56,16 @@ export async function GET() {
       return NextResponse.json({ tier: "free" });
     }
 
-    const tier = (subscription.product === "business" || subscription.product === "pro") ? "pro" : "free";
-    return NextResponse.json({ tier });
+    // "Pro" tier here collapses music-product paid tiers + Attendly paid tiers
+    // into a single "has active paid sub" badge shown on the shared sidebar.
+    const product = subscription.product || "";
+    const isPaid =
+      product === "pro" ||
+      product === "business" ||
+      product === "attendly_starter" ||
+      product === "attendly_pro" ||
+      product === "attendly_business";
+    return NextResponse.json({ tier: isPaid ? "pro" : "free" });
   } catch {
     return NextResponse.json({ tier: "free" });
   }

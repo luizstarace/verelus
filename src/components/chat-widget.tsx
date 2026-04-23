@@ -106,7 +106,7 @@ export default function ChatWidget() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Erro de conexao. Verifique sua internet e tente novamente.' },
+        { role: 'assistant', content: 'Erro de conexão. Verifique sua internet e tente novamente.' },
       ]);
     } finally {
       setIsLoading(false);

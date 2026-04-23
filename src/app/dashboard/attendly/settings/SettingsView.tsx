@@ -648,6 +648,25 @@ export default function SettingsView() {
       {/* Tab: WhatsApp */}
       {tab === 'whatsapp' && (
         <div className="space-y-6">
+          <div className="bg-brand-warning/10 border-l-4 border-brand-warning rounded-lg p-5">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-brand-warning flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+              </svg>
+              <div className="text-sm text-brand-text leading-relaxed">
+                <p className="font-semibold mb-1">Use um número dedicado ao atendimento</p>
+                <p className="text-brand-muted">
+                  A IA responderá <strong className="text-brand-text">automaticamente a toda mensagem</strong>{' '}
+                  que chegar neste número — incluindo amigos, família, grupos e qualquer outro contato.
+                </p>
+                <p className="text-brand-muted mt-2">
+                  Conecte um chip separado só do negócio, um WhatsApp Business de outro número,
+                  ou o número da empresa. <strong className="text-brand-text">Não conecte seu WhatsApp pessoal.</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-brand-surface border border-brand-border rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
               <span

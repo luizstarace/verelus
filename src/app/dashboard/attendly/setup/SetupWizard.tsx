@@ -12,8 +12,11 @@ interface Service {
   description: string;
 }
 
+type DayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+
 interface HoursEntry {
-  day: string;
+  key: DayKey;
+  label: string;
   enabled: boolean;
   open: string;
   close: string;
@@ -38,7 +41,25 @@ const CATEGORIES = [
   { value: 'outro', label: 'Outro' },
 ];
 
-const DAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+const DAYS: { key: DayKey; label: string }[] = [
+  { key: 'mon', label: 'Segunda' },
+  { key: 'tue', label: 'Terça' },
+  { key: 'wed', label: 'Quarta' },
+  { key: 'thu', label: 'Quinta' },
+  { key: 'fri', label: 'Sexta' },
+  { key: 'sat', label: 'Sábado' },
+  { key: 'sun', label: 'Domingo' },
+];
+
+function hoursArrayToRecord(arr: HoursEntry[]): Record<string, { open: string; close: string }> {
+  const result: Record<string, { open: string; close: string }> = {};
+  for (const h of arr) {
+    if (h.enabled && h.open && h.close) {
+      result[h.key] = { open: h.open, close: h.close };
+    }
+  }
+  return result;
+}
 
 const STEP_TITLES = [
   'Dados do negocio',
@@ -57,8 +78,9 @@ const STEP_DESCRIPTIONS = [
 ];
 
 function defaultHours(): HoursEntry[] {
-  return DAYS.map((day, i) => ({
-    day,
+  return DAYS.map((d, i) => ({
+    key: d.key,
+    label: d.label,
     enabled: i < 5,
     open: '08:00',
     close: '18:00',
@@ -153,7 +175,7 @@ export default function SetupWizard() {
     const validFaq = faq.filter((f) => f.question.trim() && f.answer.trim());
     const data = await apiCall('/api/attendly/business', 'PATCH', {
       services: validServices,
-      hours,
+      hours: hoursArrayToRecord(hours),
       faq: validFaq,
       onboarding_step: 3,
     });
@@ -395,7 +417,7 @@ export default function SetupWizard() {
           <h3 className="text-sm font-semibold text-brand-text mb-3">Horarios de funcionamento</h3>
           <div className="space-y-2">
             {hours.map((h, i) => (
-              <div key={h.day} className="flex items-center gap-3">
+              <div key={h.key} className="flex items-center gap-3">
                 <label className="flex items-center gap-2 w-28 shrink-0">
                   <input
                     type="checkbox"
@@ -403,7 +425,7 @@ export default function SetupWizard() {
                     onChange={(e) => updateHour(i, 'enabled', e.target.checked)}
                     className="rounded border-brand-border text-brand-trust focus:ring-brand-trust"
                   />
-                  <span className="text-sm text-brand-text">{h.day}</span>
+                  <span className="text-sm text-brand-text">{h.label}</span>
                 </label>
                 {h.enabled && (
                   <>

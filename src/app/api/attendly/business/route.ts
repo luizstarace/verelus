@@ -3,6 +3,7 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 import { requireUser, errorResponse } from '@/lib/api-auth';
 import { buildAiContext } from '@/lib/attendly/ai-context';
+import { normalizeHours } from '@/lib/attendly/hours';
 
 export async function GET() {
   try {
@@ -52,6 +53,12 @@ export async function PATCH(request: Request) {
       if (body[field] !== undefined) {
         updates[field] = body[field];
       }
+    }
+
+    // Normalize hours on write so downstream (ai-context, webhook filter) always
+    // sees canonical Record<'mon'|..., {open, close}> shape.
+    if (updates.hours !== undefined) {
+      updates.hours = normalizeHours(updates.hours);
     }
 
     if (updates.name !== undefined && (typeof updates.name !== 'string' || (updates.name as string).length > 200)) {

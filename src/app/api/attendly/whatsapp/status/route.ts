@@ -3,8 +3,8 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 import { requireUser, errorResponse } from '@/lib/api-auth';
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || 'http://localhost:8080';
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
 
 export async function GET() {
   try {
@@ -20,7 +20,7 @@ export async function GET() {
       return NextResponse.json({ connected: false, error: 'Negócio não encontrado' });
     }
 
-    if (!EVOLUTION_API_KEY) {
+    if (!EVOLUTION_API_KEY || !EVOLUTION_API_URL) {
       return NextResponse.json({ connected: false, state: 'not_configured' });
     }
 

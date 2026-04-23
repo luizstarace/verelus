@@ -58,20 +58,30 @@ const DAYS = [
   { key: 'sun', label: 'Dom' },
 ];
 
+const PT_DAY_TO_KEY: Record<string, string> = {
+  'Segunda': 'mon', 'segunda': 'mon',
+  'Terça': 'tue', 'terca': 'tue', 'Terca': 'tue',
+  'Quarta': 'wed', 'quarta': 'wed',
+  'Quinta': 'thu', 'quinta': 'thu',
+  'Sexta': 'fri', 'sexta': 'fri',
+  'Sábado': 'sat', 'sabado': 'sat', 'Sabado': 'sat',
+  'Domingo': 'sun', 'domingo': 'sun',
+};
+
 function normalizeHours(h: any): Record<string, { open: string; close: string }> {
   if (!h || typeof h !== 'object') return {};
-  // If it's already a Record with day keys
-  if (h.mon || h.tue || h.wed || h.thu || h.fri || h.sat || h.sun) return h;
-  // If it's an array (from SetupWizard)
+  // Legacy array format from older SetupWizard: [{day:'Segunda',enabled,open,close}, ...]
   if (Array.isArray(h)) {
     const result: Record<string, { open: string; close: string }> = {};
     for (const entry of h) {
-      if (entry.enabled && entry.day) {
-        result[entry.day] = { open: entry.open || '08:00', close: entry.close || '18:00' };
-      }
+      if (!entry || !entry.enabled) continue;
+      const key = entry.key || PT_DAY_TO_KEY[entry.day] || entry.day;
+      if (typeof key !== 'string' || !['mon','tue','wed','thu','fri','sat','sun'].includes(key)) continue;
+      result[key] = { open: entry.open || '08:00', close: entry.close || '18:00' };
     }
     return result;
   }
+  // Canonical Record format
   return h;
 }
 

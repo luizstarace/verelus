@@ -3,8 +3,8 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 import { requireUser, errorResponse } from '@/lib/api-auth';
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || 'http://localhost:8080';
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
 
 export async function POST() {
   try {
@@ -20,9 +20,9 @@ export async function POST() {
       return NextResponse.json({ error: 'Negócio não encontrado' }, { status: 404 });
     }
 
-    if (!EVOLUTION_API_KEY) {
+    if (!EVOLUTION_API_KEY || !EVOLUTION_API_URL) {
       return NextResponse.json(
-        { error: 'Evolution API não configurada. Defina EVOLUTION_API_KEY.' },
+        { error: 'Evolution API não configurada. Defina EVOLUTION_API_URL e EVOLUTION_API_KEY.' },
         { status: 503 }
       );
     }
@@ -94,6 +94,10 @@ export async function DELETE() {
 
     if (!business) {
       return NextResponse.json({ error: 'Negócio não encontrado' }, { status: 404 });
+    }
+
+    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+      return NextResponse.json({ error: 'Evolution API não configurada' }, { status: 503 });
     }
 
     const instanceName = `attendly_${business.id}`;

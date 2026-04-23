@@ -22,11 +22,38 @@ export async function POST(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const body = await request.json();
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400, headers: corsHeaders() });
+  }
   const { business_id, customer_name, customer_phone } = body;
 
-  if (!business_id || !customer_name) {
-    return NextResponse.json({ error: 'business_id and customer_name required' }, { status: 400, headers: corsHeaders() });
+  // Strict input validation — public endpoint, assume hostile.
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (typeof business_id !== 'string' || !UUID_RE.test(business_id)) {
+    return NextResponse.json({ error: 'Invalid business_id' }, { status: 400, headers: corsHeaders() });
+  }
+  if (typeof customer_name !== 'string' || customer_name.trim().length === 0 || customer_name.length > 120) {
+    return NextResponse.json({ error: 'customer_name required (1-120 chars)' }, { status: 400, headers: corsHeaders() });
+  }
+  if (customer_phone !== undefined && customer_phone !== null) {
+    if (typeof customer_phone !== 'string' || customer_phone.length > 30) {
+      return NextResponse.json({ error: 'Invalid customer_phone' }, { status: 400, headers: corsHeaders() });
+    }
+  }
+
+  // Block lead capture for inactive businesses to prevent orphan conversations
+  // on paused/setup businesses + reconnaissance via 200-vs-404 timing.
+  const { data: business } = await supabase
+    .from('attendly_businesses')
+    .select('status')
+    .eq('id', business_id)
+    .single();
+
+  if (!business || business.status !== 'active') {
+    return NextResponse.json({ error: 'Atendente indisponível' }, { status: 404, headers: corsHeaders() });
   }
 
   const { data, error } = await supabase
@@ -34,7 +61,7 @@ export async function POST(request: Request) {
     .insert({
       business_id,
       channel: 'widget',
-      customer_name,
+      customer_name: customer_name.trim(),
       customer_phone: customer_phone || null,
     })
     .select('id')

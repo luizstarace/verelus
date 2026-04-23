@@ -3,6 +3,7 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 import { requireUser, errorResponse } from '@/lib/api-auth';
 import { buildAiContext } from '@/lib/attendly/ai-context';
+import { normalizeHours } from '@/lib/attendly/hours';
 
 export async function POST(request: Request) {
   try {
@@ -31,8 +32,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Negócio já cadastrado. Use PATCH para atualizar.' }, { status: 409 });
     }
 
-    // Build AI context
-    const businessData = { name, category, phone, address, services: services || [], hours: hours || {}, faq: faq || [] };
+    // Normalize hours to canonical Record<'mon'|...,{open,close}> on write.
+    const normalizedHours = normalizeHours(hours);
+
+    const businessData = { name, category, phone, address, services: services || [], hours: normalizedHours, faq: faq || [] };
     const ai_context = buildAiContext(businessData);
 
     const { data, error } = await supabase
@@ -44,7 +47,7 @@ export async function POST(request: Request) {
         phone: phone || null,
         address: address || null,
         services: services || [],
-        hours: hours || {},
+        hours: normalizedHours,
         faq: faq || [],
         ai_context,
         onboarding_step: 2,

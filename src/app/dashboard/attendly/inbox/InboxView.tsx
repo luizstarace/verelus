@@ -10,8 +10,8 @@ interface Conversation {
   channel: 'widget' | 'whatsapp';
   status: 'active' | 'human_needed' | 'closed';
   message_count: number;
-  created_at: string;
-  updated_at: string;
+  started_at: string;
+  ended_at: string | null;
 }
 
 const STATUS_OPTIONS = [
@@ -152,7 +152,7 @@ export default function InboxView() {
                   </span>
                 </div>
                 <span className="text-xs text-brand-muted flex-shrink-0 ml-2">
-                  {timeAgo(conv.updated_at || conv.created_at)}
+                  {timeAgo(conv.started_at)}
                 </span>
               </div>
               <div className="flex items-center justify-between mt-1.5">

@@ -3,31 +3,47 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { rateLimit, getRateLimitHeaders } from '@/lib/attendly/rate-limit';
+import { isInsideBusinessHours } from '@/lib/attendly/hours';
 
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || 'http://localhost:8080';
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
 
-const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+// Generate all plausible formats of a BR phone number for whitelist match.
+// WhatsApp remoteJid typically comes as "55DDDNNNNNNNN" (13 digits for mobile);
+// user may have typed "DDDNNNNNNNN" (11) or even dropped the 9th digit (10).
+function phoneVariants(digits: string): string[] {
+  const d = digits.replace(/\D/g, '');
+  const variants = new Set<string>([d]);
+  if (d.startsWith('55') && d.length >= 12) {
+    const withoutCountry = d.slice(2);
+    variants.add(withoutCountry);
+    // Drop leading 9 from mobile (BR 9th digit was mandated 2012+, old contacts may lack)
+    if (withoutCountry.length === 11 && withoutCountry[2] === '9') {
+      variants.add(withoutCountry.slice(0, 2) + withoutCountry.slice(3));
+    }
+  }
+  if (d.length === 11 && d[2] === '9') {
+    variants.add(d.slice(0, 2) + d.slice(3));
+    variants.add('55' + d);
+  }
+  if (d.length === 10) {
+    variants.add('55' + d);
+    variants.add(d.slice(0, 2) + '9' + d.slice(2));
+    variants.add('55' + d.slice(0, 2) + '9' + d.slice(2));
+  }
+  return Array.from(variants);
+}
 
-function isInsideBusinessHours(hours: unknown): boolean {
-  if (!hours || typeof hours !== 'object') return false;
-  const now = new Date();
-  // São Paulo is UTC-3 year-round. Compute BR local time from UTC.
-  const brNow = new Date(now.getTime() - 3 * 60 * 60 * 1000);
-  const dayKey = DAY_KEYS[brNow.getUTCDay()];
-  const day = (hours as Record<string, { open?: string; close?: string } | null>)[dayKey];
-  if (!day || !day.open || !day.close) return false;
-  const [oH, oM] = String(day.open).split(':').map(Number);
-  const [cH, cM] = String(day.close).split(':').map(Number);
-  if (Number.isNaN(oH) || Number.isNaN(cH)) return false;
-  const nowMin = brNow.getUTCHours() * 60 + brNow.getUTCMinutes();
-  const openMin = oH * 60 + (oM || 0);
-  const closeMin = cH * 60 + (cM || 0);
-  return nowMin >= openMin && nowMin < closeMin;
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
 }
 
 async function sendWhatsAppMessage(instanceName: string, toJid: string, text: string) {
   if (!text.trim()) return;
+  if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return;
   try {
     await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
       method: 'POST',
@@ -44,12 +60,31 @@ async function sendWhatsAppMessage(instanceName: string, toJid: string, text: st
 }
 
 export async function POST(request: Request) {
-  const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const rl = rateLimit(clientIp, 60, 60000);
+  // Validate API key FIRST (before rate-limit) so unauthenticated spam
+  // cannot consume rate-limit slots intended for the legitimate Evolution instance.
+  const apiKey = request.headers.get('apikey') || '';
+  const expectedKey = process.env.EVOLUTION_API_KEY || '';
+  if (!expectedKey || !timingSafeEqual(apiKey, expectedKey)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Rate-limit by instance name (not IP), so one runaway instance can't saturate
+  // the Function limits for everyone else. Also, Evolution calls from a stable IP
+  // so IP-based rate limit is low signal.
+  let instanceForLimit = 'unknown';
+  let body: any;
+  try {
+    body = await request.json();
+    if (typeof body?.instance === 'string') instanceForLimit = body.instance;
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  const rl = rateLimit(`wh:${instanceForLimit}`, 120, 60000);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: 'Rate limit exceeded' },
-      { status: 429, headers: getRateLimitHeaders(rl.remaining, 60) }
+      { status: 429, headers: getRateLimitHeaders(rl.remaining, 120) }
     );
   }
 
@@ -59,12 +94,6 @@ export async function POST(request: Request) {
   );
 
   try {
-    const apiKey = request.headers.get('apikey') || '';
-    if (apiKey !== process.env.EVOLUTION_API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await request.json();
     const event = body.event || '';
     const instance: string = body.instance || '';
     const msgData = body.data;
@@ -110,8 +139,10 @@ export async function POST(request: Request) {
 
     if (business.whatsapp_whitelist_enabled) {
       const whitelist: string[] = Array.isArray(business.whatsapp_whitelist) ? business.whatsapp_whitelist : [];
-      const normalized = customerPhone.replace(/\D/g, '');
-      const match = whitelist.some((n) => String(n).replace(/\D/g, '') === normalized);
+      const customerVariants = new Set(phoneVariants(customerPhone));
+      const match = whitelist.some((stored) =>
+        phoneVariants(String(stored)).some((v) => customerVariants.has(v))
+      );
       if (!match) {
         return NextResponse.json({ ok: true, skipped: 'not_whitelisted' });
       }

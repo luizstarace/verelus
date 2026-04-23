@@ -70,6 +70,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Atendente ainda não foi ativado' }, { status: 403, headers: corsHeaders() });
     }
 
+    // preview is only for owner testing in the wizard (status='setup').
+    // Abuser with a leaked business_id cannot use it to bypass usage on an active business.
+    if (preview && business.status !== 'setup') {
+      return NextResponse.json({ error: 'preview mode requires business.status=setup' }, { status: 400, headers: corsHeaders() });
+    }
+
+    // Hard gate: enforce usage limits BEFORE calling Claude, so an abuser cannot
+    // rack up LLM cost by spamming after limit is exhausted. Preview mode skips
+    // (it's the owner testing in the wizard, already rate-limited by IP).
+    if (!preview) {
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('product')
+        .eq('user_id', business.user_id)
+        .in('status', ['active', 'trialing'])
+        .limit(1)
+        .single();
+      const plan = getPlanFromSubscription(sub?.product || null);
+      const usage = await checkUsageLimit(supabase, business_id, plan);
+      if (!usage.withinLimit) {
+        return NextResponse.json({
+          error: 'Limite de mensagens do plano excedido. Faça upgrade pra continuar.',
+          usage_exceeded: true,
+        }, { status: 402, headers: corsHeaders() });
+      }
+    }
+
     // Get or create conversation (skip for preview)
     let convId = conversation_id;
     if (!preview) {

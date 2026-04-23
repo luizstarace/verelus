@@ -14,7 +14,7 @@ Atendente IA 24/7 para PMEs brasileiras. Primeiro produto da plataforma Verelus.
 | Voz | ElevenLabs API (Pro/Business) |
 | Pagamentos | Stripe (subscriptions + trial 7 dias) |
 | Email | Resend |
-| WhatsApp | Evolution API (futuro) |
+| WhatsApp | Evolution API self-hosted (VPS Hetzner) + Cloudflare Tunnel (`wa.verelus.com`) |
 | Widget | Vanilla JS ~12KB, Shadow DOM |
 
 ## Planos
@@ -39,6 +39,8 @@ src/
       notifications.ts — Emails via Resend (transfer, usage, trial)
       cors.ts          — CORS headers para endpoints publicos
       rate-limit.ts    — Rate limiting in-memory por IP
+      phone.ts         — Variantes de numero BR + timingSafeEqual (whitelist WhatsApp)
+      hours.ts         — Normalizacao de horario + check "dentro do horario"
     types/
       attendly.ts      — Interfaces TypeScript do dominio
 
@@ -106,9 +108,9 @@ STRIPE_PRICE_ATTENDLY_PRO=price_1TOgy42MFMsgV0iGPMxHJiHr
 STRIPE_PRICE_ATTENDLY_BUSINESS=price_1TOgy52MFMsgV0iGwxgrl0gI
 ELEVENLABS_API_KEY=sk_93e...
 
-# Futuro (WhatsApp)
-EVOLUTION_API_URL=http://localhost:8080
-EVOLUTION_API_KEY=
+# WhatsApp (Evolution API exposta via Cloudflare Tunnel)
+EVOLUTION_API_URL=https://wa.verelus.com
+EVOLUTION_API_KEY=<64-hex, mesmo do VPS /opt/evolution/.env>
 ```
 
 ## Docs

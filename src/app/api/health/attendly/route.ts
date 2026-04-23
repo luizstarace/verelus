@@ -59,17 +59,10 @@ export async function GET() {
     checks.claude = { ok: false, latency_ms: Date.now() - aiStart, error: String(err) };
   }
 
-  const elStart = Date.now();
-  try {
-    const key = process.env.ELEVENLABS_API_KEY;
-    if (!key) throw new Error('ELEVENLABS_API_KEY not set');
-    const res = await fetch('https://api.elevenlabs.io/v1/user', {
-      headers: { 'xi-api-key': key },
-    });
-    checks.elevenlabs = { ok: res.ok, latency_ms: Date.now() - elStart };
-  } catch (err) {
-    checks.elevenlabs = { ok: false, latency_ms: Date.now() - elStart, error: String(err) };
-  }
+  // No live ElevenLabs probe — production keys are scoped to TTS-only (POST
+  // /v1/text-to-speech/*), so /v1/user and /v1/voices return 401 even when the
+  // key works. A TTS probe would burn credits on every health check.
+  // env.ELEVENLABS_API_KEY already reports presence.
 
   const evStart = Date.now();
   try {

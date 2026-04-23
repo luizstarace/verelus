@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { buildMessageHistory, getCurrentPeriod, toClaudeMessages } from '@/lib/attendly/chat';
+import {
+  buildMessageHistory,
+  getCurrentPeriod,
+  toClaudeMessages,
+  checkBusinessAvailability,
+} from '@/lib/attendly/chat';
 
 describe('buildMessageHistory', () => {
   it('returns last 20 messages', () => {
@@ -63,5 +68,71 @@ describe('getCurrentPeriod', () => {
   it('returns first day of current month', () => {
     const period = getCurrentPeriod();
     expect(period).toMatch(/^\d{4}-\d{2}-01$/);
+  });
+});
+
+describe('checkBusinessAvailability', () => {
+  it('paused business returns 503 with contact fallback', () => {
+    const result = checkBusinessAvailability(
+      { status: 'paused', phone: '(11) 99123-4567' },
+      false
+    );
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.status).toBe(503);
+      expect(result.paused).toBe(true);
+      expect(result.response).toContain('(11) 99123-4567');
+      expect(result.response).toContain('temporariamente indisponível');
+    }
+  });
+
+  it('paused business without phone uses default fallback text', () => {
+    const result = checkBusinessAvailability(
+      { status: 'paused', phone: null },
+      false
+    );
+    if (!result.allowed) {
+      expect(result.response).toContain('sem telefone cadastrado');
+    }
+  });
+
+  it('setup business without preview returns 403', () => {
+    const result = checkBusinessAvailability(
+      { status: 'setup', phone: null },
+      false
+    );
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.status).toBe(403);
+      expect(result.error).toBe('Atendente ainda não foi ativado');
+    }
+  });
+
+  it('active business with preview=true returns 400 (preview reserved for setup)', () => {
+    const result = checkBusinessAvailability(
+      { status: 'active', phone: '123' },
+      true
+    );
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.status).toBe(400);
+      expect(result.error).toBe('preview mode requires business.status=setup');
+    }
+  });
+
+  it('setup business with preview=true is allowed (owner wizard testing)', () => {
+    const result = checkBusinessAvailability(
+      { status: 'setup', phone: null },
+      true
+    );
+    expect(result.allowed).toBe(true);
+  });
+
+  it('active business without preview is allowed', () => {
+    const result = checkBusinessAvailability(
+      { status: 'active', phone: '123' },
+      false
+    );
+    expect(result.allowed).toBe(true);
   });
 });

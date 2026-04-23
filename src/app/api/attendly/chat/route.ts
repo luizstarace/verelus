@@ -2,7 +2,7 @@ export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { buildMessageHistory, toClaudeMessages } from '@/lib/attendly/chat';
+import { buildMessageHistory, toClaudeMessages, checkBusinessAvailability } from '@/lib/attendly/chat';
 import { detectTransfer } from '@/lib/attendly/transfer';
 import { incrementUsage, checkUsageLimit } from '@/lib/attendly/usage';
 import { getPlanFromSubscription } from '@/lib/attendly/plans';
@@ -59,21 +59,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Negócio não encontrado' }, { status: 404, headers: corsHeaders() });
     }
 
-    // Check status
-    if (business.status === 'paused') {
-      return NextResponse.json({
-        response: `Este atendente está temporariamente indisponível. Entre em contato diretamente: ${business.phone || 'sem telefone cadastrado'}`,
-        paused: true,
-      }, { status: 503, headers: corsHeaders() });
-    }
-    if (business.status === 'setup' && !preview) {
-      return NextResponse.json({ error: 'Atendente ainda não foi ativado' }, { status: 403, headers: corsHeaders() });
-    }
-
-    // preview is only for owner testing in the wizard (status='setup').
-    // Abuser with a leaked business_id cannot use it to bypass usage on an active business.
-    if (preview && business.status !== 'setup') {
-      return NextResponse.json({ error: 'preview mode requires business.status=setup' }, { status: 400, headers: corsHeaders() });
+    const availability = checkBusinessAvailability(business, Boolean(preview));
+    if (!availability.allowed) {
+      const payload = availability.paused
+        ? { response: availability.response, paused: true }
+        : { error: availability.error };
+      return NextResponse.json(payload, { status: availability.status, headers: corsHeaders() });
     }
 
     // Hard gate: enforce usage limits + trial expiry BEFORE calling Claude, so an

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { mapProduct, isAttendlyProduct, mapStatus } from "@/lib/stripe/mapping";
 
 export const runtime = 'edge';
 
@@ -8,50 +9,6 @@ function getSupabase() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-}
-
-// Map Stripe price ID to our unified product tier
-function mapProduct(priceId: string): string {
-  const proPriceId = process.env.STRIPE_PRICE_PRO || "";
-  const businessPriceId = process.env.STRIPE_PRICE_BUSINESS || "";
-  const attendlyStarter = process.env.STRIPE_PRICE_ATTENDLY_STARTER || "";
-  const attendlyPro = process.env.STRIPE_PRICE_ATTENDLY_PRO || "";
-  const attendlyBusiness = process.env.STRIPE_PRICE_ATTENDLY_BUSINESS || "";
-
-  // Attendly plans
-  if (priceId === attendlyBusiness) return "attendly_business";
-  if (priceId === attendlyPro) return "attendly_pro";
-  if (priceId === attendlyStarter) return "attendly_starter";
-
-  // Legacy plans
-  if (priceId === businessPriceId || priceId.includes("business")) {
-    return "business";
-  }
-  if (priceId === proPriceId || priceId.includes("pro")) {
-    return "pro";
-  }
-  return "pro"; // default paid tier
-}
-
-// Check if product is an Attendly plan
-function isAttendlyProduct(product: string): boolean {
-  return product.startsWith("attendly_");
-}
-
-// Map Stripe subscription status to our status
-function mapStatus(stripeStatus: string): string {
-  switch (stripeStatus) {
-    case "active":
-    case "trialing":
-      return "active";
-    case "past_due":
-      return "past_due";
-    case "canceled":
-    case "incomplete_expired":
-      return "canceled";
-    default:
-      return "active";
-  }
 }
 
 async function sendPurchaseEmail(email: string, plan: string) {

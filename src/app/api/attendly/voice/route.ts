@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireUser, errorResponse } from '@/lib/api-auth';
 import { getPlanFromSubscription, getPlanLimits } from '@/lib/attendly/plans';
+import { validateVoiceInput, estimateVoiceSeconds } from '@/lib/attendly/voice-validation';
 
 export async function POST(request: Request) {
   try {
@@ -11,11 +12,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { message_id, text } = body;
 
-    if (!message_id || !text) {
-      return NextResponse.json({ error: 'message_id and text required' }, { status: 400 });
-    }
-    if (text.length > 5000) {
-      return NextResponse.json({ error: 'Texto muito longo. Máximo 5000 caracteres.' }, { status: 400 });
+    const validation = validateVoiceInput(message_id, text);
+    if (!validation.ok) {
+      return NextResponse.json({ error: validation.error }, { status: validation.status });
     }
 
     const { data: sub } = await supabase
@@ -90,7 +89,7 @@ export async function POST(request: Request) {
       .update({ audio_url: signed.signedUrl })
       .eq('id', message_id);
 
-    const estimatedSeconds = Math.ceil((text.length / 750) * 60);
+    const estimatedSeconds = estimateVoiceSeconds(text);
     const period = new Date().toISOString().slice(0, 7) + '-01';
     await serviceSupabase.rpc('increment_voice_usage', {
       biz_id: business.id,

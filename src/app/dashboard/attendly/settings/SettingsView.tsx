@@ -31,6 +31,9 @@ interface Business {
   faq: Faq[];
   widget_config: WidgetConfig;
   whatsapp_number: string | null;
+  whatsapp_whitelist_enabled?: boolean;
+  whatsapp_whitelist?: string[];
+  whatsapp_hours_only?: boolean;
   owner_whatsapp: string | null;
   owner_notify_channel: 'email' | 'whatsapp' | 'both';
 }
@@ -111,6 +114,11 @@ export default function SettingsView() {
   const [waConnecting, setWaConnecting] = useState(false);
   const [waState, setWaState] = useState<string>('unknown');
   const [waPolling, setWaPolling] = useState(false);
+  const [waAcknowledged, setWaAcknowledged] = useState(false);
+  const [waWhitelistEnabled, setWaWhitelistEnabled] = useState(false);
+  const [waWhitelist, setWaWhitelist] = useState<string[]>([]);
+  const [waWhitelistInput, setWaWhitelistInput] = useState('');
+  const [waHoursOnly, setWaHoursOnly] = useState(false);
 
   // Voice test state
   const [voiceText, setVoiceText] = useState('Ol\u00e1! Eu sou o atendente virtual do seu neg\u00f3cio. Como posso ajudar?');
@@ -131,6 +139,9 @@ export default function SettingsView() {
     setWidgetGreeting(b.widget_config?.greeting || 'Ol\u00e1! Como posso ajudar?');
     setNotifyChannel(b.owner_notify_channel || 'email');
     setOwnerWhatsapp(b.owner_whatsapp || '');
+    setWaWhitelistEnabled(!!b.whatsapp_whitelist_enabled);
+    setWaWhitelist(Array.isArray(b.whatsapp_whitelist) ? b.whatsapp_whitelist : []);
+    setWaHoursOnly(!!b.whatsapp_hours_only);
   }
 
   useEffect(() => {
@@ -203,6 +214,44 @@ export default function SettingsView() {
 
   async function handleSaveNotifications() {
     await saveBusiness({ owner_notify_channel: notifyChannel, owner_whatsapp: ownerWhatsapp });
+  }
+
+  async function handleSaveWhatsAppFilters() {
+    await saveBusiness({
+      whatsapp_whitelist_enabled: waWhitelistEnabled,
+      whatsapp_whitelist: waWhitelist,
+      whatsapp_hours_only: waHoursOnly,
+    });
+  }
+
+  function handleAddWhitelistNumber() {
+    const cleaned = waWhitelistInput.replace(/\D/g, '');
+    if (cleaned.length < 10 || cleaned.length > 15) {
+      showToast('Número inválido. Use formato com DDD (ex: 11999998888).');
+      return;
+    }
+    if (waWhitelist.includes(cleaned)) {
+      showToast('Número já está na lista.');
+      return;
+    }
+    if (waWhitelist.length >= 100) {
+      showToast('Máximo de 100 números na whitelist.');
+      return;
+    }
+    setWaWhitelist([...waWhitelist, cleaned]);
+    setWaWhitelistInput('');
+  }
+
+  function handleRemoveWhitelistNumber(n: string) {
+    setWaWhitelist(waWhitelist.filter((x) => x !== n));
+  }
+
+  function formatPhoneBR(n: string): string {
+    const d = String(n).replace(/\D/g, '');
+    if (d.length === 13) return `+${d.slice(0, 2)} (${d.slice(2, 4)}) ${d.slice(4, 9)}-${d.slice(9)}`;
+    if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+    if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return d;
   }
 
   // WhatsApp
@@ -696,12 +745,28 @@ export default function SettingsView() {
               </div>
             )}
 
+            {!business.whatsapp_number && (
+              <label className="flex items-start gap-3 mb-4 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={waAcknowledged}
+                  onChange={(e) => setWaAcknowledged(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-brand-cta cursor-pointer"
+                />
+                <span className="text-sm text-brand-text leading-relaxed">
+                  Entendo que a IA responderá automaticamente a <strong>toda mensagem</strong>{' '}
+                  recebida neste número. Este é um <strong>número dedicado ao negócio</strong>,
+                  não é meu WhatsApp pessoal.
+                </span>
+              </label>
+            )}
+
             <div className="flex gap-3 flex-wrap">
               {!business.whatsapp_number && (
                 <button
                   onClick={handleWhatsAppConnect}
-                  disabled={waConnecting}
-                  className="bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
+                  disabled={waConnecting || !waAcknowledged}
+                  className="bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
                   {waConnecting ? 'Conectando...' : waQrCode ? 'Gerar novo QR' : 'Conectar WhatsApp'}
                 </button>
@@ -730,6 +795,104 @@ export default function SettingsView() {
               Conex\u00e3o via Evolution API (Baileys). O atendente IA responder\u00e1 automaticamente
               as mensagens recebidas neste n\u00famero.
             </p>
+          </div>
+
+          <div className="bg-brand-surface border border-brand-border rounded-lg p-6 space-y-5">
+            <div>
+              <h3 className="text-sm font-semibold text-brand-text mb-1">Filtros de atendimento</h3>
+              <p className="text-xs text-brand-muted">
+                Limita quando e para quem a IA responde. Qualquer mensagem filtrada cai no seu
+                WhatsApp normal sem resposta automática.
+              </p>
+            </div>
+
+            <label className="flex items-start gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={waHoursOnly}
+                onChange={(e) => setWaHoursOnly(e.target.checked)}
+                className="mt-0.5 w-4 h-4 accent-brand-cta cursor-pointer"
+              />
+              <span className="text-sm text-brand-text">
+                <strong>Responder apenas fora do horário comercial</strong>
+                <span className="block text-xs text-brand-muted mt-0.5">
+                  Dentro do expediente (aba Dados do negócio), você atende pessoalmente.
+                  Fora do horário, a IA responde.
+                </span>
+              </span>
+            </label>
+
+            <div>
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={waWhitelistEnabled}
+                  onChange={(e) => setWaWhitelistEnabled(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-brand-cta cursor-pointer"
+                />
+                <span className="text-sm text-brand-text">
+                  <strong>Responder apenas números na lista permitida</strong>
+                  <span className="block text-xs text-brand-muted mt-0.5">
+                    Use para testar com contatos específicos, ou restringir a clientes conhecidos.
+                  </span>
+                </span>
+              </label>
+
+              {waWhitelistEnabled && (
+                <div className="mt-3 ml-7 space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="tel"
+                      value={waWhitelistInput}
+                      onChange={(e) => setWaWhitelistInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddWhitelistNumber(); } }}
+                      placeholder="11999998888 (DDD + número)"
+                      className="flex-1 px-3 py-2 bg-white border border-brand-border rounded-lg text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-brand-cta"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddWhitelistNumber}
+                      className="bg-brand-cta text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition"
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+
+                  {waWhitelist.length === 0 ? (
+                    <p className="text-xs text-brand-muted italic">
+                      Lista vazia — com esta opção ativada e sem números,
+                      a IA não responderá ninguém.
+                    </p>
+                  ) : (
+                    <ul className="space-y-1.5">
+                      {waWhitelist.map((n) => (
+                        <li
+                          key={n}
+                          className="flex items-center justify-between bg-white border border-brand-border rounded-lg px-3 py-2 text-sm"
+                        >
+                          <span className="text-brand-text font-mono">{formatPhoneBR(n)}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveWhitelistNumber(n)}
+                            className="text-brand-error text-xs font-medium hover:underline"
+                          >
+                            Remover
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={handleSaveWhatsAppFilters}
+              disabled={saving}
+              className="bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
+            >
+              {saving ? 'Salvando...' : 'Salvar filtros'}
+            </button>
           </div>
         </div>
       )}

@@ -45,7 +45,8 @@ export async function PATCH(request: Request) {
     const updates: Record<string, unknown> = {};
     const fields = ['name', 'category', 'phone', 'address', 'services', 'hours', 'faq',
       'voice_id', 'widget_config', 'whatsapp_number', 'owner_whatsapp',
-      'owner_notify_channel', 'onboarding_step', 'status'] as const;
+      'owner_notify_channel', 'onboarding_step', 'status',
+      'whatsapp_whitelist_enabled', 'whatsapp_whitelist', 'whatsapp_hours_only'] as const;
 
     for (const field of fields) {
       if (body[field] !== undefined) {
@@ -61,6 +62,14 @@ export async function PATCH(request: Request) {
     }
     if (updates.faq !== undefined && (!Array.isArray(updates.faq) || (updates.faq as any[]).length > 30)) {
       return NextResponse.json({ error: 'Máximo de 30 perguntas frequentes' }, { status: 400 });
+    }
+    if (updates.whatsapp_whitelist !== undefined) {
+      if (!Array.isArray(updates.whatsapp_whitelist) || (updates.whatsapp_whitelist as any[]).length > 100) {
+        return NextResponse.json({ error: 'Whitelist: no máximo 100 números' }, { status: 400 });
+      }
+      updates.whatsapp_whitelist = (updates.whatsapp_whitelist as any[])
+        .map((n) => String(n).replace(/\D/g, ''))
+        .filter((n) => n.length >= 10 && n.length <= 15);
     }
 
     // Regenerate ai_context if business data changed

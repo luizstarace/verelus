@@ -7,6 +7,25 @@ import { rateLimit, getRateLimitHeaders } from '@/lib/attendly/rate-limit';
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || 'http://localhost:8080';
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
 
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+
+function isInsideBusinessHours(hours: unknown): boolean {
+  if (!hours || typeof hours !== 'object') return false;
+  const now = new Date();
+  // São Paulo is UTC-3 year-round. Compute BR local time from UTC.
+  const brNow = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+  const dayKey = DAY_KEYS[brNow.getUTCDay()];
+  const day = (hours as Record<string, { open?: string; close?: string } | null>)[dayKey];
+  if (!day || !day.open || !day.close) return false;
+  const [oH, oM] = String(day.open).split(':').map(Number);
+  const [cH, cM] = String(day.close).split(':').map(Number);
+  if (Number.isNaN(oH) || Number.isNaN(cH)) return false;
+  const nowMin = brNow.getUTCHours() * 60 + brNow.getUTCMinutes();
+  const openMin = oH * 60 + (oM || 0);
+  const closeMin = cH * 60 + (cM || 0);
+  return nowMin >= openMin && nowMin < closeMin;
+}
+
 async function sendWhatsAppMessage(instanceName: string, toJid: string, text: string) {
   if (!text.trim()) return;
   try {
@@ -81,12 +100,25 @@ export async function POST(request: Request) {
 
     const { data: business } = await supabase
       .from('attendly_businesses')
-      .select('id, status')
+      .select('id, status, hours, whatsapp_whitelist_enabled, whatsapp_whitelist, whatsapp_hours_only')
       .eq('id', businessId)
       .single();
 
     if (!business || business.status !== 'active') {
       return NextResponse.json({ ok: true });
+    }
+
+    if (business.whatsapp_whitelist_enabled) {
+      const whitelist: string[] = Array.isArray(business.whatsapp_whitelist) ? business.whatsapp_whitelist : [];
+      const normalized = customerPhone.replace(/\D/g, '');
+      const match = whitelist.some((n) => String(n).replace(/\D/g, '') === normalized);
+      if (!match) {
+        return NextResponse.json({ ok: true, skipped: 'not_whitelisted' });
+      }
+    }
+
+    if (business.whatsapp_hours_only && isInsideBusinessHours(business.hours)) {
+      return NextResponse.json({ ok: true, skipped: 'inside_business_hours' });
     }
 
     const chatRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/attendly/chat`, {

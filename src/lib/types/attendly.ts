@@ -12,6 +12,9 @@ export interface AttendlyBusiness {
   voice_id: string;
   widget_config: WidgetConfig;
   whatsapp_number: string | null;
+  whatsapp_whitelist_enabled: boolean;
+  whatsapp_whitelist: string[];
+  whatsapp_hours_only: boolean;
   owner_whatsapp: string | null;
   owner_notify_channel: 'email' | 'whatsapp' | 'both';
   onboarding_step: number | null;

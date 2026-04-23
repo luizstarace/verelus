@@ -11,15 +11,15 @@ interface UsageData {
 }
 
 const PLAN_DISPLAY: Record<string, { name: string; priceLabel: string }> = {
-  starter: { name: 'Starter', priceLabel: 'R$ 147/mes' },
-  pro: { name: 'Pro', priceLabel: 'R$ 297/mes' },
-  business: { name: 'Business', priceLabel: 'R$ 597/mes' },
+  starter: { name: 'Starter', priceLabel: 'R$ 147/mês' },
+  pro: { name: 'Pro', priceLabel: 'R$ 297/mês' },
+  business: { name: 'Business', priceLabel: 'R$ 597/mês' },
 };
 
 const PLAN_FEATURES: Record<string, string[]> = {
-  starter: ['500 mensagens/mes', 'Widget de chat', 'Suporte por email'],
-  pro: ['2.500 mensagens/mes', '30 min de voz/mes', 'Widget + WhatsApp', 'Suporte prioritario'],
-  business: ['10.000 mensagens/mes', '120 min de voz/mes', 'Clonagem de voz', 'Suporte dedicado'],
+  starter: ['500 mensagens/mês', 'Widget de chat', 'Suporte por email'],
+  pro: ['2.500 mensagens/mês', '30 min de voz/mês', 'Widget + WhatsApp', 'Suporte prioritário'],
+  business: ['10.000 mensagens/mês', '120 min de voz/mês', 'Clonagem de voz', 'Suporte dedicado'],
 };
 
 function barColor(percentage: number): string {
@@ -60,14 +60,12 @@ export default function BillingView() {
   }
 
   if (!usage) {
-    return <div className="p-6 text-brand-muted">Nao foi possivel carregar dados de uso.</div>;
+    return <div className="p-6 text-brand-muted">Não foi possível carregar dados de uso.</div>;
   }
 
   const planInfo = PLAN_DISPLAY[usage.plan];
   const textPct = Math.min(usage.text.percentage, 100);
   const voicePct = Math.min(usage.voice.percentage, 100);
-  const voiceLimitMin = Math.floor(usage.voice.limit_seconds / 60);
-  const voiceUsedMin = Math.floor(usage.voice.used_seconds / 60);
 
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6">
@@ -85,12 +83,12 @@ export default function BillingView() {
             Ativo
           </span>
         </div>
-        <p className="text-xs text-brand-muted mt-3">Periodo: {usage.period}</p>
+        <p className="text-xs text-brand-muted mt-3">Período: {usage.period}</p>
       </div>
 
       {/* Usage Bars */}
       <div className="bg-brand-surface border border-brand-border rounded-lg p-6 space-y-5">
-        <h2 className="text-lg font-semibold text-brand-text">Uso do periodo</h2>
+        <h2 className="text-lg font-semibold text-brand-text">Uso do período</h2>
 
         {/* Text messages */}
         <div>
@@ -115,7 +113,7 @@ export default function BillingView() {
             <div className="flex items-center justify-between mb-1">
               <span className="text-sm text-brand-text">Minutos de voz</span>
               <span className="text-sm text-brand-muted">
-                {formatSeconds(usage.voice.used_seconds)} / {voiceLimitMin} minutos
+                {formatSeconds(usage.voice.used_seconds)} / {formatSeconds(usage.voice.limit_seconds)}
               </span>
             </div>
             <div className="w-full bg-brand-border rounded-full h-3">
@@ -130,7 +128,7 @@ export default function BillingView() {
 
         {usage.overage_notified && (
           <p className="text-xs text-brand-warning">
-            Voce ultrapassou o limite do plano. Mensagens extras serao cobradas por excedente.
+            Você ultrapassou o limite do plano. Mensagens extras serão cobradas por excedente.
           </p>
         )}
       </div>
@@ -179,13 +177,7 @@ export default function BillingView() {
           href="/attendly#pricing"
           className="inline-block bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition"
         >
-          Fazer upgrade
-        </a>
-        <a
-          href="/attendly#pricing"
-          className="text-sm text-brand-trust hover:underline"
-        >
-          Ver planos e fazer upgrade →
+          {usage.plan === 'business' ? 'Ver planos' : 'Fazer upgrade'}
         </a>
       </div>
     </div>

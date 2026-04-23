@@ -91,7 +91,7 @@ export default function ProfileClient() {
     <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-brand-text mb-2">Seu perfil</h1>
       <p className="text-sm text-brand-muted mb-8">
-        Esses dados aparecem no cabecalho de toda proposta que voce envia.
+        Esses dados aparecem no cabeçalho de toda proposta que você envia.
       </p>
 
       {error && (

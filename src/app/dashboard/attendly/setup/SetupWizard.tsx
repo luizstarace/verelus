@@ -62,16 +62,16 @@ function hoursArrayToRecord(arr: HoursEntry[]): Record<string, { open: string; c
 }
 
 const STEP_TITLES = [
-  'Dados do negocio',
-  'Servicos, Horarios e FAQ',
+  'Dados do negócio',
+  'Serviços, Horários e FAQ',
   'Testar o atendente',
   'Instalar Widget',
   'Conectar WhatsApp',
 ];
 
 const STEP_DESCRIPTIONS = [
-  'Conte-nos sobre seu negocio para configurar o atendente.',
-  'Adicione servicos, horarios de funcionamento e perguntas frequentes.',
+  'Conte-nos sobre seu negócio para configurar o atendente.',
+  'Adicione serviços, horários de funcionamento e perguntas frequentes.',
   'Teste o atendente com uma conversa simulada.',
   'Instale o widget no seu site para atender clientes automaticamente.',
   'Conecte o WhatsApp para atender pelo canal mais popular do Brasil.',
@@ -149,7 +149,7 @@ export default function SetupWizard() {
 
   async function handleStep1Next() {
     if (!name.trim()) {
-      setError('Nome do negocio e obrigatorio.');
+      setError('Nome do negócio é obrigatório.');
       return;
     }
     const payload = { name: name.trim(), category, phone, address };
@@ -207,7 +207,7 @@ export default function SetupWizard() {
       }
 
       const reader = res.body?.getReader();
-      if (!reader) throw new Error('Streaming nao suportado');
+      if (!reader) throw new Error('Streaming não suportado');
 
       const decoder = new TextDecoder();
       let assistantText = '';
@@ -316,7 +316,7 @@ export default function SetupWizard() {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-brand-text mb-1">
-            Nome do negocio <span className="text-brand-error">*</span>
+            Nome do negócio <span className="text-brand-error">*</span>
           </label>
           <input
             className={inputClass}
@@ -350,10 +350,10 @@ export default function SetupWizard() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-brand-text mb-1">Endereco</label>
+          <label className="block text-sm font-medium text-brand-text mb-1">Endereço</label>
           <input
             className={inputClass}
-            placeholder="Rua, numero, cidade"
+            placeholder="Rua, número, cidade"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
@@ -367,12 +367,12 @@ export default function SetupWizard() {
       <div className="space-y-6">
         {/* Services */}
         <div>
-          <h3 className="text-sm font-semibold text-brand-text mb-3">Servicos</h3>
+          <h3 className="text-sm font-semibold text-brand-text mb-3">Serviços</h3>
           {services.map((s, i) => (
             <div key={i} className="grid grid-cols-2 gap-2 mb-3 p-3 bg-brand-surface rounded-lg">
               <input
                 className={inputClass}
-                placeholder="Nome do servico"
+                placeholder="Nome do serviço"
                 value={s.name}
                 onChange={(e) => updateService(i, 'name', e.target.value)}
               />
@@ -384,7 +384,7 @@ export default function SetupWizard() {
               />
               <input
                 className={inputClass}
-                placeholder="Duracao (min)"
+                placeholder="Duração (min)"
                 value={s.duration}
                 onChange={(e) => updateService(i, 'duration', e.target.value)}
               />
@@ -408,13 +408,13 @@ export default function SetupWizard() {
             </div>
           ))}
           <button type="button" onClick={addService} className="text-brand-trust text-sm font-medium hover:underline">
-            + Adicionar servico
+            + Adicionar serviço
           </button>
         </div>
 
         {/* Hours */}
         <div>
-          <h3 className="text-sm font-semibold text-brand-text mb-3">Horarios de funcionamento</h3>
+          <h3 className="text-sm font-semibold text-brand-text mb-3">Horários de funcionamento</h3>
           <div className="space-y-2">
             {hours.map((h, i) => (
               <div key={h.key} className="flex items-center gap-3">
@@ -566,7 +566,7 @@ export default function SetupWizard() {
         </div>
         <h3 className="text-lg font-semibold text-brand-text">WhatsApp — Em breve</h3>
         <p className="text-sm text-brand-muted max-w-md mx-auto">
-          A integracao com o WhatsApp Business esta sendo desenvolvida. Voce sera notificado quando estiver disponivel.
+          A integração com o WhatsApp Business está sendo desenvolvida. Você será notificado quando estiver disponível.
         </p>
       </div>
     );

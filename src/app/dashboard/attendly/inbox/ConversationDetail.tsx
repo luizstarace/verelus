@@ -224,7 +224,7 @@ export default function ConversationDetail({ conversationId, onBack, onStatusCha
             const isCustomer = msg.role === 'customer';
             const label = roleLabel(msg.role);
             return (
-              <div key={msg.id} className={`flex ${isCustomer ? 'justify-start' : 'justify-start'}`}>
+              <div key={msg.id} className={`flex ${isCustomer ? 'justify-start' : 'justify-end'}`}>
                 <div className={`max-w-[80%] rounded-lg px-3 py-2 ${bubbleStyle(msg.role)}`}>
                   {label && (
                     <span className="block text-xs font-semibold mb-0.5 opacity-70">{label}</span>

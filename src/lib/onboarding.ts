@@ -76,52 +76,59 @@ export function getNextOnboardingEmail(progress: Record<string, boolean | string
   return null;
 }
 
-// Onboarding email templates in Portuguese
+// Onboarding email templates em PT-BR — Attendly (atendente IA pra PMEs).
+//
+// Nota: checkOnboardingMilestones acima ainda verifica tabelas legadas
+// (artist_profiles, ai_outputs, pitch_submissions) do produto musical
+// descontinuado. Os endpoints /api/onboarding/* também não têm caller
+// ativo no momento. Estes templates são um default seguro caso o fluxo
+// seja reativado — eventual migração pra Attendly milestones
+// (business criado, WhatsApp conectado, 1ª conversa) fica pra depois.
 export const ONBOARDING_EMAILS: Record<string, { subject: string; body: string }> = {
   welcome: {
-    subject: 'Bem-vindo ao Verelus! Suas 11 ferramentas estão prontas',
+    subject: 'Bem-vindo ao Attendly! Vamos colocar seu atendente no ar',
     body: `
-      <h2 style="color: #00f5a0;">Bem-vindo ao Verelus!</h2>
-      <p>Estamos felizes em ter você. O Verelus tem 11 ferramentas feitas pra resolver dores reais do músico independente brasileiro.</p>
+      <h2 style="color: #00f5a0;">Seu teste grátis de 7 dias começou!</h2>
+      <p>O Attendly é um atendente de IA que responde seus clientes 24h por dia, no WhatsApp e no widget do seu site. Em 15 minutos fica pronto.</p>
       <h3>Comece por aqui:</h3>
       <ol>
-        <li><strong>Gere sua Bio Adaptativa</strong> — 4 bios prontas pra Spotify, Instagram, EPK e Twitter</li>
-        <li><strong>Monte seu Rider Técnico</strong> — PDF profissional com diagrama de palco</li>
-        <li><strong>Calcule seu Cachê</strong> — Quanto cobrar por show e quanto sobra no bolso</li>
+        <li><strong>Configure seu negócio</strong> — nome, serviços, horários e FAQ (5 minutos)</li>
+        <li><strong>Teste o atendente</strong> — simule uma conversa no próprio painel antes de ir ao ar</li>
+        <li><strong>Conecte o WhatsApp</strong> — escaneie um QR com um número dedicado</li>
       </ol>
-      <a href="{{appUrl}}/dashboard" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Abrir Ferramentas</a>
+      <a href="{{appUrl}}/dashboard/attendly/setup" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Começar configuração</a>
     `,
   },
   complete_profile: {
-    subject: 'Falta pouco! Complete seu perfil no Verelus',
+    subject: 'Falta pouco! Complete a configuração do seu atendente',
     body: `
-      <h2 style="color: #00f5a0;">Seu perfil está quase pronto!</h2>
-      <p>Um perfil completo permite que a IA gere bios, pitches e conteúdo mais personalizado pra você.</p>
-      <p>Leva menos de 2 minutos:</p>
+      <h2 style="color: #00f5a0;">Seu atendente precisa conhecer seu negócio.</h2>
+      <p>Sem os dados básicos preenchidos, a IA responde de forma genérica. Leva menos de 5 minutos pra configurar:</p>
       <ul>
-        <li>Nome do projeto/banda</li>
-        <li>Gênero musical</li>
-        <li>URL do Spotify (pra Growth Tracker)</li>
+        <li>Nome e categoria do negócio</li>
+        <li>Serviços e preços</li>
+        <li>Horário de funcionamento</li>
+        <li>Perguntas frequentes dos clientes</li>
       </ul>
-      <a href="{{appUrl}}/dashboard/profile" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Completar Perfil</a>
+      <a href="{{appUrl}}/dashboard/attendly/setup" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Completar configuração</a>
     `,
   },
   try_ai: {
-    subject: 'Gere sua primeira bio com IA em 30 segundos',
+    subject: 'Teste seu atendente antes de colocar no ar',
     body: `
-      <h2 style="color: #00f5a0;">Já experimentou a Bio Adaptativa?</h2>
-      <p>Responde 6 perguntas curtas e recebe 4 bios profissionais prontas pra copiar e colar. Cada uma no tamanho exato da plataforma.</p>
-      <p>Também temos Rider Técnico, Contrato de Show, Calculadora de Cachê e mais 7 ferramentas.</p>
-      <a href="{{appUrl}}/dashboard/bio" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Gerar Minha Bio</a>
+      <h2 style="color: #00f5a0;">Já simulou uma conversa com o seu atendente?</h2>
+      <p>No painel, você pode mandar mensagens como se fosse um cliente e ver como a IA responde. É a melhor forma de ajustar tom, FAQ e regras de transferência antes de abrir pro público.</p>
+      <p>O modo de teste não conta no seu limite mensal.</p>
+      <a href="{{appUrl}}/dashboard/attendly/setup" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Testar agora</a>
     `,
   },
   first_pitch: {
-    subject: 'Seu Pitch Kit está pronto — envie pra curadores',
+    subject: 'Conecte o WhatsApp e comece a atender',
     body: `
-      <h2 style="color: #00f5a0;">Suas músicas merecem ser ouvidas!</h2>
-      <p>O Pitch Kit do Verelus gera email + 1-pager + press release coordenados pra enviar a curadores, gravadoras e mídia.</p>
-      <p>Profissional, personalizado, em português. Tudo em menos de 1 minuto.</p>
-      <a href="{{appUrl}}/dashboard/pitch-kit" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Criar Meu Pitch Kit</a>
+      <h2 style="color: #00f5a0;">Último passo: conectar o WhatsApp.</h2>
+      <p>A integração é feita escaneando um QR Code com o celular — igual o WhatsApp Web. Dica importante: use um número dedicado (não o pessoal) pra evitar que a IA responda seus familiares.</p>
+      <p>Se preferir começar só pelo widget do site, tudo bem — dá pra conectar o WhatsApp depois.</p>
+      <a href="{{appUrl}}/dashboard/attendly/settings?tab=whatsapp" style="display:inline-block;background:#00f5a0;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Conectar WhatsApp</a>
     `,
   },
 };

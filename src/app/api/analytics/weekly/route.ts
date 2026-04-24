@@ -146,7 +146,7 @@ Seja direto, use números, e foque em ações que um founder solo pode executar.
           Authorization: `Bearer ${resendKey}`,
         },
         body: JSON.stringify({
-          from: "Verelus Analytics <analytics@verelus.com>",
+          from: "Verelus Analytics <contato@verelus.com>",
           to: [founderEmail],
           subject: `[Verelus] Relatorio Semanal de Growth #${weekNumber} — ${formattedDate}`,
           html: buildReportEmail(reportContent, metrics, weekNumber),

@@ -13,7 +13,7 @@ export async function notifyOwnerEmail(params: NotifyOwnerParams) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Attendly <noreply@verelus.com>',
+        from: 'Attendly <contato@verelus.com>',
         to: params.to,
         subject: params.subject,
         html: params.html,

@@ -35,7 +35,7 @@ export async function GET(request: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Attendly Monitor <noreply@verelus.com>',
+          from: 'Attendly Monitor <contato@verelus.com>',
           to: [process.env.FOUNDER_EMAIL || 'luizsfap@gmail.com'],
           subject: `[ALERT] Attendly health check: ${data.status}`,
           html: `

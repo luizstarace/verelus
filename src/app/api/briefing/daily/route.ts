@@ -35,7 +35,7 @@ export async function POST(request: Request) {
           Authorization: `Bearer ${resendKey}`,
         },
         body: JSON.stringify({
-          from: "Verelus <briefing@verelus.com>",
+          from: "Verelus Briefing <contato@verelus.com>",
           to: [founderEmail],
           subject: `Verelus Daily Briefing - ${new Date().toLocaleDateString("pt-BR")}`,
           html: emailHtml,

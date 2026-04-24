@@ -56,7 +56,7 @@ async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: s
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Verelus <newsletter@verelus.com>",
+        from: "Verelus Newsletter <contato@verelus.com>",
         to: [email],
         subject: "Bem-vindo ao Verelus!",
         html: `

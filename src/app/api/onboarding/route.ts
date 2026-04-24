@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
             Authorization: `Bearer ${resendKey}`,
           },
           body: JSON.stringify({
-            from: 'Verelus <noreply@verelus.com>',
+            from: 'Verelus <contato@verelus.com>',
             to: [user.email],
             subject: template.subject,
             html: htmlBody,

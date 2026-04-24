@@ -37,11 +37,11 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
 }
 
-// Generate a unique unsubscribe token
+// Generate a unique unsubscribe token. Must be UUID because the
+// email_subscribers.unsubscribe_token column is typed uuid in Postgres —
+// 48-char hex used previously caused every new INSERT to fail with 400.
 function generateToken(): string {
-  const array = new Uint8Array(24);
-  crypto.getRandomValues(array);
-  return Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
+  return crypto.randomUUID();
 }
 
 async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: string) {

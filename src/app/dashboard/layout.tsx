@@ -27,6 +27,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/attendly/settings', label: 'Ajustes', icon: '🔧', tier: 1 },
   { href: '/dashboard/attendly/billing', label: 'Plano & Uso', icon: '📈', tier: 1 },
   { href: '/dashboard/attendly/logs', label: 'Logs', icon: '🗒️', tier: 1 },
+  { href: '/ajuda', label: 'Ajuda', icon: '❓', tier: 1 },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

@@ -16,7 +16,13 @@ async function sendPurchaseEmail(email: string, plan: string) {
   if (!resendKey) return;
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://verelus.com";
-  const planLabel = plan === "business" ? "Business" : "Pro";
+
+  // Map raw product string to user-facing label (Attendly plans + legacy fallback).
+  let planLabel = "Pro";
+  if (plan === "attendly_starter") planLabel = "Starter";
+  else if (plan === "attendly_pro") planLabel = "Pro";
+  else if (plan === "attendly_business" || plan === "business") planLabel = "Business";
+  else if (plan === "pro") planLabel = "Pro";
 
   try {
     await fetch("https://api.resend.com/emails", {
@@ -26,46 +32,48 @@ async function sendPurchaseEmail(email: string, plan: string) {
         Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
-        from: "Verelus <contato@verelus.com>",
+        from: "Attendly <contato@verelus.com>",
         to: [email],
-        subject: `Bem-vindo ao Verelus ${planLabel}!`,
+        subject: `Seu plano Attendly ${planLabel} está ativo!`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #e5e5e5; padding: 40px 30px; border-radius: 12px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #f5f5f5; font-size: 28px; margin: 0;">Verelus</h1>
-              <p style="color: #00f5a0; font-size: 14px; margin: 4px 0 0;">Ferramentas para músicos</p>
+              <h1 style="color: #f5f5f5; font-size: 28px; margin: 0;">Attendly</h1>
+              <p style="color: #00f5a0; font-size: 14px; margin: 4px 0 0;">Seu atendente de IA, 24h por dia</p>
             </div>
             <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 30px; margin-bottom: 24px; border: 1px solid #262626;">
-              <h2 style="color: #00f5a0; margin: 0 0 16px; font-size: 22px;">Parabéns! Seu plano ${planLabel} está ativo.</h2>
+              <h2 style="color: #00f5a0; margin: 0 0 16px; font-size: 22px;">Plano ${planLabel} ativo. Vamos colocar seu atendente no ar?</h2>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0 0 16px;">
-                Agora você tem acesso ilimitado a todas as 11 ferramentas do Verelus.
-              </p>
-              <p style="color: #d4d4d4; line-height: 1.7; margin: 0;">
-                Aqui está o que você pode fazer agora:
+                Em 15 minutos seu atendente está respondendo clientes no WhatsApp e no widget do seu site. A gente já preparou o caminho pra você:
               </p>
             </div>
             <div style="margin-bottom: 24px;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #f5f5f5;">Bio, Rider, Contrato, Cachê</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Ferramentas profissionais com PDF, ilimitadas</p>
+              <div style="margin-bottom: 16px;">
+                <strong style="color: #f5f5f5;">1. Configure seu negócio</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Nome, serviços, horários e perguntas frequentes — 5 minutos.</p>
               </div>
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #f5f5f5;">Growth Tracker + Metas</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Email semanal com dados reais + projeções</p>
+              <div style="margin-bottom: 16px;">
+                <strong style="color: #f5f5f5;">2. Conecte o WhatsApp</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Escaneie o QR com um número dedicado (não o pessoal).</p>
               </div>
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #f5f5f5;">Pitch Kit + Cronograma</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Pitches coordenados + 30 dias de posts</p>
+              <div style="margin-bottom: 16px;">
+                <strong style="color: #f5f5f5;">3. Instale o widget (opcional)</strong>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Cole uma linha de código no seu site e o atendente aparece no canto.</p>
               </div>
             </div>
             <div style="text-align: center; margin-bottom: 24px;">
-              <a href="${appUrl}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #00f5a0, #00d9f5); color: #000; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 15px;">
-                Acessar meu Dashboard
+              <a href="${appUrl}/dashboard/attendly/setup" style="display: inline-block; background: linear-gradient(135deg, #00f5a0, #00d9f5); color: #000; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 15px;">
+                Começar a configurar
               </a>
+            </div>
+            <div style="background: #171717; border-radius: 8px; padding: 16px; margin-bottom: 24px; border: 1px solid #262626;">
+              <p style="color: #d4d4d4; margin: 0; font-size: 14px; line-height: 1.6;">
+                Precisa de ajuda? O manual completo está em <a href="${appUrl}/ajuda" style="color: #60a5fa;">verelus.com/ajuda</a> e você pode responder este email direto que a gente lê.
+              </p>
             </div>
             <div style="text-align: center; border-top: 1px solid #262626; padding-top: 20px;">
               <p style="color: #737373; font-size: 13px; margin: 0;">
-                <strong style="color: #a3a3a3;">Verelus</strong> — Ferramentas para músicos
+                <strong style="color: #a3a3a3;">Verelus</strong> — Produtos com IA para o seu negócio
               </p>
               <p style="color: #525252; font-size: 12px; margin: 8px 0 0;">
                 &copy; 2026 Verelus. Todos os direitos reservados.

@@ -63,7 +63,7 @@ export default function PrivacyPage() {
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">7. Direitos do Titular (LGPD)</h2>
           <p>Você tem direito a: acesso, correção, anonimização, bloqueio, eliminação, portabilidade, informação sobre compartilhamento e revogação de consentimento.</p>
-          <p>Titulares de conta Verelus podem exercer esses direitos diretamente em <a href="mailto:privacidade@verelus.com" className="text-brand-trust">privacidade@verelus.com</a>.</p>
+          <p>Titulares de conta Verelus podem exercer esses direitos diretamente em <a href="mailto:contato@verelus.com" className="text-brand-trust">contato@verelus.com</a>.</p>
           <p>Clientes finais (pessoas atendidas pela IA) devem direcionar pedidos ao negócio com o qual interagiram — esse negócio é o controlador dos dados. A Verelus, como operadora, atenderá a solicitação via o titular da conta correspondente.</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">8. Cookies</h2>
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
           <p>Podemos atualizar esta política. Mudanças significativas serão comunicadas por email ao titular da conta com antecedência razoável.</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">11. Encarregado e Contato</h2>
-          <p>Para exercer direitos, tirar dúvidas ou reportar incidentes: <a href="mailto:privacidade@verelus.com" className="text-brand-trust">privacidade@verelus.com</a>.</p>
+          <p>Para exercer direitos, tirar dúvidas ou reportar incidentes: <a href="mailto:contato@verelus.com" className="text-brand-trust">contato@verelus.com</a>.</p>
         </div>
       </div>
     </div>

@@ -308,11 +308,10 @@ export default function AjudaPage() {
 
           <section id="suporte">
             <h2 className="text-xl font-semibold text-brand-text mb-3">12. Suporte</h2>
-            <ul className="list-disc pl-6 space-y-1">
-              <li><strong>Dúvidas de uso:</strong> <a href="mailto:suporte@verelus.com" className="text-brand-trust hover:underline">suporte@verelus.com</a></li>
-              <li><strong>Cobrança e plano:</strong> <a href="mailto:financeiro@verelus.com" className="text-brand-trust hover:underline">financeiro@verelus.com</a></li>
-              <li><strong>Privacidade e LGPD:</strong> <a href="mailto:privacidade@verelus.com" className="text-brand-trust hover:underline">privacidade@verelus.com</a></li>
-            </ul>
+            <p>
+              Para qualquer assunto — dúvidas de uso, cobrança, privacidade ou LGPD — escreva para{' '}
+              <a href="mailto:contato@verelus.com" className="text-brand-trust hover:underline">contato@verelus.com</a>.
+            </p>
             <p className="mt-3 text-xs text-brand-muted">
               Resposta em até 1 dia útil. Para clientes Business, atendimento prioritário em até 4 horas em dias úteis.
             </p>

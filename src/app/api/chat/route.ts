@@ -46,7 +46,7 @@ Seu nome é "Vee" e você ajuda os usuários a entenderem e usarem as ferramenta
 ## Regras
 1. Responda SEMPRE em português brasileiro
 2. Seja amigável, direto e útil
-3. Se não souber algo, sugira contatar suporte@verelus.com
+3. Se não souber algo, sugira escrever para contato@verelus.com
 4. Não invente funcionalidades que não existem
 5. Limite suas respostas a 200 palavras quando possível`;
 
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicKey) {
       return NextResponse.json({
-        reply: 'Desculpe, o chat está temporariamente indisponível. Entre em contato pelo suporte@verelus.com.',
+        reply: 'Desculpe, o chat está temporariamente indisponível. Escreva para contato@verelus.com.',
       });
     }
 

@@ -325,7 +325,7 @@ export default function AttendlyPage() {
                 </svg>
               </div>
               <p className="text-sm font-semibold mb-1">Resposta &lt; 2s</p>
-              <p className="text-xs text-brand-muted">Claude Haiku 4.5 em streaming</p>
+              <p className="text-xs text-brand-muted">Resposta em streaming</p>
             </div>
             <div className="bg-brand-bg rounded-xl p-6 border border-brand-border text-center">
               <div className="w-11 h-11 bg-brand-trust/10 rounded-lg flex items-center justify-center mx-auto mb-3">

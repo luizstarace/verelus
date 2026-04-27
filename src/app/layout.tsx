@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Verelus — Produtos com IA para o seu negócio",
+  title: "Verelus — Atendente IA 24/7 para PMEs brasileiras",
   description:
     "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
   openGraph: {
-    title: "Verelus — Produtos com IA para o seu negócio",
+    title: "Verelus — Atendente IA 24/7 para PMEs brasileiras",
     description:
       "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
     type: "website",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verelus — Produtos com IA para o seu negócio",
+    title: "Verelus — Atendente IA 24/7 para PMEs brasileiras",
     description: "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
   },
   robots: "index, follow",

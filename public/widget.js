@@ -217,7 +217,7 @@
     // Footer
     var footer = document.createElement('div');
     footer.className = 'aw-footer';
-    footer.innerHTML = 'Powered by <a href="https://attendly.com.br" target="_blank" rel="noopener">Attendly</a>';
+    footer.innerHTML = 'Powered by <a href="https://verelus.com/attendly" target="_blank" rel="noopener">Attendly</a>';
     panel.appendChild(footer);
 
     // ── Open/Close ───────────────────────────────────────

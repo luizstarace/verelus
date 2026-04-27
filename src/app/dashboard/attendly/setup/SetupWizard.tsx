@@ -260,7 +260,17 @@ export default function SetupWizard() {
       status: 'active',
       onboarding_step: null,
     });
-    if (data) router.push('/dashboard/attendly');
+    if (data) {
+      router.push('/dashboard/attendly');
+    } else {
+      // apiCall already populated `error` from the response. The error block
+      // is rendered at the top of the wizard card; on a long step 5 (QR + tips)
+      // it can be off-screen, so scroll it into view + give a nudge to retry.
+      setError((prev) => prev || 'Não conseguimos finalizar a configuração. Tente novamente em alguns segundos.');
+      if (typeof document !== 'undefined') {
+        document.getElementById('wizard-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
   }
 
   async function copyWidgetCode() {
@@ -692,7 +702,7 @@ export default function SetupWizard() {
           <p className="text-sm text-brand-muted mb-6">{STEP_DESCRIPTIONS[step - 1]}</p>
 
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-50 border border-brand-error text-brand-error text-sm">
+            <div id="wizard-error" className="mb-4 p-3 rounded-lg bg-red-50 border border-brand-error text-brand-error text-sm">
               {error}
             </div>
           )}

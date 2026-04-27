@@ -4,11 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Verelus — Atendente IA 24/7 para PMEs brasileiras",
   description:
-    "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
+    "Attendly responde seus clientes no WhatsApp e no site 24h. Atendimento automático para salão, clínica, restaurante, academia e prestador de serviço. Teste 7 dias grátis sem cartão.",
   openGraph: {
     title: "Verelus — Atendente IA 24/7 para PMEs brasileiras",
     description:
-      "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
+      "Attendly responde seus clientes no WhatsApp e no site 24h. Atendimento automático para salão, clínica, restaurante, academia e prestador de serviço. Teste 7 dias grátis sem cartão.",
     type: "website",
     url: "https://verelus.com",
     siteName: "Verelus",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Verelus — Atendente IA 24/7 para PMEs brasileiras",
-    description: "Attendly: atendente IA 24/7 para PMEs brasileiras. WhatsApp, chat no site, voz. Teste grátis por 7 dias.",
+    description: "Attendly responde seus clientes no WhatsApp e no site 24h. Atendimento automático para salão, clínica, restaurante, academia e prestador de serviço. Teste 7 dias grátis sem cartão.",
   },
   robots: "index, follow",
 };

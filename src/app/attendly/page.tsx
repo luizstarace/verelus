@@ -105,6 +105,26 @@ export default function AttendlyPage() {
         </div>
       </section>
 
+      {/* ── Tech-trust strip ── */}
+      <section className="bg-white py-8 border-y border-brand-border">
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-center text-xs uppercase tracking-wider text-brand-muted mb-4 font-semibold">
+            Construído com tecnologia de ponta
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-brand-muted">
+            <span className="font-medium">Anthropic Claude</span>
+            <span className="text-brand-border">·</span>
+            <span className="font-medium">Stripe</span>
+            <span className="text-brand-border">·</span>
+            <span className="font-medium">Supabase</span>
+            <span className="text-brand-border">·</span>
+            <span className="font-medium">Cloudflare</span>
+            <span className="text-brand-border">·</span>
+            <span className="font-medium">ElevenLabs</span>
+          </div>
+        </div>
+      </section>
+
       {/* ── Para quem e o Attendly ── */}
       <section className="bg-white py-20">
         <div className="max-w-6xl mx-auto px-6">

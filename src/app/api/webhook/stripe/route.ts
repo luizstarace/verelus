@@ -256,12 +256,32 @@ export async function POST(req: NextRequest) {
           { onConflict: "email" }
         );
 
-        // If Attendly subscription, activate the business
+        // If Attendly subscription, activate the business. UPDATE first; if no
+        // row matched (customer paid before completing the setup wizard), INSERT
+        // a stub so they're not orphaned with an active sub and no business
+        // record. Customer fills in name/services/etc. when they open the wizard.
         if (isAttendlyProduct(productType)) {
-          await supabase
+          const { data: updated } = await supabase
             .from("attendly_businesses")
             .update({ status: "active" })
-            .eq("user_id", user.id);
+            .eq("user_id", user.id)
+            .select("id");
+
+          if (!updated || updated.length === 0) {
+            const stubName = (email.split("@")[0] || "Meu negócio").slice(0, 50);
+            const { error: insErr } = await supabase
+              .from("attendly_businesses")
+              .insert({
+                user_id: user.id,
+                name: stubName,
+                status: "active",
+              });
+            // 23505 = unique violation — race with a concurrent stub insert.
+            // Safe to ignore; the row exists either way.
+            if (insErr && (insErr as { code?: string }).code !== "23505") {
+              console.error("attendly_businesses stub insert error:", insErr);
+            }
+          }
         }
 
         // Send post-purchase welcome email via Resend

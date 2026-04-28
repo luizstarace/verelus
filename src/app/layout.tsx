@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -45,7 +46,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans antialiased bg-brand-bg text-brand-text">{children}</body>
+      <body className="font-sans antialiased bg-brand-bg text-brand-text">
+        <MetaPixel />
+        {children}
+      </body>
     </html>
   );
 }

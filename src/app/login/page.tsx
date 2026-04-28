@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
+import { trackMeta } from '@/lib/analytics/meta';
 
 function getSupabase() {
   return createBrowserClient(
@@ -51,6 +52,7 @@ export default function LoginPage() {
           },
         });
         if (signUpError) throw signUpError;
+        trackMeta('CompleteRegistration', { method: 'email' });
         setMessage('Verifique seu email para confirmar o cadastro.');
       } else if (mode === 'reset') {
         // Redirect to /auth/reset directly. The page listens for PASSWORD_RECOVERY event.
@@ -79,6 +81,10 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
+    // Google OAuth doesn't differentiate signup vs signin client-side, so we
+    // emit Lead instead of CompleteRegistration; cleaner attribution comes
+    // server-side later if needed.
+    trackMeta('Lead', { method: 'google_oauth' });
     const { error: oauthError } = await getSupabase().auth.signInWithOAuth({
       provider: 'google',
       options: {

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { trackMeta } from '@/lib/analytics/meta';
 
 interface OverviewStats {
   msgs_month: number;
@@ -13,6 +15,18 @@ export default function OverviewDashboard() {
   const [business, setBusiness] = useState<any>(null);
   const [conversations, setConversations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+
+  // Stripe redirects back to /dashboard/attendly?checkout=success after a paid
+  // checkout. Fire the Subscribe pixel event once per session (sessionStorage
+  // dedup) so a refresh or back-navigation doesn't double-count.
+  useEffect(() => {
+    if (searchParams?.get('checkout') !== 'success') return;
+    if (typeof window === 'undefined') return;
+    if (window.sessionStorage.getItem('attendly_subscribe_tracked') === '1') return;
+    trackMeta('Subscribe', { currency: 'BRL' });
+    window.sessionStorage.setItem('attendly_subscribe_tracked', '1');
+  }, [searchParams]);
 
   useEffect(() => {
     async function load() {

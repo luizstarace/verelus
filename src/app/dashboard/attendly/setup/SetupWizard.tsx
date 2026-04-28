@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { trackMeta } from '@/lib/analytics/meta';
 
 // --- Types ---
 
@@ -261,6 +262,11 @@ export default function SetupWizard() {
       onboarding_step: null,
     });
     if (data) {
+      trackMeta('StartTrial', {
+        value: 0,
+        currency: 'BRL',
+        content_name: 'attendly_trial',
+      });
       router.push('/dashboard/attendly');
     } else {
       // apiCall already populated `error` from the response. The error block

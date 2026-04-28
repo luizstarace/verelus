@@ -12,11 +12,20 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://verelus.com",
     siteName: "Verelus",
+    images: [
+      {
+        url: "https://verelus.com/og-attendly.png",
+        width: 1200,
+        height: 630,
+        alt: "Attendly — Atendente IA 24/7 no WhatsApp e no site",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Verelus — Atendente IA 24/7 para PMEs brasileiras",
     description: "Attendly responde seus clientes no WhatsApp e no site 24h. Atendimento automático para salão, clínica, restaurante, academia e prestador de serviço. Teste 7 dias grátis sem cartão.",
+    images: ["https://verelus.com/og-attendly.png"],
   },
   robots: "index, follow",
 };

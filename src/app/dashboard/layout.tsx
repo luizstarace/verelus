@@ -23,6 +23,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/atalaia', label: 'Visão Geral', icon: '📊', tier: 1 },
   { href: '/dashboard/atalaia/inbox', label: 'Conversas', icon: '💬', tier: 1 },
+  { href: '/dashboard/atalaia/playground', label: 'Treinar IA', icon: '🎯', tier: 1 },
   { href: '/dashboard/atalaia/setup', label: 'Configurar', icon: '⚙️', tier: 1 },
   { href: '/dashboard/atalaia/settings', label: 'Ajustes', icon: '🔧', tier: 1 },
   { href: '/dashboard/atalaia/billing', label: 'Plano & Uso', icon: '📈', tier: 1 },

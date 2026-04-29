@@ -32,7 +32,9 @@ export async function POST(request: Request) {
         'mode': 'subscription',
         'line_items[0][price]': stripePriceId,
         'line_items[0][quantity]': '1',
-        'subscription_data[trial_period_days]': '7',
+        // Trial is enforced in-app via business.trial_ends_at — do NOT request
+        // an additional Stripe trial period here, otherwise customers who
+        // already burned their 7 in-app days could get another 7 free on Stripe.
         'subscription_data[metadata][user_id]': userId,
         'subscription_data[metadata][product]': price_key.replace('_monthly', ''),
         'success_url': `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/atalaia?checkout=success`,

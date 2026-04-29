@@ -431,7 +431,8 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-4">Planos simples, sem surpresas</h2>
           <p className="text-brand-muted text-center mb-14 max-w-xl mx-auto">
-            Comece com 7 dias grátis em qualquer plano. Sem cartão de crédito.
+            Comece com <strong>7 dias grátis no plano Starter</strong> (500 mensagens). Sem cartão.
+            Depois você escolhe seu plano.
           </p>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto items-start">
             <div className="bg-white rounded-2xl p-8 border-2 border-brand-border hover:shadow-md transition-shadow">
@@ -584,7 +585,7 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
             Começar agora — 7 dias grátis
           </Link>
           <p className="text-sm text-white/70">
-            7 dias grátis. Sem cartão. Sem compromisso.
+            7 dias grátis no plano Starter. Sem cartão. Sem compromisso.
           </p>
         </div>
       </section>

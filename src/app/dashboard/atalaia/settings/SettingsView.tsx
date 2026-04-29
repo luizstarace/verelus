@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import WhatsAppBanWarning from '@/components/atalaia/WhatsAppBanWarning';
 
 interface Service {
   name: string;
@@ -739,6 +740,7 @@ export default function SettingsView() {
       {/* Tab: WhatsApp */}
       {tab === 'whatsapp' && (
         <div className="space-y-6">
+          <WhatsAppBanWarning />
           <div className="bg-brand-warning/10 border-l-4 border-brand-warning rounded-lg p-5">
             <div className="flex items-start gap-3">
               <svg className="w-5 h-5 text-brand-warning flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

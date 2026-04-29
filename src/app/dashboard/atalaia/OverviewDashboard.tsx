@@ -86,7 +86,7 @@ export default function OverviewDashboard() {
           <span className={trialInfo.expired ? 'text-brand-error font-medium' : 'text-brand-trust font-medium'}>
             {trialInfo.expired
               ? 'Seu período de teste expirou. Assine um plano para continuar atendendo.'
-              : `${trialInfo.daysLeft} ${trialInfo.daysLeft === 1 ? 'dia restante' : 'dias restantes'} no teste grátis.`}
+              : `${trialInfo.daysLeft} ${trialInfo.daysLeft === 1 ? 'dia restante' : 'dias restantes'} no trial — plano Starter (500 mensagens).`}
           </span>
           <a href="/dashboard/atalaia/billing" className="shrink-0 bg-brand-cta text-white font-medium px-4 py-1.5 rounded-md hover:brightness-110 transition">
             {trialInfo.expired ? 'Assinar agora' : 'Ver planos'}

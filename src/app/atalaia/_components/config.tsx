@@ -23,6 +23,8 @@ const sharedFaq: FaqEntry[] = [
   { q: 'Posso cancelar quando quiser?', a: 'Sim, 2 cliques no painel. Sem multa, sem burocracia, sem período de fidelidade.' },
   { q: 'Funciona com WhatsApp?', a: 'Sim. O Atalaia funciona tanto no WhatsApp quanto via widget no seu site. Seus clientes escolhem onde preferem falar.' },
   { q: 'O atendente responde em outros idiomas?', a: 'Sim. A IA detecta o idioma do cliente e responde automaticamente. Ideal se você recebe turistas ou clientes internacionais.' },
+  { q: 'O que é a "voz natural" mencionada no plano Pro e Business?', a: 'Síntese de voz feita pela ElevenLabs (provedor especializado, mesma tecnologia usada por podcasts e audiobooks profissionais). O atendente pode mandar áudios em português brasileiro nas respostas. Você escolhe entre 6 vozes prontas (3 femininas, 3 masculinas). O preview funciona em qualquer plano — você ouve antes de assinar.' },
+  { q: 'Tem risco de o WhatsApp banir o número conectado?', a: 'Sim, é um risco real. Conexões via API podem ser banidas pelo WhatsApp se o número for novo, pessoal, ou se comportar de forma muito automatizada. Recomendamos um chip dedicado ao negócio com 30+ dias de uso normal antes de conectar. Mostramos esse aviso explícito no momento da conexão.' },
 ];
 
 export const mainConfig: VerticalConfig = {

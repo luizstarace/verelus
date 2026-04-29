@@ -32,6 +32,8 @@ const config: Config = {
         "glow": "glow 2s ease-in-out infinite alternate",
         "float": "float 6s ease-in-out infinite",
         "slide-in-right": "slide-in-right 150ms ease-out",
+        "radar-ping": "radar-ping 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+        "radar-ping-delayed": "radar-ping 2.5s cubic-bezier(0.4, 0, 0.2, 1) 1.25s infinite",
       },
       keyframes: {
         glow: {
@@ -45,6 +47,11 @@ const config: Config = {
         "slide-in-right": {
           from: { transform: "translateX(10px)", opacity: "0" },
           to: { transform: "translateX(0)", opacity: "1" },
+        },
+        "radar-ping": {
+          "0%": { transform: "scale(1)", opacity: "0.6" },
+          "70%": { transform: "scale(2.2)", opacity: "0" },
+          "100%": { transform: "scale(2.2)", opacity: "0" },
         },
       },
     },

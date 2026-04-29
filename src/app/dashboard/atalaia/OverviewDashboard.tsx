@@ -1,10 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { trackMeta } from '@/lib/analytics/meta';
 import WhatsAppBanWarning from '@/components/atalaia/WhatsAppBanWarning';
 import { ATALAIA_VOICES, DEFAULT_VOICE_ID } from '@/lib/atalaia/voices';
+import BusinessDataSection from '@/components/atalaia/sections/BusinessDataSection';
+import ServicesSection from '@/components/atalaia/sections/ServicesSection';
+import HoursSection from '@/components/atalaia/sections/HoursSection';
+import FaqSection from '@/components/atalaia/sections/FaqSection';
+import WidgetSection from '@/components/atalaia/sections/WidgetSection';
+import NotificationsSection from '@/components/atalaia/sections/NotificationsSection';
+import AtalaiaLogo from '@/components/atalaia/AtalaiaLogo';
 
 interface OverviewStats {
   msgs_month: number;
@@ -19,10 +26,19 @@ interface OverviewStats {
 interface Business {
   id: string;
   name: string;
+  category?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  services?: any[];
+  hours?: Record<string, { open?: string; close?: string }> | null;
+  faq?: { question: string; answer: string }[];
+  widget_config?: { color?: string; position?: 'bottom-right' | 'bottom-left'; greeting?: string };
   whatsapp_number: string | null;
   voice_id: string | null;
   trial_ends_at: string | null;
   status: string;
+  owner_whatsapp?: string | null;
+  owner_notify_channel?: 'email' | 'whatsapp' | 'both' | null;
 }
 
 interface Conversation {
@@ -68,6 +84,27 @@ export default function OverviewDashboard() {
   const [logsOpen, setLogsOpen] = useState(false);
   const [logs, setLogs] = useState<LogEntry[] | null>(null);
   const [logsLoading, setLogsLoading] = useState(false);
+
+  // Config accordions state
+  const [openConfig, setOpenConfig] = useState<Set<string>>(new Set(['data']));
+  function toggleConfig(id: string) {
+    setOpenConfig((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const reloadBusiness = useCallback(async () => {
+    try {
+      const res = await fetch('/api/atalaia/business');
+      const data = await res.json();
+      if (data.business) setBusiness(data.business);
+    } catch (err) {
+      console.error('reloadBusiness', err);
+    }
+  }, []);
 
   useEffect(() => {
     if (searchParams?.get('checkout') !== 'success') return;
@@ -209,15 +246,24 @@ export default function OverviewDashboard() {
       : 0;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="relative p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+      {/* Subtle ambient background */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-amber-50/40 via-transparent to-blue-50/30"
+      />
+
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-brand-text">
-          Painel do {business.name}
-        </h1>
-        <p className="text-sm text-brand-muted mt-1">
-          Tudo que importa do seu atendente em uma tela só. Role pra ver e ajustar.
-        </p>
+      <div className="flex items-center gap-4">
+        <AtalaiaLogo size={56} />
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-brand-text leading-tight">
+            Painel do {business.name}
+          </h1>
+          <p className="text-sm text-brand-muted mt-0.5">
+            A torre que vigia seu WhatsApp. Tudo numa tela só.
+          </p>
+        </div>
       </div>
 
       {/* Trial banner */}
@@ -470,39 +516,45 @@ export default function OverviewDashboard() {
           </div>
         </PanelCard>
 
-        {/* Configurar (link aggregate) */}
-        <PanelCard title="Configurar negócio" linkHref="/dashboard/atalaia/setup" linkLabel="Editar tudo →">
-          <p className="text-sm text-brand-muted mb-3">
-            Dados, serviços, horários, FAQ, widget e notificações ficam na configuração inicial —
-            você pode voltar lá a qualquer momento.
+      </div>
+
+      {/* Configurar negócio — accordions inline */}
+      <div className="bg-white rounded-xl border border-brand-border overflow-hidden">
+        <div className="p-4 sm:p-6 border-b border-brand-border">
+          <h2 className="text-base sm:text-lg font-semibold text-brand-text">Configurar atendente</h2>
+          <p className="text-xs text-brand-muted mt-1">
+            Tudo que a IA usa pra responder seus clientes. Clique numa seção para abrir e editar.
           </p>
-          <ul className="text-xs text-brand-muted space-y-1.5">
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-trust" />
-              Dados do negócio (nome, categoria, telefone)
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-trust" />
-              Serviços e preços
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-trust" />
-              Horários de funcionamento
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-trust" />
-              Perguntas frequentes (FAQ)
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-trust" />
-              Widget no site
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-trust" />
-              Notificações de transferência humana
-            </li>
-          </ul>
-        </PanelCard>
+        </div>
+        <div className="divide-y divide-brand-border">
+          {[
+            { id: 'data', title: 'Dados do negócio', render: () => <BusinessDataSection business={business} onSaved={reloadBusiness} /> },
+            { id: 'services', title: 'Serviços e preços', render: () => <ServicesSection business={business} onSaved={reloadBusiness} /> },
+            { id: 'hours', title: 'Horários de funcionamento', render: () => <HoursSection business={business} onSaved={reloadBusiness} /> },
+            { id: 'faq', title: 'Perguntas frequentes (FAQ)', render: () => <FaqSection business={business} onSaved={reloadBusiness} /> },
+            { id: 'widget', title: 'Widget no site', render: () => <WidgetSection business={business} onSaved={reloadBusiness} /> },
+            { id: 'notify', title: 'Notificações para você', render: () => <NotificationsSection business={business} onSaved={reloadBusiness} /> },
+          ].map((sec) => {
+            const isOpen = openConfig.has(sec.id);
+            return (
+              <div key={sec.id}>
+                <button
+                  type="button"
+                  onClick={() => toggleConfig(sec.id)}
+                  className="w-full flex items-center justify-between p-4 sm:p-5 hover:bg-brand-surface transition text-left"
+                >
+                  <span className="text-sm sm:text-base font-medium text-brand-text">{sec.title}</span>
+                  <span className="text-brand-muted text-xs">{isOpen ? '▲' : '▼'}</span>
+                </button>
+                {isOpen && (
+                  <div className="px-4 sm:px-5 pb-5">
+                    {sec.render()}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Logs (collapsed) */}

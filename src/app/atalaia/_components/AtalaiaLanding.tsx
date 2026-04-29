@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { VerticalConfig } from './config';
+import AtalaiaLogo from '@/components/atalaia/AtalaiaLogo';
 
 // Shared landing-page shell consumed by /atalaia/page.tsx and the vertical
 // pages under /atalaia/{slug}/page.tsx. Only the H1, hero subtitle and FAQ
@@ -106,10 +107,15 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="bg-brand-bg py-24">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <div className="inline-flex items-baseline gap-3 mb-8">
-            <span className="text-8xl sm:text-9xl font-black text-brand-cta leading-none tracking-tighter">
+      <section className="relative bg-brand-bg py-24 overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-blue-100/30"
+        />
+        <div className="relative max-w-6xl mx-auto px-6 text-center">
+          <div className="flex items-center justify-center gap-4 sm:gap-6 mb-8 flex-wrap">
+            <AtalaiaLogo size={110} withRadar />
+            <span className="text-7xl sm:text-9xl font-black text-brand-cta leading-none tracking-tighter">
               24/7
             </span>
           </div>

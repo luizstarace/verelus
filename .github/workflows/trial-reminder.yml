@@ -1,0 +1,30 @@
+name: Trial reminder cron
+
+on:
+  schedule:
+    # 09:00 UTC daily = 06:00 BRT, before owners check inbox
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger trial reminder endpoint
+        env:
+          CRON_SECRET: ${{ secrets.ATALAIA_CRON_SECRET }}
+          ENDPOINT_URL: https://atalaia.verelus.com/api/atalaia/cron/trial-reminder
+        run: |
+          set -euo pipefail
+          if [ -z "$CRON_SECRET" ]; then
+            echo "ATALAIA_CRON_SECRET not set in repo secrets — skipping"
+            exit 1
+          fi
+          response=$(curl -fsSL -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            "$ENDPOINT_URL")
+          echo "Response: $response"
+          # Surface count for visibility in Actions log
+          sent_count=$(echo "$response" | grep -o '"sent_count":[0-9]*' | cut -d: -f2 || echo "0")
+          echo "Reminders sent: $sent_count"

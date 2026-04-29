@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 // Shared shell for blog index + each post page. Includes nav/footer (consistent
-// with /attendly) and a typography-styled article container.
+// with /atalaia) and a typography-styled article container.
 
 const SITE_BASE = 'https://verelus.com';
 
@@ -27,10 +27,10 @@ export function BlogShell({ children }: { children: ReactNode }) {
           </Link>
           <div className="flex items-center gap-6">
             <Link
-              href="/attendly"
+              href="/atalaia"
               className="text-sm font-medium text-brand-muted hover:text-brand-trust transition-colors"
             >
-              Attendly
+              Atalaia
             </Link>
             <Link
               href="/blog"
@@ -93,7 +93,7 @@ export function BlogPostShell({ meta, children }: { meta: BlogPostMeta; children
       '@id': `${SITE_BASE}/blog/${meta.slug}`,
     },
     keywords: meta.keywords.join(', '),
-    image: `${SITE_BASE}/og-attendly.png`,
+    image: `${SITE_BASE}/og-atalaia.png`,
   };
 
   const breadcrumbLd = {
@@ -148,15 +148,15 @@ export function BlogPostShell({ meta, children }: { meta: BlogPostMeta; children
 
         {/* CTA at end of every post */}
         <div className="mt-16 p-8 bg-brand-surface border border-brand-border rounded-2xl text-center">
-          <h2 className="text-xl font-bold mb-2">Quer testar o Attendly?</h2>
+          <h2 className="text-xl font-bold mb-2">Quer testar o Atalaia?</h2>
           <p className="text-brand-muted mb-5">
             7 dias grátis sem cartão. Setup em 5 minutos.
           </p>
           <Link
-            href="/attendly"
+            href="/atalaia"
             className="inline-block px-8 py-3 bg-brand-cta text-white font-semibold rounded-xl hover:brightness-110 transition-all"
           >
-            Conhecer o Attendly
+            Conhecer o Atalaia
           </Link>
         </div>
       </article>

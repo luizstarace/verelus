@@ -10,7 +10,7 @@ export default function DashboardError({
   reset: () => void;
 }) {
   useEffect(() => {
-    fetch('/api/attendly/client-error', {
+    fetch('/api/atalaia/client-error', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -37,7 +37,7 @@ export default function DashboardError({
             Tentar novamente
           </button>
           <a
-            href="/dashboard/attendly"
+            href="/dashboard/atalaia"
             className="bg-brand-surface border border-brand-border text-brand-text font-medium px-4 py-2 rounded-lg hover:bg-brand-border/50 transition"
           >
             Voltar ao painel

@@ -23,7 +23,7 @@ vi.mock('@/lib/api-auth', () => ({
   }),
 }));
 
-describe('POST /api/attendly/whatsapp/connect', () => {
+describe('POST /api/atalaia/whatsapp/connect', () => {
   const envBefore = { ...process.env };
 
   beforeEach(() => {
@@ -49,7 +49,7 @@ describe('POST /api/attendly/whatsapp/connect', () => {
       } as unknown as Response;
     }) as unknown as typeof fetch;
 
-    const { POST } = await import('@/app/api/attendly/whatsapp/connect/route');
+    const { POST } = await import('@/app/api/atalaia/whatsapp/connect/route');
     const res = await POST();
     expect(res.status).toBe(200);
 
@@ -59,9 +59,9 @@ describe('POST /api/attendly/whatsapp/connect', () => {
       instanceName: string;
       webhook: { headers?: Record<string, string>; url: string };
     };
-    expect(body.webhook.url).toBe('https://app.test.local/api/attendly/whatsapp/webhook');
+    expect(body.webhook.url).toBe('https://app.test.local/api/atalaia/whatsapp/webhook');
     expect(body.webhook.headers?.apikey).toBe('secret-key-123');
-    expect(body.instanceName).toBe('attendly_biz-123');
+    expect(body.instanceName).toBe('atalaia_biz-123');
   });
 
   it('also calls /webhook/set to heal pre-existing instances', async () => {
@@ -76,10 +76,10 @@ describe('POST /api/attendly/whatsapp/connect', () => {
       } as unknown as Response;
     }) as unknown as typeof fetch;
 
-    const { POST } = await import('@/app/api/attendly/whatsapp/connect/route');
+    const { POST } = await import('@/app/api/atalaia/whatsapp/connect/route');
     await POST();
 
-    const setCall = calls.find((c) => c.url.includes('/webhook/set/attendly_biz-123'));
+    const setCall = calls.find((c) => c.url.includes('/webhook/set/atalaia_biz-123'));
     expect(setCall, '/webhook/set should be called').toBeTruthy();
     const body = setCall!.body as { headers?: Record<string, string>; enabled: boolean };
     expect(body.headers?.apikey).toBe('secret-key-123');

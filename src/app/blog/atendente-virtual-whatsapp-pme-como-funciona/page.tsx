@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     publishedTime: meta.publishedAt,
     images: [
       {
-        url: 'https://verelus.com/og-attendly.png',
+        url: 'https://verelus.com/og-atalaia.png',
         width: 1200,
         height: 630,
         alt: meta.title,
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: meta.title,
     description: meta.description,
-    images: ['https://verelus.com/og-attendly.png'],
+    images: ['https://verelus.com/og-atalaia.png'],
   },
   alternates: { canonical: `https://verelus.com/blog/${meta.slug}` },
 };
@@ -148,7 +148,7 @@ export default function Post() {
         </li>
         <li>
           <strong>R$ 100-300/mês:</strong> Plataformas SaaS focadas em PMEs (incluindo o{' '}
-          <Link href="/attendly">Attendly</Link>). Setup em minutos, sem código, suporte
+          <Link href="/atalaia">Atalaia</Link>). Setup em minutos, sem código, suporte
           incluído. Limites por número de mensagens.
         </li>
         <li>
@@ -202,7 +202,7 @@ export default function Post() {
       <ol>
         <li>
           <strong>Escolha uma plataforma com trial grátis.</strong> Você precisa ver funcionando
-          com seus próprios dados antes de pagar. O Attendly oferece 7 dias grátis sem cartão —
+          com seus próprios dados antes de pagar. O Atalaia oferece 7 dias grátis sem cartão —
           tempo suficiente para sentir se faz sentido.
         </li>
         <li>

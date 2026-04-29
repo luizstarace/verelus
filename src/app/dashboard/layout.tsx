@@ -21,12 +21,12 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard/attendly', label: 'Visão Geral', icon: '📊', tier: 1 },
-  { href: '/dashboard/attendly/inbox', label: 'Conversas', icon: '💬', tier: 1 },
-  { href: '/dashboard/attendly/setup', label: 'Configurar', icon: '⚙️', tier: 1 },
-  { href: '/dashboard/attendly/settings', label: 'Ajustes', icon: '🔧', tier: 1 },
-  { href: '/dashboard/attendly/billing', label: 'Plano & Uso', icon: '📈', tier: 1 },
-  { href: '/dashboard/attendly/logs', label: 'Logs', icon: '🗒️', tier: 1 },
+  { href: '/dashboard/atalaia', label: 'Visão Geral', icon: '📊', tier: 1 },
+  { href: '/dashboard/atalaia/inbox', label: 'Conversas', icon: '💬', tier: 1 },
+  { href: '/dashboard/atalaia/setup', label: 'Configurar', icon: '⚙️', tier: 1 },
+  { href: '/dashboard/atalaia/settings', label: 'Ajustes', icon: '🔧', tier: 1 },
+  { href: '/dashboard/atalaia/billing', label: 'Plano & Uso', icon: '📈', tier: 1 },
+  { href: '/dashboard/atalaia/logs', label: 'Logs', icon: '🗒️', tier: 1 },
   { href: '/ajuda', label: 'Ajuda', icon: '❓', tier: 1 },
 ];
 
@@ -49,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return;
       }
       if (window.location.pathname === '/dashboard') {
-        window.location.href = '/dashboard/attendly';
+        window.location.href = '/dashboard/atalaia';
         return;
       }
       setUser(u);

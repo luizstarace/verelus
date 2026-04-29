@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     publishedTime: meta.publishedAt,
     images: [
       {
-        url: 'https://verelus.com/og-attendly.png',
+        url: 'https://verelus.com/og-atalaia.png',
         width: 1200,
         height: 630,
         alt: meta.title,
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: meta.title,
     description: meta.description,
-    images: ['https://verelus.com/og-attendly.png'],
+    images: ['https://verelus.com/og-atalaia.png'],
   },
   alternates: { canonical: `https://verelus.com/blog/${meta.slug}` },
 };
@@ -64,7 +64,7 @@ export default function Post() {
         <strong>Solução:</strong> ou alguém do time fica de plantão (caro, ruim para a equipe),
         ou você usa um atendente automático que responde 24/7. Para PMEs, a segunda opção é
         quase sempre mais viável. Veja como o{' '}
-        <Link href="/attendly">Attendly</Link> resolve isso.
+        <Link href="/atalaia">Atalaia</Link> resolve isso.
       </p>
 
       <h2>2. Tempo médio de resposta passa de 5 minutos</h2>

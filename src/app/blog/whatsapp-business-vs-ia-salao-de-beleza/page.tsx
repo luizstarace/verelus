@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     url: `https://verelus.com/blog/${meta.slug}`,
     siteName: 'Verelus',
     publishedTime: meta.publishedAt,
-    images: [{ url: 'https://verelus.com/og-attendly.png', width: 1200, height: 630, alt: meta.title }],
+    images: [{ url: 'https://verelus.com/og-atalaia.png', width: 1200, height: 630, alt: meta.title }],
   },
   twitter: {
     card: 'summary_large_image',
     title: meta.title,
     description: meta.description,
-    images: ['https://verelus.com/og-attendly.png'],
+    images: ['https://verelus.com/og-atalaia.png'],
   },
   alternates: { canonical: `https://verelus.com/blog/${meta.slug}` },
 };
@@ -113,7 +113,7 @@ export default function Post() {
 
       <h2>Como a IA cobre o gap</h2>
       <p>
-        Atendente com IA (como o <Link href="/attendly/salao">Attendly para salão de
+        Atendente com IA (como o <Link href="/atalaia/salao">Atalaia para salão de
         beleza</Link>) responde tudo isso automaticamente, no padrão do seu salão:
       </p>
       <ul>

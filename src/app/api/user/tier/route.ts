@@ -56,15 +56,15 @@ export async function GET() {
       return NextResponse.json({ tier: "free" });
     }
 
-    // "Pro" tier here collapses music-product paid tiers + Attendly paid tiers
+    // "Pro" tier here collapses music-product paid tiers + Atalaia paid tiers
     // into a single "has active paid sub" badge shown on the shared sidebar.
     const product = subscription.product || "";
     const isPaid =
       product === "pro" ||
       product === "business" ||
-      product === "attendly_starter" ||
-      product === "attendly_pro" ||
-      product === "attendly_business";
+      product === "atalaia_starter" ||
+      product === "atalaia_pro" ||
+      product === "atalaia_business";
     return NextResponse.json({ tier: isPaid ? "pro" : "free" });
   } catch {
     return NextResponse.json({ tier: "free" });

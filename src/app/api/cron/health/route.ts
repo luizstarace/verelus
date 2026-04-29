@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   try {
     // Call health check endpoint
-    const res = await fetch(`${appUrl}/api/health/attendly`);
+    const res = await fetch(`${appUrl}/api/health/atalaia`);
     const data = await res.json();
 
     if (data.status === 'healthy') {
@@ -35,17 +35,17 @@ export async function GET(request: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Attendly Monitor <contato@verelus.com>',
+          from: 'Atalaia Monitor <contato@verelus.com>',
           to: [process.env.FOUNDER_EMAIL || 'luizsfap@gmail.com'],
-          subject: `[ALERT] Attendly health check: ${data.status}`,
+          subject: `[ALERT] Atalaia health check: ${data.status}`,
           html: `
             <div style="font-family:Inter,sans-serif;max-width:500px;margin:0 auto;">
-              <h2 style="color:#ef4444;">Attendly Health Degraded</h2>
+              <h2 style="color:#ef4444;">Atalaia Health Degraded</h2>
               <p><strong>Status:</strong> ${data.status}</p>
               <p><strong>Timestamp:</strong> ${data.timestamp}</p>
               <p><strong>Failed checks:</strong></p>
               <p>${failedChecks}</p>
-              <a href="${appUrl}/api/health/attendly" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:16px;">Check now →</a>
+              <a href="${appUrl}/api/health/atalaia" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:16px;">Check now →</a>
             </div>
           `,
         }),

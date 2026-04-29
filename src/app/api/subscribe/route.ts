@@ -69,7 +69,7 @@ async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: s
             <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 30px; margin-bottom: 24px; border: 1px solid #262626;">
               <h2 style="color: #f5f5f5; margin: 0 0 16px; font-size: 22px;">Olá, ${name.replace(/[<>&"']/g, '')}!</h2>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0 0 16px;">
-                Obrigado por se cadastrar. Você vai receber novidades da Verelus, lançamentos dos nossos produtos com IA (o primeiro é o <strong style="color: #60a5fa;">Attendly</strong> — atendente virtual 24h via WhatsApp e widget), e dicas práticas para automatizar atendimento no seu negócio.
+                Obrigado por se cadastrar. Você vai receber novidades da Verelus, lançamentos dos nossos produtos com IA (o primeiro é o <strong style="color: #60a5fa;">Atalaia</strong> — atendente virtual 24h via WhatsApp e widget), e dicas práticas para automatizar atendimento no seu negócio.
               </p>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0;">
                 Sem spam. Frequência baixa, só quando tem algo útil de verdade.
@@ -93,10 +93,10 @@ async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: s
 
             <div style="background: #171717; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 24px; border: 1px solid #262626;">
               <p style="color: #d4d4d4; margin: 0 0 12px; font-size: 15px;">
-                Conheça o Attendly — nosso atendente virtual de IA pra PMEs brasileiras.
+                Conheça o Atalaia — nosso atendente virtual de IA pra PMEs brasileiras.
               </p>
-              <a href="${appUrl}/attendly" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 15px;">
-                Ver o Attendly
+              <a href="${appUrl}/atalaia" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 15px;">
+                Ver o Atalaia
               </a>
             </div>
 

@@ -1,9 +1,9 @@
 export const runtime = 'edge';
 
 export const metadata = {
-  title: 'Manual do Attendly — Verelus',
+  title: 'Manual do Atalaia — Verelus',
   description:
-    'Guia passo-a-passo para configurar e usar o Attendly: atendente de IA para PMEs via WhatsApp e widget de chat.',
+    'Guia passo-a-passo para configurar e usar o Atalaia: atendente de IA para PMEs via WhatsApp e widget de chat.',
 };
 
 export default function AjudaPage() {
@@ -12,7 +12,7 @@ export default function AjudaPage() {
       <nav className="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto border-b border-brand-border">
         <a href="/" className="text-xl font-bold tracking-tight">VERELUS</a>
         <div className="flex items-center gap-4 text-sm">
-          <a href="/dashboard/attendly" className="text-brand-muted hover:text-brand-text transition">Dashboard</a>
+          <a href="/dashboard/atalaia" className="text-brand-muted hover:text-brand-text transition">Dashboard</a>
           <a href="/login" className="text-brand-muted hover:text-brand-text transition">Entrar</a>
         </div>
       </nav>
@@ -20,7 +20,7 @@ export default function AjudaPage() {
       <article className="max-w-4xl mx-auto px-6 py-12">
         <header className="mb-10">
           <p className="text-xs uppercase tracking-wider text-brand-muted mb-2">Manual</p>
-          <h1 className="text-3xl font-bold mb-3">Manual do Attendly</h1>
+          <h1 className="text-3xl font-bold mb-3">Manual do Atalaia</h1>
           <p className="text-brand-muted">
             Guia passo-a-passo para configurar seu atendente de IA, conectar WhatsApp e
             atender clientes 24 horas por dia. Estimativa: 15 minutos para deixar tudo funcionando.
@@ -32,7 +32,7 @@ export default function AjudaPage() {
             Sumário
           </h2>
           <ol className="space-y-1.5 text-sm">
-            <li><a href="#o-que-e" className="text-brand-trust hover:underline">1. O que é o Attendly</a></li>
+            <li><a href="#o-que-e" className="text-brand-trust hover:underline">1. O que é o Atalaia</a></li>
             <li><a href="#cadastro" className="text-brand-trust hover:underline">2. Criar conta e teste grátis</a></li>
             <li><a href="#setup" className="text-brand-trust hover:underline">3. Configurar seu negócio (Setup)</a></li>
             <li><a href="#widget" className="text-brand-trust hover:underline">4. Instalar o widget no seu site</a></li>
@@ -50,9 +50,9 @@ export default function AjudaPage() {
         <div className="prose prose-sm max-w-none text-brand-muted space-y-10">
 
           <section id="o-que-e">
-            <h2 className="text-xl font-semibold text-brand-text mb-3">1. O que é o Attendly</h2>
+            <h2 className="text-xl font-semibold text-brand-text mb-3">1. O que é o Atalaia</h2>
             <p>
-              O Attendly é um atendente virtual de IA que responde seus clientes
+              O Atalaia é um atendente virtual de IA que responde seus clientes
               automaticamente em dois canais: um <strong>chat embutido no seu site</strong> (widget)
               e o <strong>WhatsApp</strong>. Ele conhece seu negócio (serviços, preços, horários,
               perguntas frequentes) e responde 24h por dia em português, transferindo
@@ -70,7 +70,7 @@ export default function AjudaPage() {
               <li>Acesse <a href="/login" className="text-brand-trust hover:underline">verelus.com/login</a> e clique em <strong>&quot;Criar conta&quot;</strong>.</li>
               <li>Informe seu email e crie uma senha.</li>
               <li>Confirme o email pelo link que enviamos (cheque a caixa de spam se não chegar em 1 minuto).</li>
-              <li>Faça login. Você cai no painel do Attendly com 7 dias grátis ativos. <strong>Não pedimos cartão</strong> nessa etapa.</li>
+              <li>Faça login. Você cai no painel do Atalaia com 7 dias grátis ativos. <strong>Não pedimos cartão</strong> nessa etapa.</li>
             </ol>
             <p className="mt-3">
               Durante o teste você pode usar todas as funcionalidades do plano Starter,
@@ -236,7 +236,7 @@ export default function AjudaPage() {
 
           <section id="plano">
             <h2 className="text-xl font-semibold text-brand-text mb-3">9. Plano, uso e cobrança</h2>
-            <p>O Attendly tem três planos:</p>
+            <p>O Atalaia tem três planos:</p>
             <table className="w-full text-sm mt-3 border-collapse">
               <thead>
                 <tr className="border-b border-brand-border text-left text-brand-text">

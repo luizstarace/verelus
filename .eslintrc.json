@@ -1,0 +1,7 @@
+{
+  "extends": "next/core-web-vitals",
+  "ignorePatterns": [".next/**", ".vercel/**", "node_modules/**", ".claude/**"],
+  "rules": {
+    "react/no-unescaped-entities": "off"
+  }
+}

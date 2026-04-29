@@ -20,7 +20,7 @@ const PLAN_DISPLAY: Record<string, { name: string; priceLabel: string }> = {
 const PLAN_FEATURES: Record<string, string[]> = {
   starter: ['500 mensagens/mês', 'Widget de chat', 'Suporte por email'],
   pro: ['2.500 mensagens/mês', '30 min de voz/mês', 'Widget + WhatsApp', 'Suporte prioritário'],
-  business: ['10.000 mensagens/mês', '120 min de voz/mês', 'Clonagem de voz', 'Suporte dedicado'],
+  business: ['10.000 mensagens/mês', '120 min de voz/mês', 'Suporte dedicado'],
 };
 
 function barColor(percentage: number): string {

@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { requireUser, errorResponse } from '@/lib/api-auth';
 import { buildAiContext } from '@/lib/atalaia/ai-context';
 import { normalizeHours } from '@/lib/atalaia/hours';
+import { isAllowedVoiceId } from '@/lib/atalaia/voices';
 
 export async function GET() {
   try {
@@ -69,6 +70,9 @@ export async function PATCH(request: Request) {
     }
     if (updates.faq !== undefined && (!Array.isArray(updates.faq) || (updates.faq as any[]).length > 30)) {
       return NextResponse.json({ error: 'Máximo de 30 perguntas frequentes' }, { status: 400 });
+    }
+    if (updates.voice_id !== undefined && !isAllowedVoiceId(updates.voice_id as string)) {
+      return NextResponse.json({ error: 'Voz não permitida' }, { status: 400 });
     }
     if (updates.whatsapp_whitelist !== undefined) {
       if (!Array.isArray(updates.whatsapp_whitelist) || (updates.whatsapp_whitelist as any[]).length > 100) {

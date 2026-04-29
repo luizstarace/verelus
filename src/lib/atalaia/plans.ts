@@ -21,7 +21,7 @@ export const ATALAIA_PLANS: Record<AtalaiaPlan, AtalaiaPlanLimits> = {
     text_messages: 10000,
     voice_seconds: 7200,
     voice_enabled: true,
-    voice_clone: true,
+    voice_clone: false,
     overage_text_cents: 5,
     overage_voice_cents: 50,
   },

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import WhatsAppBanWarning from '@/components/atalaia/WhatsAppBanWarning';
+import { ATALAIA_VOICES, DEFAULT_VOICE_ID } from '@/lib/atalaia/voices';
 
 interface Service {
   name: string;
@@ -159,9 +160,12 @@ export default function SettingsView() {
 
   // Voice test state
   const [voiceText, setVoiceText] = useState('Olá! Eu sou o atendente virtual do seu negócio. Como posso ajudar?');
-  const [voiceTesting, setVoiceTesting] = useState(false);
+  const [voiceTesting, setVoiceTesting] = useState<string | null>(null); // id being previewed
   const [voiceAudioUrl, setVoiceAudioUrl] = useState<string | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [voiceId, setVoiceId] = useState<string>(DEFAULT_VOICE_ID);
+  const [voiceSaving, setVoiceSaving] = useState(false);
+  const [voiceSaved, setVoiceSaved] = useState(false);
 
   function syncFormState(b: any) {
     setName(b.name || '');
@@ -179,6 +183,7 @@ export default function SettingsView() {
     setWaWhitelistEnabled(!!b.whatsapp_whitelist_enabled);
     setWaWhitelist(Array.isArray(b.whatsapp_whitelist) ? b.whatsapp_whitelist : []);
     setWaHoursOnly(!!b.whatsapp_hours_only);
+    setVoiceId(b.voice_id && b.voice_id !== 'default' ? b.voice_id : DEFAULT_VOICE_ID);
   }
 
   useEffect(() => {
@@ -341,15 +346,16 @@ export default function SettingsView() {
     }
   }
 
-  async function handleTestVoice() {
-    setVoiceTesting(true);
+  async function handleTestVoice(targetVoiceId?: string) {
+    const idToTest = targetVoiceId || voiceId;
+    setVoiceTesting(idToTest);
     setVoiceError(null);
     setVoiceAudioUrl(null);
     try {
       const res = await fetch('/api/atalaia/voice/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: voiceText }),
+        body: JSON.stringify({ text: voiceText, voice_id: idToTest }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -362,7 +368,32 @@ export default function SettingsView() {
     } catch {
       setVoiceError('Erro de rede');
     } finally {
-      setVoiceTesting(false);
+      setVoiceTesting(null);
+    }
+  }
+
+  async function handleSaveVoice(targetVoiceId: string) {
+    setVoiceSaving(true);
+    setVoiceSaved(false);
+    setVoiceError(null);
+    try {
+      const res = await fetch('/api/atalaia/business', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voice_id: targetVoiceId }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setVoiceError(data.error || 'Erro ao salvar voz');
+        return;
+      }
+      setVoiceId(targetVoiceId);
+      setVoiceSaved(true);
+      setTimeout(() => setVoiceSaved(false), 2500);
+    } catch {
+      setVoiceError('Erro de rede');
+    } finally {
+      setVoiceSaving(false);
     }
   }
 
@@ -945,40 +976,93 @@ export default function SettingsView() {
       {/* Tab: Voz */}
       {tab === 'voice' && (
         <div className="space-y-6">
-          <div className="bg-brand-surface border border-brand-border rounded-lg p-6">
-            <h3 className="text-sm font-medium text-brand-text mb-2">Testar voz do atendente</h3>
-            <p className="text-xs text-brand-muted mb-4">
-              Gere uma amostra para ouvir a voz que o atendente usará nas respostas
-              (ElevenLabs). O envio automático de áudio nos chats é liberado nos
-              planos Pro e Business.
-            </p>
-            <textarea
-              value={voiceText}
-              onChange={(e) => setVoiceText(e.target.value)}
-              maxLength={500}
-              rows={3}
-              className="w-full border border-brand-border rounded-lg px-3 py-2 text-sm text-brand-text bg-white mb-3"
-              placeholder="Texto para testar a voz (até 500 caracteres)"
-            />
-            <div className="text-xs text-brand-muted mb-3">
-              {voiceText.length}/500 caracteres
+          <div className="bg-brand-surface border border-brand-border rounded-lg p-6 space-y-4">
+            <div>
+              <h3 className="text-sm font-semibold text-brand-text mb-1">Voz do atendente</h3>
+              <p className="text-xs text-brand-muted">
+                Escolha uma das vozes abaixo. O preview funciona em qualquer plano.
+                O envio automático de áudio nos chats reais é liberado nos planos
+                <strong> Pro e Business</strong>.
+              </p>
             </div>
-            <button
-              onClick={handleTestVoice}
-              disabled={voiceTesting || !voiceText.trim()}
-              className="bg-brand-cta text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
-            >
-              {voiceTesting ? 'Gerando...' : 'Testar voz'}
-            </button>
+            <div>
+              <label className="block text-xs font-medium text-brand-muted mb-1">
+                Texto para o teste (até 500 caracteres)
+              </label>
+              <textarea
+                value={voiceText}
+                onChange={(e) => setVoiceText(e.target.value)}
+                maxLength={500}
+                rows={2}
+                className="w-full border border-brand-border rounded-lg px-3 py-2 text-sm text-brand-text bg-white"
+                placeholder="Olá! Eu sou o atendente virtual..."
+              />
+              <div className="text-xs text-brand-muted mt-1">
+                {voiceText.length}/500 caracteres
+              </div>
+            </div>
 
+            {(['feminine', 'masculine'] as const).map((gender) => (
+              <div key={gender}>
+                <p className="text-xs font-semibold text-brand-text uppercase tracking-wide mb-2">
+                  {gender === 'feminine' ? 'Femininas' : 'Masculinas'}
+                </p>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  {ATALAIA_VOICES.filter((v) => v.gender === gender).map((v) => {
+                    const isSelected = voiceId === v.id;
+                    const isPreviewing = voiceTesting === v.id;
+                    return (
+                      <div
+                        key={v.id}
+                        className={`rounded-lg border p-3 bg-white space-y-2 transition ${
+                          isSelected ? 'border-brand-trust ring-2 ring-brand-trust/20' : 'border-brand-border'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold text-brand-text">{v.name}</p>
+                          {isSelected && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-brand-success/10 text-brand-success font-medium">
+                              Em uso
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-brand-muted leading-snug">{v.hint}</p>
+                        <div className="flex flex-col gap-1.5 pt-1">
+                          <button
+                            onClick={() => handleTestVoice(v.id)}
+                            disabled={voiceTesting !== null || !voiceText.trim()}
+                            className="text-xs px-3 py-1.5 rounded border border-brand-border text-brand-text font-medium hover:bg-brand-surface disabled:opacity-50 transition"
+                          >
+                            {isPreviewing ? 'Gerando...' : 'Testar'}
+                          </button>
+                          <button
+                            onClick={() => handleSaveVoice(v.id)}
+                            disabled={voiceSaving || isSelected}
+                            className="text-xs px-3 py-1.5 rounded bg-brand-cta text-white font-medium hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                          >
+                            {isSelected ? 'Selecionada' : voiceSaving ? 'Salvando...' : 'Usar essa voz'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {voiceSaved && (
+              <div className="p-3 rounded-lg bg-brand-success/10 border border-brand-success/30 text-sm text-brand-success">
+                Voz atualizada ✓
+              </div>
+            )}
             {voiceError && (
-              <div className="mt-4 p-3 bg-brand-error/10 border border-brand-error/30 rounded-lg text-sm text-brand-error">
+              <div className="p-3 rounded-lg bg-brand-error/10 border border-brand-error/30 text-sm text-brand-error">
                 {voiceError}
               </div>
             )}
-
             {voiceAudioUrl && (
-              <div className="mt-4">
+              <div>
+                <p className="text-xs text-brand-muted mb-1">Última amostra:</p>
                 <audio controls autoPlay src={voiceAudioUrl} className="w-full" />
               </div>
             )}

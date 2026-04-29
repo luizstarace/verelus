@@ -3,6 +3,7 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 import { requireUser, errorResponse } from '@/lib/api-auth';
 import { rateLimit, getRateLimitHeaders } from '@/lib/atalaia/rate-limit';
+import { isAllowedVoiceId, resolveVoiceId } from '@/lib/atalaia/voices';
 
 export async function POST(request: Request) {
   try {
@@ -21,6 +22,7 @@ export async function POST(request: Request) {
 
     const body = await request.json().catch(() => ({}));
     const text = typeof body.text === 'string' ? body.text : '';
+    const requestedVoiceId = typeof body.voice_id === 'string' ? body.voice_id : null;
 
     if (!text.trim()) {
       return NextResponse.json({ error: 'Texto obrigatório' }, { status: 400 });
@@ -29,16 +31,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Texto de teste máximo 500 caracteres' }, { status: 400 });
     }
 
-    const { data: business } = await supabase
-      .from('atalaia_businesses')
-      .select('voice_id')
-      .eq('user_id', userId)
-      .single();
-
-    const voiceId =
-      !business?.voice_id || business.voice_id === 'default'
-        ? '21m00Tcm4TlvDq8ikWAM'
-        : business.voice_id;
+    // If caller passes a voice_id, validate against the curated list. Otherwise
+    // fall back to the saved business.voice_id. Without validation any client
+    // could pull arbitrary ElevenLabs voices, including premium ones we don't
+    // want to expose in self-serve.
+    let voiceId: string;
+    if (requestedVoiceId) {
+      if (!isAllowedVoiceId(requestedVoiceId)) {
+        return NextResponse.json({ error: 'Voz não permitida' }, { status: 400 });
+      }
+      voiceId = resolveVoiceId(requestedVoiceId);
+    } else {
+      const { data: business } = await supabase
+        .from('atalaia_businesses')
+        .select('voice_id')
+        .eq('user_id', userId)
+        .single();
+      voiceId = resolveVoiceId(business?.voice_id);
+    }
 
     const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: 'POST',

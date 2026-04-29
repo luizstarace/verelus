@@ -6,13 +6,16 @@ export interface StripePrices {
   atalaiaBusiness: string;
 }
 
+// Env var names kept as STRIPE_PRICE_ATTENDLY_* (legacy from pre-rebrand);
+// production CF Pages config still uses these names. Renaming would require
+// updating env vars in dashboard (no functional gain — env vars aren't user-facing).
 function readPricesFromEnv(): StripePrices {
   return {
     pro: process.env.STRIPE_PRICE_PRO || '',
     business: process.env.STRIPE_PRICE_BUSINESS || '',
-    atalaiaStarter: process.env.STRIPE_PRICE_ATALAIA_STARTER || '',
-    atalaiaPro: process.env.STRIPE_PRICE_ATALAIA_PRO || '',
-    atalaiaBusiness: process.env.STRIPE_PRICE_ATALAIA_BUSINESS || '',
+    atalaiaStarter: process.env.STRIPE_PRICE_ATTENDLY_STARTER || '',
+    atalaiaPro: process.env.STRIPE_PRICE_ATTENDLY_PRO || '',
+    atalaiaBusiness: process.env.STRIPE_PRICE_ATTENDLY_BUSINESS || '',
   };
 }
 

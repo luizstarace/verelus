@@ -10,9 +10,9 @@ export async function POST(request: Request) {
     const { price_key } = body;
 
     const PRICE_MAP: Record<string, string> = {
-      atalaia_starter_monthly: process.env.STRIPE_PRICE_ATALAIA_STARTER || '',
-      atalaia_pro_monthly: process.env.STRIPE_PRICE_ATALAIA_PRO || '',
-      atalaia_business_monthly: process.env.STRIPE_PRICE_ATALAIA_BUSINESS || '',
+      atalaia_starter_monthly: process.env.STRIPE_PRICE_ATTENDLY_STARTER || '',
+      atalaia_pro_monthly: process.env.STRIPE_PRICE_ATTENDLY_PRO || '',
+      atalaia_business_monthly: process.env.STRIPE_PRICE_ATTENDLY_BUSINESS || '',
     };
 
     const stripePriceId = PRICE_MAP[price_key];

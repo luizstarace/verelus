@@ -115,7 +115,70 @@ export async function POST(request: Request) {
     }
     const businessId = instance.replace('atalaia_', '');
 
-    // Ignore non-message events (CONNECTION_UPDATE etc.)
+    // Connection-state events: persist + alert owner when an established
+    // connection drops unexpectedly (typical timelock/ban signature).
+    if (event === 'connection.update' || event === 'CONNECTION_UPDATE') {
+      const newState: string = msgData?.state || body.data?.state || 'unknown';
+      const { data: bizBefore } = await supabase
+        .from('atalaia_businesses')
+        .select('id, name, user_id, whatsapp_number, whatsapp_last_state')
+        .eq('id', businessId)
+        .single();
+
+      if (!bizBefore) {
+        return NextResponse.json({ ok: true, ignored: 'unknown_business' });
+      }
+
+      // Only update + alert if state actually changed (Evolution may resend).
+      if (bizBefore.whatsapp_last_state === newState) {
+        return NextResponse.json({ ok: true, no_change: true });
+      }
+
+      await supabase
+        .from('atalaia_businesses')
+        .update({
+          whatsapp_last_state: newState,
+          whatsapp_state_changed_at: new Date().toISOString(),
+        })
+        .eq('id', businessId);
+
+      // Drop alert: number was previously connected (whatsapp_number is set
+      // and last state was 'open') and now closed/disconnected. Don't fire on
+      // initial setup transitions (qr → connecting → open).
+      const droppedFromOpen =
+        bizBefore.whatsapp_number &&
+        bizBefore.whatsapp_last_state === 'open' &&
+        (newState === 'close' || newState === 'closed');
+
+      if (droppedFromOpen) {
+        try {
+          const { notifyOwnerEmail, buildWhatsAppDisconnectedEmail } = await import('@/lib/atalaia/notifications');
+          const { data: ownerUser } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', bizBefore.user_id)
+            .maybeSingle();
+          if (ownerUser?.email) {
+            const supportUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://atalaia.verelus.com'}/dashboard/atalaia/support?category=whatsapp_disconnect&prefill=1`;
+            const emailData = buildWhatsAppDisconnectedEmail(bizBefore.name, supportUrl);
+            emailData.to = ownerUser.email;
+            notifyOwnerEmail(emailData).catch(() => {});
+          }
+        } catch (err) {
+          await logAtalaia(supabase, {
+            business_id: businessId,
+            endpoint: '/api/atalaia/whatsapp/webhook',
+            channel: 'whatsapp',
+            status_code: 0,
+            error: `disconnect alert email failed: ${err instanceof Error ? err.message : String(err)}`,
+          });
+        }
+      }
+
+      return NextResponse.json({ ok: true, state: newState });
+    }
+
+    // Ignore other non-message events
     if (event && event !== 'messages.upsert' && event !== 'MESSAGES_UPSERT') {
       return NextResponse.json({ ok: true });
     }

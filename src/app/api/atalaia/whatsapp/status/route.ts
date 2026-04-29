@@ -12,7 +12,7 @@ export async function GET() {
 
     const { data: business } = await supabase
       .from('atalaia_businesses')
-      .select('id, whatsapp_number')
+      .select('id, whatsapp_number, whatsapp_last_state, whatsapp_state_changed_at')
       .eq('user_id', userId)
       .single();
 
@@ -21,7 +21,12 @@ export async function GET() {
     }
 
     if (!EVOLUTION_API_KEY || !EVOLUTION_API_URL) {
-      return NextResponse.json({ connected: false, state: 'not_configured' });
+      return NextResponse.json({
+        connected: false,
+        state: 'not_configured',
+        last_state: business.whatsapp_last_state ?? null,
+        state_changed_at: business.whatsapp_state_changed_at ?? null,
+      });
     }
 
     const instanceName = `atalaia_${business.id}`;
@@ -30,7 +35,12 @@ export async function GET() {
     });
 
     if (!res.ok) {
-      return NextResponse.json({ connected: false, state: 'unknown' });
+      return NextResponse.json({
+        connected: false,
+        state: 'unknown',
+        last_state: business.whatsapp_last_state ?? null,
+        state_changed_at: business.whatsapp_state_changed_at ?? null,
+      });
     }
 
     const data = await res.json();
@@ -57,7 +67,12 @@ export async function GET() {
       } catch {}
     }
 
-    return NextResponse.json({ connected, state });
+    return NextResponse.json({
+      connected,
+      state,
+      last_state: business.whatsapp_last_state ?? null,
+      state_changed_at: business.whatsapp_state_changed_at ?? null,
+    });
   } catch (err) {
     const { error, status } = errorResponse(err);
     return NextResponse.json({ error }, { status });

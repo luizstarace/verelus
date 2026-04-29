@@ -23,6 +23,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/atalaia', label: 'Painel', icon: '🏠', tier: 1 },
   { href: '/dashboard/atalaia/playground', label: 'Treinar IA', icon: '🎯', tier: 1 },
+  { href: '/dashboard/atalaia/support', label: 'Suporte', icon: '📩', tier: 1 },
   { href: '/ajuda', label: 'Ajuda', icon: '❓', tier: 1 },
 ];
 

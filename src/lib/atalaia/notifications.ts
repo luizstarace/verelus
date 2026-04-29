@@ -66,3 +66,48 @@ export function buildTrialExpiryEmail(businessName: string, daysLeft: number, ch
     `,
   };
 }
+
+export function buildWhatsAppDisconnectedEmail(businessName: string, supportUrl: string): NotifyOwnerParams {
+  return {
+    to: '',
+    subject: `[Atalaia] WhatsApp do ${businessName} caiu`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:500px;margin:0 auto;">
+        <h2 style="color:#b91c1c;">Conexão WhatsApp interrompida</h2>
+        <p>A conexão do WhatsApp de <strong>${businessName}</strong> caiu. Enquanto isso, a IA não consegue responder mensagens.</p>
+        <p><strong>Causa mais comum:</strong> "timelock" do WhatsApp — restrição temporária de 24-72h quando ele detecta padrão de automação. Some sozinho. Tente reconectar mais tarde.</p>
+        <p>Se a conexão não voltar em 72h, pode ser banimento permanente do número. Use o suporte abaixo para pedir ajuda.</p>
+        <a href="${supportUrl}" style="display:inline-block;background:#f59e0b;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:16px;">Pedir ajuda →</a>
+      </div>
+    `,
+  };
+}
+
+export function buildSupportTicketEmail(
+  businessName: string,
+  ownerEmail: string,
+  category: string,
+  message: string,
+  ticketId: string
+): NotifyOwnerParams {
+  const categoryLabel: Record<string, string> = {
+    whatsapp_ban: 'WhatsApp banido',
+    whatsapp_disconnect: 'WhatsApp desconectado',
+    other: 'Outro assunto',
+  };
+  return {
+    to: '',
+    subject: `[Atalaia Suporte] ${categoryLabel[category] || category} — ${businessName}`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;">
+        <h2 style="color:#1e3a5f;">Novo ticket de suporte</h2>
+        <p><strong>Negócio:</strong> ${businessName}</p>
+        <p><strong>Cliente:</strong> ${ownerEmail}</p>
+        <p><strong>Categoria:</strong> ${categoryLabel[category] || category}</p>
+        <p><strong>Ticket:</strong> ${ticketId}</p>
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0;" />
+        <p style="white-space:pre-wrap;background:#f8fafc;padding:12px;border-radius:8px;">${message.replace(/[<>]/g, (c) => (c === '<' ? '&lt;' : '&gt;'))}</p>
+      </div>
+    `,
+  };
+}

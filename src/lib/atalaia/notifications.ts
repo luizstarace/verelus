@@ -83,6 +83,41 @@ export function buildWhatsAppDisconnectedEmail(businessName: string, supportUrl:
   };
 }
 
+export function buildBSPProvisioningEmail(businessName: string, dashboardUrl: string): NotifyOwnerParams {
+  return {
+    to: '',
+    subject: `[Atalaia] Estamos preparando seu número WhatsApp oficial`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;color:#0f172a;">
+        <h2 style="color:#1e3a5f;">Seu número oficial está a caminho</h2>
+        <p>O <strong>${businessName}</strong> vai receber um número WhatsApp Business <strong>oficial</strong>, gerenciado pela Verelus. Sem usar seu WhatsApp pessoal.</p>
+        <p style="background:#f1f5f9;padding:12px 16px;border-left:3px solid #1e3a5f;border-radius:0 8px 8px 0;">
+          <strong>Prazo:</strong> 3 a 7 dias úteis (verificação Meta).
+        </p>
+        <p>Enquanto isso, você pode conectar um número provisório (QR code) e começar a atender clientes <strong>hoje</strong>. Quando o oficial ficar pronto, a migração é automática — seu histórico fica salvo.</p>
+        <a href="${dashboardUrl}" style="display:inline-block;background:#f59e0b;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:16px;">Conectar provisório →</a>
+      </div>
+    `,
+  };
+}
+
+export function buildBSPApprovedEmail(businessName: string, phoneNumber: string, dashboardUrl: string): NotifyOwnerParams {
+  return {
+    to: '',
+    subject: `[Atalaia] Seu número oficial está ativo: ${phoneNumber}`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;color:#0f172a;">
+        <h2 style="color:#1e3a5f;">Número oficial ativo</h2>
+        <p>O <strong>${businessName}</strong> agora atende pelo número WhatsApp Business oficial:</p>
+        <p style="font-size:22px;font-weight:bold;color:#1e3a5f;background:#f1f5f9;padding:16px;border-radius:8px;text-align:center;letter-spacing:0.5px;">${phoneNumber}</p>
+        <p>Compartilhe esse número com seus clientes (site, Instagram, cartão). O histórico de conversas anteriores está preservado no painel.</p>
+        <p style="color:#64748b;font-size:13px;">Sem risco de banimento. Sem usar seu WhatsApp pessoal. Tudo automático.</p>
+        <a href="${dashboardUrl}" style="display:inline-block;background:#f59e0b;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:16px;">Ver inbox →</a>
+      </div>
+    `,
+  };
+}
+
 export function buildSupportTicketEmail(
   businessName: string,
   ownerEmail: string,

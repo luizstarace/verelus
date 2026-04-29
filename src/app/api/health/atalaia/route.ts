@@ -22,6 +22,9 @@ const REQUIRED_ENV = [
   'ELEVENLABS_API_KEY',
   'EVOLUTION_API_URL',
   'EVOLUTION_API_KEY',
+  'ZENVIA_API_URL',
+  'ZENVIA_API_KEY',
+  'ZENVIA_WEBHOOK_SECRET',
 ] as const;
 
 export async function GET() {
@@ -75,6 +78,22 @@ export async function GET() {
     checks.evolution = { ok: res.ok, latency_ms: Date.now() - evStart };
   } catch (err) {
     checks.evolution = { ok: false, latency_ms: Date.now() - evStart, error: String(err) };
+  }
+
+  // Zenvia probe — light GET against a stable endpoint. Auth-failures (401)
+  // count as unhealthy because they signal misconfigured token. 5xx/timeouts
+  // signal Zenvia downtime.
+  const zvStart = Date.now();
+  try {
+    const url = process.env.ZENVIA_API_URL || 'https://api.zenvia.com';
+    const key = process.env.ZENVIA_API_KEY;
+    if (!key) throw new Error('ZENVIA_API_KEY not set');
+    const res = await fetch(`${url.replace(/\/+$/, '')}/v2/templates?limit=1`, {
+      headers: { 'X-API-TOKEN': key },
+    });
+    checks.zenvia = { ok: res.ok, latency_ms: Date.now() - zvStart };
+  } catch (err) {
+    checks.zenvia = { ok: false, latency_ms: Date.now() - zvStart, error: String(err) };
   }
 
   // Env presence — only reports whether keys are set, never their values.

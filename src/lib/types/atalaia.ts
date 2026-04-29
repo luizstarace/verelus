@@ -1,3 +1,6 @@
+export type WhatsAppProvider = 'evolution' | 'zenvia';
+export type BspKycStatus = 'not_started' | 'pending' | 'approved' | 'rejected';
+
 export interface AtalaiaBusiness {
   id: string;
   user_id: string;
@@ -15,10 +18,24 @@ export interface AtalaiaBusiness {
   whatsapp_whitelist_enabled: boolean;
   whatsapp_whitelist: string[];
   whatsapp_hours_only: boolean;
+  whatsapp_last_state: string | null;
+  whatsapp_state_changed_at: string | null;
   owner_whatsapp: string | null;
   owner_notify_channel: 'email' | 'whatsapp' | 'both';
   onboarding_step: number | null;
   status: 'setup' | 'active' | 'paused';
+  whatsapp_provider: WhatsAppProvider;
+  whatsapp_byo: boolean;
+  bsp_kyc_status: BspKycStatus | null;
+  bsp_kyc_started_at: string | null;
+  bsp_kyc_decided_at: string | null;
+  bsp_kyc_rejection_reason: string | null;
+  bsp_waba_id: string | null;
+  bsp_phone_number_id: string | null;
+  bsp_subaccount_id: string | null;
+  bsp_provisioned_at: string | null;
+  bsp_active_at: string | null;
+  bsp_evolution_bridge_until: string | null;
   created_at: string;
   updated_at: string;
 }

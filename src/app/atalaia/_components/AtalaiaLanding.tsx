@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import TrialCtaButton from '@/components/TrialCtaButton';
 import type { VerticalConfig } from './config';
 
 // Shared landing-page shell consumed by /atalaia/page.tsx and the vertical
@@ -120,17 +121,17 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
             {config.heroSubtitle}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <Link
-              href="/login"
+            <TrialCtaButton
+              source={`hero-${config.slug}`}
               className="px-8 py-4 bg-brand-cta text-white font-semibold rounded-xl text-lg hover:brightness-110 transition-all shadow-lg shadow-brand-cta/25"
             >
               Testar 7 dias grátis
-            </Link>
+            </TrialCtaButton>
             <a
-              href="#como-funciona"
+              href="#pricing"
               className="px-8 py-4 font-semibold rounded-xl text-lg text-brand-primary border-2 border-brand-border hover:border-brand-trust hover:text-brand-trust transition-all"
             >
-              Ver como funciona
+              Ver planos
             </a>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-brand-muted">
@@ -159,6 +160,49 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
               Dados em conformidade com a LGPD
             </span>
           </div>
+        </div>
+      </section>
+
+      {/* ── Preview pricing (compact, acima da fold) ── */}
+      <section className="bg-white py-10 border-t border-brand-border">
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-center text-sm text-brand-muted mb-5">
+            Pricing público, sem formulário. Comece com 7 dias grátis em qualquer plano.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <div className="bg-brand-bg rounded-xl p-4 border border-brand-border text-center">
+              <div className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1">Starter</div>
+              <div className="mb-2">
+                <span className="text-2xl font-black">R$147</span>
+                <span className="text-brand-muted text-xs">/mês</span>
+              </div>
+              <p className="text-[11px] text-brand-muted leading-tight">500 mensagens · WhatsApp + widget</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 border-2 border-brand-cta ring-1 ring-brand-cta text-center relative">
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-brand-cta text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                Mais popular
+              </span>
+              <div className="text-xs font-semibold text-brand-cta uppercase tracking-wider mb-1">Pro</div>
+              <div className="mb-2">
+                <span className="text-2xl font-black">R$297</span>
+                <span className="text-brand-muted text-xs">/mês</span>
+              </div>
+              <p className="text-[11px] text-brand-muted leading-tight">2.500 msgs · 30 min voz</p>
+            </div>
+            <div className="bg-brand-bg rounded-xl p-4 border border-brand-border text-center">
+              <div className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1">Business</div>
+              <div className="mb-2">
+                <span className="text-2xl font-black">R$597</span>
+                <span className="text-brand-muted text-xs">/mês</span>
+              </div>
+              <p className="text-[11px] text-brand-muted leading-tight">10k msgs · voz personalizada</p>
+            </div>
+          </div>
+          <p className="text-center text-xs text-brand-muted mt-5">
+            <a href="#pricing" className="text-brand-trust font-medium hover:underline">
+              Ver planos completos abaixo ↓
+            </a>
+          </p>
         </div>
       </section>
 
@@ -427,7 +471,7 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
       </section>
 
       {/* ── Pricing ── */}
-      <section className="bg-brand-bg py-24">
+      <section id="pricing" className="bg-brand-bg py-24">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-4">Planos simples, sem surpresas</h2>
           <p className="text-brand-muted text-center mb-14 max-w-xl mx-auto">
@@ -455,12 +499,12 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
                   Widget + WhatsApp
                 </li>
               </ul>
-              <Link
-                href="/login"
+              <TrialCtaButton
+                source="pricing-starter"
                 className="block text-center w-full px-6 py-3 font-semibold rounded-lg bg-brand-surface text-brand-text hover:bg-brand-border transition-all"
               >
                 Testar 7 dias grátis
-              </Link>
+              </TrialCtaButton>
             </div>
 
             <div className="relative bg-white rounded-2xl p-8 border-2 border-brand-cta ring-2 ring-brand-cta shadow-xl">
@@ -493,12 +537,12 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
                   Widget + WhatsApp
                 </li>
               </ul>
-              <Link
-                href="/login"
+              <TrialCtaButton
+                source="pricing-pro"
                 className="block text-center w-full px-6 py-3 font-semibold rounded-lg bg-brand-cta text-white hover:brightness-110 transition-all shadow-lg shadow-brand-cta/25"
               >
                 Testar 7 dias grátis
-              </Link>
+              </TrialCtaButton>
             </div>
 
             <div className="bg-white rounded-2xl p-8 border-2 border-brand-border hover:shadow-md transition-shadow">
@@ -534,12 +578,12 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
                   Widget + WhatsApp
                 </li>
               </ul>
-              <Link
-                href="/login"
+              <TrialCtaButton
+                source="pricing-business"
                 className="block text-center w-full px-6 py-3 font-semibold rounded-lg bg-brand-surface text-brand-text hover:bg-brand-border transition-all"
               >
                 Testar 7 dias grátis
-              </Link>
+              </TrialCtaButton>
             </div>
           </div>
         </div>
@@ -577,12 +621,12 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 max-w-3xl mx-auto leading-snug">
             Enquanto você lê isso, seu concorrente está atendendo clientes às 3 da manhã.
           </h2>
-          <Link
-            href="/login"
+          <TrialCtaButton
+            source={`final-cta-${config.slug}`}
             className="inline-block px-10 py-4 bg-brand-cta text-white font-semibold rounded-xl text-lg hover:brightness-110 transition-all shadow-lg shadow-black/20 mb-5"
           >
             Começar agora — 7 dias grátis
-          </Link>
+          </TrialCtaButton>
           <p className="text-sm text-white/70">
             7 dias grátis. Sem cartão. Sem compromisso.
           </p>

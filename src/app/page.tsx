@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import TrialCtaButton from '@/components/TrialCtaButton';
 
 export default function Home() {
   return (
@@ -25,75 +26,90 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <section className="flex flex-col items-center text-center px-6 pt-24 pb-20 max-w-4xl mx-auto">
+      <section className="flex flex-col items-center text-center px-6 pt-20 pb-10 max-w-4xl mx-auto">
         <span className="inline-block px-4 py-1.5 bg-brand-trust/10 text-brand-trust text-xs font-semibold rounded-full mb-6">
           7 dias grátis · sem cartão
         </span>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6">
-          Atendente IA 24/7 no WhatsApp{' '}
-          <span className="text-brand-trust">para PMEs brasileiras</span>
+          Atendente IA 24/7 no WhatsApp,{' '}
+          <span className="text-brand-trust">a partir de R$147/mês</span>
         </h1>
         <p className="text-lg text-brand-muted max-w-2xl leading-relaxed">
-          O Atalaia responde seus clientes no WhatsApp e no widget do seu site
-          como se fosse você. Agenda, tira dúvidas e vende — mesmo de madrugada.
+          Sua atendente IA responde no WhatsApp e no widget do seu site como se fosse você.
+          Agenda, tira dúvidas e vende — mesmo de madrugada. Tudo via Atalaia.
         </p>
       </section>
 
-      {/* Product */}
-      <section className="px-6 py-16 max-w-5xl mx-auto">
-        <div className="max-w-lg mx-auto">
-          <div className="bg-white border border-brand-border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-brand-trust/10 rounded-xl flex items-center justify-center">
-                  <svg
-                    className="w-7 h-7 text-brand-trust"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">Atalaia</h3>
-                  <p className="text-sm text-brand-muted">Atendente IA 24/7 para PMEs</p>
-                </div>
-              </div>
-              <span className="hidden sm:inline-block text-[11px] font-semibold uppercase tracking-wider bg-brand-trust/10 text-brand-trust px-2.5 py-1 rounded-full">
-                Disponível
-              </span>
+      {/* Pricing — 3 mini-cards acima da fold */}
+      <section className="px-6 pt-4 pb-16 max-w-5xl mx-auto">
+        <div className="grid sm:grid-cols-3 gap-4 mb-6">
+          {/* Starter */}
+          <div className="bg-white rounded-xl p-5 border border-brand-border hover:shadow-md transition-shadow">
+            <h3 className="text-base font-bold mb-1">Starter</h3>
+            <div className="mb-2">
+              <span className="text-2xl font-black">R$147</span>
+              <span className="text-brand-muted text-xs">/mês</span>
             </div>
-            <p className="text-brand-muted leading-relaxed mb-4">
-              IA que responde seus clientes no WhatsApp e no seu site como se fosse você.
-              Sem robô, sem espera. Seu negócio atendendo 24 horas por dia, 7 dias por semana.
+            <p className="text-xs text-brand-muted mb-4 leading-relaxed">
+              500 mensagens/mês · Widget + WhatsApp
             </p>
-            <p className="text-sm text-brand-muted mb-6">
-              <span className="font-semibold text-brand-text">A partir de R$ 147/mês</span>
-              {' · '}7 dias grátis sem cartão
-            </p>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-cta text-white font-semibold rounded-lg hover:brightness-110 transition-all"
+            <TrialCtaButton
+              source="home-pricing-starter"
+              className="block text-center w-full px-4 py-2 text-sm font-semibold rounded-lg bg-brand-surface text-brand-text hover:bg-brand-border transition-all"
             >
               Testar 7 dias grátis
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-            <Link
-              href="/atalaia"
-              className="ml-3 inline-flex items-center gap-1 px-4 py-3 text-sm text-brand-muted hover:text-brand-trust transition-colors"
+            </TrialCtaButton>
+          </div>
+
+          {/* Pro (destacado) */}
+          <div className="relative bg-white rounded-xl p-5 border-2 border-brand-cta ring-1 ring-brand-cta shadow-md">
+            <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-brand-cta text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-sm">
+              Mais popular
+            </span>
+            <h3 className="text-base font-bold mb-1">Pro</h3>
+            <div className="mb-2">
+              <span className="text-2xl font-black">R$297</span>
+              <span className="text-brand-muted text-xs">/mês</span>
+            </div>
+            <p className="text-xs text-brand-muted mb-4 leading-relaxed">
+              2.500 mensagens · 30 min voz · Widget + WhatsApp
+            </p>
+            <TrialCtaButton
+              source="home-pricing-pro"
+              className="block text-center w-full px-4 py-2 text-sm font-semibold rounded-lg bg-brand-cta text-white hover:brightness-110 transition-all"
             >
-              Ver detalhes
-            </Link>
+              Testar 7 dias grátis
+            </TrialCtaButton>
+          </div>
+
+          {/* Business */}
+          <div className="bg-white rounded-xl p-5 border border-brand-border hover:shadow-md transition-shadow">
+            <h3 className="text-base font-bold mb-1">Business</h3>
+            <div className="mb-2">
+              <span className="text-2xl font-black">R$597</span>
+              <span className="text-brand-muted text-xs">/mês</span>
+            </div>
+            <p className="text-xs text-brand-muted mb-4 leading-relaxed">
+              10.000 mensagens · 120 min voz · Voz personalizada
+            </p>
+            <TrialCtaButton
+              source="home-pricing-business"
+              className="block text-center w-full px-4 py-2 text-sm font-semibold rounded-lg bg-brand-surface text-brand-text hover:bg-brand-border transition-all"
+            >
+              Testar 7 dias grátis
+            </TrialCtaButton>
           </div>
         </div>
+
+        <p className="text-center text-sm text-brand-muted">
+          Pricing público, setup em 5 minutos, LGPD-first.{' '}
+          <Link
+            href="/atalaia"
+            className="text-brand-trust font-medium hover:underline"
+          >
+            Ver detalhes da Atalaia →
+          </Link>
+        </p>
       </section>
 
       {/* JSON-LD SoftwareApplication for rich results */}

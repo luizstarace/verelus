@@ -215,10 +215,9 @@ export default function AjudaPage() {
               em português brasileiro). Em <strong>Ajustes &gt; Voz</strong>:
             </p>
             <ul className="list-disc pl-6 space-y-1 mt-2">
-              <li>Escolha uma voz padrão e teste com qualquer texto.</li>
+              <li>Escolha entre <strong>6 vozes</strong> (3 femininas e 3 masculinas) — todas em português brasileiro.</li>
               <li>O preview funciona em <strong>todos os planos</strong> — você pode ouvir antes de assinar.</li>
               <li>O envio automático de áudio em conversas reais requer plano Pro ou Business.</li>
-              <li>O plano Business permite clonar uma voz própria (entre em contato).</li>
             </ul>
           </section>
 
@@ -263,7 +262,7 @@ export default function AjudaPage() {
                   <td className="py-2 pr-3">Business</td>
                   <td className="py-2 pr-3">R$ 597</td>
                   <td className="py-2 pr-3">10.000</td>
-                  <td className="py-2">2 horas + voz própria</td>
+                  <td className="py-2">2 horas</td>
                 </tr>
               </tbody>
             </table>

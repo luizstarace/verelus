@@ -24,9 +24,9 @@ describe('Atalaia Plans', () => {
     expect(limits.voice_seconds).toBe(1800);
   });
 
-  it('business has voice clone', () => {
+  it('business has 2h voice but no clone (self-serve)', () => {
     const limits = getPlanLimits('business');
-    expect(limits.voice_clone).toBe(true);
+    expect(limits.voice_clone).toBe(false);
     expect(limits.voice_seconds).toBe(7200);
   });
 

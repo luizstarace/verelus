@@ -8,6 +8,7 @@ interface UsageData {
   text: { used: number; limit: number; percentage: number };
   voice: { used_seconds: number; limit_seconds: number; percentage: number; enabled: boolean };
   overage_notified: boolean;
+  has_active_subscription?: boolean;
 }
 
 const PLAN_DISPLAY: Record<string, { name: string; priceLabel: string }> = {
@@ -19,7 +20,7 @@ const PLAN_DISPLAY: Record<string, { name: string; priceLabel: string }> = {
 const PLAN_FEATURES: Record<string, string[]> = {
   starter: ['500 mensagens/mês', 'Widget de chat', 'Suporte por email'],
   pro: ['2.500 mensagens/mês', '30 min de voz/mês', 'Widget + WhatsApp', 'Suporte prioritário'],
-  business: ['10.000 mensagens/mês', '120 min de voz/mês', 'Clonagem de voz', 'Suporte dedicado'],
+  business: ['10.000 mensagens/mês', '120 min de voz/mês', 'Suporte dedicado'],
 };
 
 function barColor(percentage: number): string {
@@ -77,13 +78,27 @@ export default function BillingView() {
           <div>
             <p className="text-sm text-brand-muted">Plano atual</p>
             <p className="text-xl font-bold text-brand-text">{planInfo.name}</p>
-            <p className="text-sm text-brand-muted">{planInfo.priceLabel}</p>
+            <p className="text-sm text-brand-muted">
+              {usage.has_active_subscription === false ? 'Trial gratuito por 7 dias' : planInfo.priceLabel}
+            </p>
           </div>
-          <span className="text-xs font-medium px-3 py-1 rounded-full bg-brand-success/10 text-brand-success">
-            Ativo
+          <span
+            className={`text-xs font-medium px-3 py-1 rounded-full ${
+              usage.has_active_subscription === false
+                ? 'bg-brand-trust/10 text-brand-trust'
+                : 'bg-brand-success/10 text-brand-success'
+            }`}
+          >
+            {usage.has_active_subscription === false ? 'Em trial' : 'Ativo'}
           </span>
         </div>
         <p className="text-xs text-brand-muted mt-3">Período: {usage.period}</p>
+        {usage.has_active_subscription === false && (
+          <p className="text-xs text-brand-muted mt-2">
+            Durante o trial você está no plano Starter (500 mensagens, sem voz). Faça upgrade
+            quando quiser para liberar mais mensagens e voz.
+          </p>
+        )}
       </div>
 
       {/* Usage Bars */}

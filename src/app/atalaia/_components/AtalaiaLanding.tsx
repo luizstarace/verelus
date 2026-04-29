@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { VerticalConfig } from './config';
+import AtalaiaLogo from '@/components/atalaia/AtalaiaLogo';
 
 // Shared landing-page shell consumed by /atalaia/page.tsx and the vertical
 // pages under /atalaia/{slug}/page.tsx. Only the H1, hero subtitle and FAQ
@@ -106,10 +107,15 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="bg-brand-bg py-24">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <div className="inline-flex items-baseline gap-3 mb-8">
-            <span className="text-8xl sm:text-9xl font-black text-brand-cta leading-none tracking-tighter">
+      <section className="relative bg-brand-bg py-24 overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-blue-100/30"
+        />
+        <div className="relative max-w-6xl mx-auto px-6 text-center">
+          <div className="flex items-center justify-center gap-4 sm:gap-6 mb-8 flex-wrap">
+            <AtalaiaLogo size={110} withRadar />
+            <span className="text-7xl sm:text-9xl font-black text-brand-cta leading-none tracking-tighter">
               24/7
             </span>
           </div>
@@ -431,7 +437,8 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-4">Planos simples, sem surpresas</h2>
           <p className="text-brand-muted text-center mb-14 max-w-xl mx-auto">
-            Comece com 7 dias grátis em qualquer plano. Sem cartão de crédito.
+            Comece com <strong>7 dias grátis no plano Starter</strong> (500 mensagens). Sem cartão.
+            Depois você escolhe seu plano.
           </p>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto items-start">
             <div className="bg-white rounded-2xl p-8 border-2 border-brand-border hover:shadow-md transition-shadow">
@@ -525,7 +532,7 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
                   <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
-                  Voz personalizada
+                  Suporte dedicado
                 </li>
                 <li className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-brand-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -584,7 +591,7 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
             Começar agora — 7 dias grátis
           </Link>
           <p className="text-sm text-white/70">
-            7 dias grátis. Sem cartão. Sem compromisso.
+            7 dias grátis no plano Starter. Sem cartão. Sem compromisso.
           </p>
         </div>
       </section>

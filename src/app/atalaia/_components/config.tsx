@@ -37,7 +37,7 @@ export const mainConfig: VerticalConfig = {
     </>
   ),
   heroSubtitle:
-    'Uma IA que responde no WhatsApp e no seu site como se fosse você. Agenda, tira dúvidas e vende — mesmo de madrugada.',
+    'Sua atendente IA responde no WhatsApp e no seu site como se fosse você. Agenda, tira dúvidas e vende — mesmo de madrugada. Tudo via Atalaia.',
   faq: sharedFaq,
 };
 
@@ -53,7 +53,7 @@ export const salaoConfig: VerticalConfig = {
     </>
   ),
   heroSubtitle:
-    'Sua cliente quer marcar manicure às 22h? O Atalaia responde no WhatsApp e no site do salão, agenda e confirma — sem você precisar olhar o celular.',
+    'Sua cliente quer marcar manicure às 22h? Sua atendente IA responde via Atalaia no WhatsApp e no site do salão, agenda e confirma — sem você precisar olhar o celular.',
   faq: [
     { q: 'O atendente sabe agendar manicure, corte, coloração e outros serviços?', a: 'Sim. Você cadastra cada serviço com duração e preço; a IA aprende e oferece o que faz sentido pra dúvida da cliente.' },
     { q: 'E se cada profissional tem agenda diferente?', a: 'Você pode definir horários gerais do salão. Para agenda por profissional individual, recomendamos integrar com seu sistema atual (estamos lançando integrações nativas em breve).' },
@@ -76,7 +76,7 @@ export const clinicaConfig: VerticalConfig = {
     </>
   ),
   heroSubtitle:
-    'Pacientes marcam consulta a qualquer hora pelo WhatsApp. O Atalaia responde com seus horários reais e libera sua recepcionista pra cuidar de quem está na clínica.',
+    'Pacientes marcam consulta a qualquer hora pelo WhatsApp. Sua atendente IA responde via Atalaia com seus horários reais e libera sua recepcionista pra cuidar de quem está na clínica.',
   faq: [
     { q: 'Funciona pra clínica médica, consultório odontológico, fisioterapia, psicologia?', a: 'Sim, qualquer prática que receba marcações por WhatsApp. Você define os tipos de consulta, horários e perguntas frequentes.' },
     { q: 'O atendente sabe diferenciar dúvida clínica de agendamento?', a: 'Sim. Para qualquer pergunta sobre saúde, sintoma ou tratamento, o Atalaia transfere automaticamente pra um profissional humano em vez de inventar resposta.' },
@@ -122,7 +122,7 @@ export const academiaConfig: VerticalConfig = {
     </>
   ),
   heroSubtitle:
-    'Aluno quer saber preço, horário de aula ou marcar avaliação física? O Atalaia responde 24h pelo WhatsApp e site, e te conecta com o lead quando ele estiver pronto pra matricular.',
+    'Aluno quer saber preço, horário de aula ou marcar avaliação física? Sua atendente IA responde 24h via Atalaia (WhatsApp + site), e te conecta com o lead quando ele estiver pronto pra matricular.',
   faq: [
     { q: 'Atende dúvidas sobre planos (mensal, trimestral, anual)?', a: 'Sim. Você cadastra cada plano com valor e benefícios; o atendente apresenta de forma clara e oferece o que faz mais sentido pra dúvida do lead.' },
     { q: 'Atende sobre horários das aulas coletivas?', a: 'Sim. Você cadastra a grade da semana, e o atendente responde "tem aula de spinning na quinta às 19h?" com a resposta certa.' },

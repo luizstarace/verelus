@@ -9,7 +9,7 @@ export default function PrivacyPage() {
         <div className="prose prose-sm max-w-none text-brand-muted space-y-6">
           <p><strong>Última atualização:</strong> 23 de abril de 2026</p>
 
-          <p>A Verelus é a controladora desta plataforma e opera o produto Attendly — um atendente de IA para pequenos e médios negócios brasileiros via WhatsApp e widget de chat. Esta política descreve como tratamos dados pessoais em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei 13.709/2018).</p>
+          <p>A Verelus é a controladora desta plataforma e opera o produto Atalaia — um atendente de IA para pequenos e médios negócios brasileiros via WhatsApp e widget de chat. Esta política descreve como tratamos dados pessoais em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei 13.709/2018).</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">1. Dados que Coletamos</h2>
           <p><strong>Dados do titular da conta (cliente Verelus):</strong></p>

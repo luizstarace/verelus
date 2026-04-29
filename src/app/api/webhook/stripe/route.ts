@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { mapProduct, isAttendlyProduct, mapStatus } from "@/lib/stripe/mapping";
+import { mapProduct, isAtalaiaProduct, mapStatus } from "@/lib/stripe/mapping";
 
 export const runtime = 'edge';
 
@@ -17,11 +17,11 @@ async function sendPurchaseEmail(email: string, plan: string) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://verelus.com";
 
-  // Map raw product string to user-facing label (Attendly plans + legacy fallback).
+  // Map raw product string to user-facing label (Atalaia plans + legacy fallback).
   let planLabel = "Pro";
-  if (plan === "attendly_starter") planLabel = "Starter";
-  else if (plan === "attendly_pro") planLabel = "Pro";
-  else if (plan === "attendly_business" || plan === "business") planLabel = "Business";
+  if (plan === "atalaia_starter") planLabel = "Starter";
+  else if (plan === "atalaia_pro") planLabel = "Pro";
+  else if (plan === "atalaia_business" || plan === "business") planLabel = "Business";
   else if (plan === "pro") planLabel = "Pro";
 
   try {
@@ -32,13 +32,13 @@ async function sendPurchaseEmail(email: string, plan: string) {
         Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
-        from: "Attendly <contato@verelus.com>",
+        from: "Atalaia <contato@verelus.com>",
         to: [email],
-        subject: `Seu plano Attendly ${planLabel} está ativo!`,
+        subject: `Seu plano Atalaia ${planLabel} está ativo!`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #e5e5e5; padding: 40px 30px; border-radius: 12px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #f5f5f5; font-size: 28px; margin: 0;">Attendly</h1>
+              <h1 style="color: #f5f5f5; font-size: 28px; margin: 0;">Atalaia</h1>
               <p style="color: #00f5a0; font-size: 14px; margin: 4px 0 0;">Seu atendente de IA, 24h por dia</p>
             </div>
             <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 30px; margin-bottom: 24px; border: 1px solid #262626;">
@@ -62,7 +62,7 @@ async function sendPurchaseEmail(email: string, plan: string) {
               </div>
             </div>
             <div style="text-align: center; margin-bottom: 24px;">
-              <a href="${appUrl}/dashboard/attendly/setup" style="display: inline-block; background: linear-gradient(135deg, #00f5a0, #00d9f5); color: #000; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 15px;">
+              <a href="${appUrl}/dashboard/atalaia/setup" style="display: inline-block; background: linear-gradient(135deg, #00f5a0, #00d9f5); color: #000; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 15px;">
                 Começar a configurar
               </a>
             </div>
@@ -256,13 +256,13 @@ export async function POST(req: NextRequest) {
           { onConflict: "email" }
         );
 
-        // If Attendly subscription, activate the business. UPDATE first; if no
+        // If Atalaia subscription, activate the business. UPDATE first; if no
         // row matched (customer paid before completing the setup wizard), INSERT
         // a stub so they're not orphaned with an active sub and no business
         // record. Customer fills in name/services/etc. when they open the wizard.
-        if (isAttendlyProduct(productType)) {
+        if (isAtalaiaProduct(productType)) {
           const { data: updated } = await supabase
-            .from("attendly_businesses")
+            .from("atalaia_businesses")
             .update({ status: "active" })
             .eq("user_id", user.id)
             .select("id");
@@ -270,7 +270,7 @@ export async function POST(req: NextRequest) {
           if (!updated || updated.length === 0) {
             const stubName = (email.split("@")[0] || "Meu negócio").slice(0, 50);
             const { error: insErr } = await supabase
-              .from("attendly_businesses")
+              .from("atalaia_businesses")
               .insert({
                 user_id: user.id,
                 name: stubName,
@@ -279,7 +279,7 @@ export async function POST(req: NextRequest) {
             // 23505 = unique violation — race with a concurrent stub insert.
             // Safe to ignore; the row exists either way.
             if (insErr && (insErr as { code?: string }).code !== "23505") {
-              console.error("attendly_businesses stub insert error:", insErr);
+              console.error("atalaia_businesses stub insert error:", insErr);
             }
           }
         }
@@ -310,8 +310,8 @@ export async function POST(req: NextRequest) {
           { onConflict: "stripe_subscription_id" }
         );
 
-        // Sync Attendly business status with subscription
-        if (isAttendlyProduct(productType)) {
+        // Sync Atalaia business status with subscription
+        if (isAtalaiaProduct(productType)) {
           const { data: sub } = await supabase
             .from("subscriptions")
             .select("user_id")
@@ -321,7 +321,7 @@ export async function POST(req: NextRequest) {
           if (sub?.user_id) {
             const bizStatus = status === "active" ? "active" : "paused";
             await supabase
-              .from("attendly_businesses")
+              .from("atalaia_businesses")
               .update({ status: bizStatus })
               .eq("user_id", sub.user_id);
           }
@@ -333,7 +333,7 @@ export async function POST(req: NextRequest) {
       case "customer.subscription.deleted": {
         const customerId = event.customer;
 
-        // Get subscription before updating to check if Attendly
+        // Get subscription before updating to check if Atalaia
         const { data: existingSub } = await supabase
           .from("subscriptions")
           .select("user_id, product")
@@ -351,10 +351,10 @@ export async function POST(req: NextRequest) {
           { onConflict: "stripe_subscription_id" }
         );
 
-        // Pause Attendly business on cancellation
-        if (existingSub && isAttendlyProduct(existingSub.product)) {
+        // Pause Atalaia business on cancellation
+        if (existingSub && isAtalaiaProduct(existingSub.product)) {
           await supabase
-            .from("attendly_businesses")
+            .from("atalaia_businesses")
             .update({ status: "paused" })
             .eq("user_id", existingSub.user_id);
         }

@@ -244,8 +244,8 @@ export const translations = {
         subscribe: "Subscribe",
       },
     },
-    attendly: {
-      nav: { product: 'Attendly', about: 'About', login: 'Sign In' },
+    atalaia: {
+      nav: { product: 'Atalaia', about: 'About', login: 'Sign In' },
       hero: {
         title: 'Your business answering customers 24/7',
         subtitle: 'AI that responds on WhatsApp and your website as if it were you. No robot, no waiting.',
@@ -253,9 +253,9 @@ export const translations = {
         noCreditCard: 'No credit card required',
       },
       comparison: {
-        title: 'Why Attendly?',
+        title: 'Why Atalaia?',
         human: 'Human agent',
-        ai: 'Attendly',
+        ai: 'Atalaia',
         price: { human: '$800-2,000/mo', ai: 'From $30/mo' },
         hours: { human: '8h per day', ai: '24/7/365' },
         absence: { human: 'Vacations, absences', ai: 'Never misses' },
@@ -539,8 +539,8 @@ export const translations = {
         subscribe: "Inscrever-se",
       },
     },
-    attendly: {
-      nav: { product: 'Attendly', about: 'Sobre', login: 'Entrar' },
+    atalaia: {
+      nav: { product: 'Atalaia', about: 'Sobre', login: 'Entrar' },
       hero: {
         title: 'Seu negócio atendendo clientes 24/7',
         subtitle: 'IA que responde no WhatsApp e no seu site como se fosse você. Sem robô, sem espera.',
@@ -548,9 +548,9 @@ export const translations = {
         noCreditCard: 'Sem cartão de crédito',
       },
       comparison: {
-        title: 'Por que Attendly?',
+        title: 'Por que Atalaia?',
         human: 'Atendente humano',
-        ai: 'Attendly',
+        ai: 'Atalaia',
         price: { human: 'R$ 1.500-3.000/mês', ai: 'A partir de R$ 147/mês' },
         hours: { human: '8h por dia', ai: '24/7/365' },
         absence: { human: 'Férias, faltas', ai: 'Nunca falta' },

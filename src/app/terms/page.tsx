@@ -10,18 +10,18 @@ export default function TermsPage() {
           <p><strong>Última atualização:</strong> 23 de abril de 2026</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">1. Aceitação</h2>
-          <p>Ao criar uma conta ou utilizar a plataforma Verelus (&quot;Serviço&quot;), em especial o produto Attendly, você concorda com estes Termos. Se não concordar, não utilize o Serviço.</p>
+          <p>Ao criar uma conta ou utilizar a plataforma Verelus (&quot;Serviço&quot;), em especial o produto Atalaia, você concorda com estes Termos. Se não concordar, não utilize o Serviço.</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">2. Descrição do Serviço</h2>
-          <p>Attendly é um atendente virtual de IA para pequenos e médios negócios, operando via widget de chat embutido em sites e via WhatsApp. O Serviço gera respostas automatizadas com base em configurações fornecidas pelo titular da conta (nome do negócio, serviços, horário, FAQ, contexto).</p>
+          <p>Atalaia é um atendente virtual de IA para pequenos e médios negócios, operando via widget de chat embutido em sites e via WhatsApp. O Serviço gera respostas automatizadas com base em configurações fornecidas pelo titular da conta (nome do negócio, serviços, horário, FAQ, contexto).</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">3. Contas e Assinaturas</h2>
           <p>Para acessar o Serviço é necessário criar uma conta. O titular é responsável por manter a confidencialidade de credenciais e por todas as atividades realizadas com sua conta.</p>
-          <p>O Attendly oferece um período de teste gratuito de 7 dias, sem necessidade de cartão. Após o teste, a continuidade do serviço requer assinatura de um plano (Starter, Pro ou Business), com cobrança mensal ou anual via Stripe. Uso acima do limite do plano pode gerar cobrança por excedente, conforme divulgado na página de planos.</p>
+          <p>O Atalaia oferece um período de teste gratuito de 7 dias, sem necessidade de cartão. Após o teste, a continuidade do serviço requer assinatura de um plano (Starter, Pro ou Business), com cobrança mensal ou anual via Stripe. Uso acima do limite do plano pode gerar cobrança por excedente, conforme divulgado na página de planos.</p>
           <p>Assinaturas podem ser canceladas a qualquer momento pelo painel. O cancelamento encerra a cobrança no próximo ciclo, e o acesso permanece até o fim do período já pago.</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">4. Responsabilidade do Titular pelos Dados dos Clientes Finais</h2>
-          <p>Ao usar o Attendly para atender clientes via WhatsApp ou widget, o titular da conta é o controlador dos dados dos seus próprios clientes (números, nomes, conteúdo das conversas). A Verelus é operadora (processadora) e trata esses dados apenas para executar o Serviço.</p>
+          <p>Ao usar o Atalaia para atender clientes via WhatsApp ou widget, o titular da conta é o controlador dos dados dos seus próprios clientes (números, nomes, conteúdo das conversas). A Verelus é operadora (processadora) e trata esses dados apenas para executar o Serviço.</p>
           <p>É responsabilidade do titular: (i) informar seus clientes de que o atendimento inicial é feito por IA; (ii) cumprir com a LGPD e demais leis aplicáveis ao seu negócio; (iii) obter consentimento dos clientes quando a legislação exigir; (iv) garantir que o uso do WhatsApp esteja em conformidade com os Termos do WhatsApp.</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">5. Conteúdo Gerado por IA</h2>
@@ -36,7 +36,7 @@ export default function TermsPage() {
           <p>É proibido usar o Serviço para: (i) enviar mensagens não solicitadas (spam); (ii) enganar clientes quanto à natureza automatizada do atendimento; (iii) atividades ilegais, fraude ou violação de direitos de terceiros; (iv) engenharia reversa da plataforma; (v) acesso não autorizado a dados de outros usuários. Violações podem resultar em suspensão imediata da conta sem reembolso.</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">8. Propriedade Intelectual</h2>
-          <p>A plataforma, marca Verelus, marca Attendly, código, design e documentação são de propriedade da Verelus. Dados configurados pelo titular (serviços, FAQ, contexto) e o histórico de conversas com seus clientes pertencem ao titular da conta.</p>
+          <p>A plataforma, marca Verelus, marca Atalaia, código, design e documentação são de propriedade da Verelus. Dados configurados pelo titular (serviços, FAQ, contexto) e o histórico de conversas com seus clientes pertencem ao titular da conta.</p>
 
           <h2 className="text-xl font-semibold text-brand-text mt-8">9. Limitação de Responsabilidade</h2>
           <p>O Serviço é fornecido &quot;como está&quot;. A Verelus não garante disponibilidade ininterrupta, ausência de erros ou adequação a finalidades específicas. A responsabilidade máxima da Verelus fica limitada ao valor efetivamente pago pelo titular nos 12 meses anteriores ao evento que deu origem à reclamação.</p>

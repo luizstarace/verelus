@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     url: `https://verelus.com/blog/${meta.slug}`,
     siteName: 'Verelus',
     publishedTime: meta.publishedAt,
-    images: [{ url: 'https://verelus.com/og-attendly.png', width: 1200, height: 630, alt: meta.title }],
+    images: [{ url: 'https://verelus.com/og-atalaia.png', width: 1200, height: 630, alt: meta.title }],
   },
   twitter: {
     card: 'summary_large_image',
     title: meta.title,
     description: meta.description,
-    images: ['https://verelus.com/og-attendly.png'],
+    images: ['https://verelus.com/og-atalaia.png'],
   },
   alternates: { canonical: `https://verelus.com/blog/${meta.slug}` },
 };
@@ -83,7 +83,7 @@ export default function Post() {
         </li>
         <li>
           <strong>SaaS pronto pra PME:</strong> ferramentas como o{' '}
-          <Link href="/attendly">Attendly</Link> que entregam o pacote completo com setup
+          <Link href="/atalaia">Atalaia</Link> que entregam o pacote completo com setup
           de poucos minutos.
         </li>
       </ol>

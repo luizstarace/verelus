@@ -8,13 +8,13 @@
   var businessId = scriptEl ? scriptEl.getAttribute('data-business') : null;
 
   if (!businessId) {
-    console.error('[Attendly] Missing data-business attribute on widget script tag.');
+    console.error('[Atalaia] Missing data-business attribute on widget script tag.');
     return;
   }
 
   // ── Constants ────────────────────────────────────────────────────
   var MAX_MESSAGES = 30;
-  var STORAGE_KEY = 'attendly_widget_' + businessId;
+  var STORAGE_KEY = 'atalaia_widget_' + businessId;
   var EXPIRY_MS = 24 * 60 * 60 * 1000; // 24h
 
   // ── State ────────────────────────────────────────────────────────
@@ -177,7 +177,7 @@
 
     // Host element + Shadow DOM
     var host = document.createElement('div');
-    host.id = 'attendly-widget-host';
+    host.id = 'atalaia-widget-host';
     document.body.appendChild(host);
     var shadow = host.attachShadow({ mode: 'closed' });
 
@@ -217,7 +217,7 @@
     // Footer
     var footer = document.createElement('div');
     footer.className = 'aw-footer';
-    footer.innerHTML = 'Powered by <a href="https://verelus.com/attendly" target="_blank" rel="noopener">Attendly</a>';
+    footer.innerHTML = 'Powered by <a href="https://verelus.com/atalaia" target="_blank" rel="noopener">Atalaia</a>';
     panel.appendChild(footer);
 
     // ── Open/Close ───────────────────────────────────────
@@ -281,7 +281,7 @@
         customer_phone: phoneInput.value.trim() || undefined,
       };
 
-      fetch(BASE_URL + '/api/attendly/widget/lead', {
+      fetch(BASE_URL + '/api/atalaia/widget/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -415,7 +415,7 @@
       customer_name: customerName,
     };
 
-    fetch(BASE_URL + '/api/attendly/chat', {
+    fetch(BASE_URL + '/api/atalaia/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -529,7 +529,7 @@
   }
 
   // ── Boot ─────────────────────────────────────────────────────────
-  fetch(BASE_URL + '/api/attendly/widget/' + encodeURIComponent(businessId) + '/config')
+  fetch(BASE_URL + '/api/atalaia/widget/' + encodeURIComponent(businessId) + '/config')
     .then(function(res) {
       if (!res.ok) throw new Error('Config fetch failed');
       return res.json();
@@ -542,7 +542,7 @@
       }
     })
     .catch(function(err) {
-      console.error('[Attendly] Failed to load widget config:', err);
+      console.error('[Atalaia] Failed to load widget config:', err);
     });
 
 })();

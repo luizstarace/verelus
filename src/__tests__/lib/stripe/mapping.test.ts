@@ -1,25 +1,25 @@
 import { describe, it, expect } from 'vitest';
-import { mapProduct, isAttendlyProduct, mapStatus, type StripePrices } from '@/lib/stripe/mapping';
+import { mapProduct, isAtalaiaProduct, mapStatus, type StripePrices } from '@/lib/stripe/mapping';
 
 const PRICES: StripePrices = {
   pro: 'price_pro_legacy',
   business: 'price_biz_legacy',
-  attendlyStarter: 'price_attendly_starter',
-  attendlyPro: 'price_attendly_pro',
-  attendlyBusiness: 'price_attendly_business',
+  atalaiaStarter: 'price_atalaia_starter',
+  atalaiaPro: 'price_atalaia_pro',
+  atalaiaBusiness: 'price_atalaia_business',
 };
 
 describe('mapProduct', () => {
-  it('maps attendly business price to attendly_business', () => {
-    expect(mapProduct('price_attendly_business', PRICES)).toBe('attendly_business');
+  it('maps atalaia business price to atalaia_business', () => {
+    expect(mapProduct('price_atalaia_business', PRICES)).toBe('atalaia_business');
   });
 
-  it('maps attendly pro price to attendly_pro', () => {
-    expect(mapProduct('price_attendly_pro', PRICES)).toBe('attendly_pro');
+  it('maps atalaia pro price to atalaia_pro', () => {
+    expect(mapProduct('price_atalaia_pro', PRICES)).toBe('atalaia_pro');
   });
 
-  it('maps attendly starter price to attendly_starter', () => {
-    expect(mapProduct('price_attendly_starter', PRICES)).toBe('attendly_starter');
+  it('maps atalaia starter price to atalaia_starter', () => {
+    expect(mapProduct('price_atalaia_starter', PRICES)).toBe('atalaia_starter');
   });
 
   it('maps legacy business price to business', () => {
@@ -42,47 +42,47 @@ describe('mapProduct', () => {
     expect(mapProduct('price_custom_pro_plan', PRICES)).toBe('pro');
   });
 
-  it('prefers attendly price match over generic substring', () => {
-    // attendly_pro price happens to contain "pro" substring; should resolve to attendly_pro
-    expect(mapProduct('price_attendly_pro', PRICES)).toBe('attendly_pro');
+  it('prefers atalaia price match over generic substring', () => {
+    // atalaia_pro price happens to contain "pro" substring; should resolve to atalaia_pro
+    expect(mapProduct('price_atalaia_pro', PRICES)).toBe('atalaia_pro');
   });
 
   it('does not treat empty string as matching empty env prices', () => {
     const emptyPrices: StripePrices = {
       pro: '',
       business: '',
-      attendlyStarter: '',
-      attendlyPro: '',
-      attendlyBusiness: '',
+      atalaiaStarter: '',
+      atalaiaPro: '',
+      atalaiaBusiness: '',
     };
-    // Empty priceId with empty envs should NOT short-circuit to attendly_* — falls through to "pro" default
+    // Empty priceId with empty envs should NOT short-circuit to atalaia_* — falls through to "pro" default
     expect(mapProduct('', emptyPrices)).toBe('pro');
   });
 });
 
-describe('isAttendlyProduct', () => {
-  it('returns true for attendly_starter', () => {
-    expect(isAttendlyProduct('attendly_starter')).toBe(true);
+describe('isAtalaiaProduct', () => {
+  it('returns true for atalaia_starter', () => {
+    expect(isAtalaiaProduct('atalaia_starter')).toBe(true);
   });
 
-  it('returns true for attendly_pro', () => {
-    expect(isAttendlyProduct('attendly_pro')).toBe(true);
+  it('returns true for atalaia_pro', () => {
+    expect(isAtalaiaProduct('atalaia_pro')).toBe(true);
   });
 
-  it('returns true for attendly_business', () => {
-    expect(isAttendlyProduct('attendly_business')).toBe(true);
+  it('returns true for atalaia_business', () => {
+    expect(isAtalaiaProduct('atalaia_business')).toBe(true);
   });
 
   it('returns false for legacy "pro"', () => {
-    expect(isAttendlyProduct('pro')).toBe(false);
+    expect(isAtalaiaProduct('pro')).toBe(false);
   });
 
   it('returns false for legacy "business"', () => {
-    expect(isAttendlyProduct('business')).toBe(false);
+    expect(isAtalaiaProduct('business')).toBe(false);
   });
 
   it('returns false for empty string', () => {
-    expect(isAttendlyProduct('')).toBe(false);
+    expect(isAtalaiaProduct('')).toBe(false);
   });
 });
 

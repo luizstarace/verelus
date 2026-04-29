@@ -1,27 +1,27 @@
 export interface StripePrices {
   pro: string;
   business: string;
-  attendlyStarter: string;
-  attendlyPro: string;
-  attendlyBusiness: string;
+  atalaiaStarter: string;
+  atalaiaPro: string;
+  atalaiaBusiness: string;
 }
 
 function readPricesFromEnv(): StripePrices {
   return {
     pro: process.env.STRIPE_PRICE_PRO || '',
     business: process.env.STRIPE_PRICE_BUSINESS || '',
-    attendlyStarter: process.env.STRIPE_PRICE_ATTENDLY_STARTER || '',
-    attendlyPro: process.env.STRIPE_PRICE_ATTENDLY_PRO || '',
-    attendlyBusiness: process.env.STRIPE_PRICE_ATTENDLY_BUSINESS || '',
+    atalaiaStarter: process.env.STRIPE_PRICE_ATALAIA_STARTER || '',
+    atalaiaPro: process.env.STRIPE_PRICE_ATALAIA_PRO || '',
+    atalaiaBusiness: process.env.STRIPE_PRICE_ATALAIA_BUSINESS || '',
   };
 }
 
 export function mapProduct(priceId: string, prices: StripePrices = readPricesFromEnv()): string {
   if (!priceId) return 'pro';
 
-  if (priceId === prices.attendlyBusiness) return 'attendly_business';
-  if (priceId === prices.attendlyPro) return 'attendly_pro';
-  if (priceId === prices.attendlyStarter) return 'attendly_starter';
+  if (priceId === prices.atalaiaBusiness) return 'atalaia_business';
+  if (priceId === prices.atalaiaPro) return 'atalaia_pro';
+  if (priceId === prices.atalaiaStarter) return 'atalaia_starter';
 
   if ((prices.business && priceId === prices.business) || priceId.includes('business')) {
     return 'business';
@@ -32,8 +32,8 @@ export function mapProduct(priceId: string, prices: StripePrices = readPricesFro
   return 'pro';
 }
 
-export function isAttendlyProduct(product: string): boolean {
-  return product.startsWith('attendly_');
+export function isAtalaiaProduct(product: string): boolean {
+  return product.startsWith('atalaia_');
 }
 
 export function mapStatus(stripeStatus: string): string {

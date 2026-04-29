@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     url: `https://verelus.com/blog/${meta.slug}`,
     siteName: 'Verelus',
     publishedTime: meta.publishedAt,
-    images: [{ url: 'https://verelus.com/og-attendly.png', width: 1200, height: 630, alt: meta.title }],
+    images: [{ url: 'https://verelus.com/og-atalaia.png', width: 1200, height: 630, alt: meta.title }],
   },
   twitter: {
     card: 'summary_large_image',
     title: meta.title,
     description: meta.description,
-    images: ['https://verelus.com/og-attendly.png'],
+    images: ['https://verelus.com/og-atalaia.png'],
   },
   alternates: { canonical: `https://verelus.com/blog/${meta.slug}` },
 };
@@ -165,7 +165,7 @@ export default function Post() {
       <p>
         <strong>Estágio 2 — volume crescendo, atendimento atrasando:</strong> mude para SaaS
         de chatbot com IA. Plano starter de R$ 100-200/mês paga sozinho com 1-2 vendas extras.
-        O <Link href="/attendly">Attendly</Link>, por exemplo, tem trial 7 dias grátis sem
+        O <Link href="/atalaia">Atalaia</Link>, por exemplo, tem trial 7 dias grátis sem
         cartão pra testar a tese.
       </p>
       <p>

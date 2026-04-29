@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     url: `https://verelus.com/blog/${meta.slug}`,
     siteName: 'Verelus',
     publishedTime: meta.publishedAt,
-    images: [{ url: 'https://verelus.com/og-attendly.png', width: 1200, height: 630, alt: meta.title }],
+    images: [{ url: 'https://verelus.com/og-atalaia.png', width: 1200, height: 630, alt: meta.title }],
   },
   twitter: {
     card: 'summary_large_image',
     title: meta.title,
     description: meta.description,
-    images: ['https://verelus.com/og-attendly.png'],
+    images: ['https://verelus.com/og-atalaia.png'],
   },
   alternates: { canonical: `https://verelus.com/blog/${meta.slug}` },
 };
@@ -186,7 +186,7 @@ export default function Post() {
         Para PMEs com volume real, a redução de 80%+ é alcançável em 4 semanas. O custo de
         ferramentas decentes (R$ 100-300/mês) é ridículo perto do custo do cliente que
         desistiu porque você demorou a responder. Se você quer testar, o{' '}
-        <Link href="/attendly">Attendly</Link> oferece 7 dias grátis sem cartão pra você
+        <Link href="/atalaia">Atalaia</Link> oferece 7 dias grátis sem cartão pra você
         medir a diferença.
       </p>
     </BlogPostShell>

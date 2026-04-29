@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     siteName: 'Verelus',
     images: [
       {
-        url: 'https://verelus.com/og-attendly.png',
+        url: 'https://verelus.com/og-atalaia.png',
         width: 1200,
         height: 630,
         alt: 'Blog Verelus',

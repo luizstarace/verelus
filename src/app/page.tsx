@@ -10,10 +10,10 @@ export default function Home() {
         </Link>
         <div className="flex items-center gap-6">
           <Link
-            href="/attendly"
+            href="/atalaia"
             className="text-sm font-medium text-brand-muted hover:text-brand-trust transition-colors"
           >
-            Attendly
+            Atalaia
           </Link>
           <Link
             href="/login"
@@ -34,7 +34,7 @@ export default function Home() {
           <span className="text-brand-trust">para PMEs brasileiras</span>
         </h1>
         <p className="text-lg text-brand-muted max-w-2xl leading-relaxed">
-          O Attendly responde seus clientes no WhatsApp e no widget do seu site
+          O Atalaia responde seus clientes no WhatsApp e no widget do seu site
           como se fosse você. Agenda, tira dúvidas e vende — mesmo de madrugada.
         </p>
       </section>
@@ -61,7 +61,7 @@ export default function Home() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold">Attendly</h3>
+                  <h3 className="text-xl font-bold">Atalaia</h3>
                   <p className="text-sm text-brand-muted">Atendente IA 24/7 para PMEs</p>
                 </div>
               </div>
@@ -87,7 +87,7 @@ export default function Home() {
               </svg>
             </Link>
             <Link
-              href="/attendly"
+              href="/atalaia"
               className="ml-3 inline-flex items-center gap-1 px-4 py-3 text-sm text-brand-muted hover:text-brand-trust transition-colors"
             >
               Ver detalhes
@@ -103,12 +103,12 @@ export default function Home() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'SoftwareApplication',
-            name: 'Attendly',
+            name: 'Atalaia',
             applicationCategory: 'BusinessApplication',
             operatingSystem: 'Web',
             description:
               'Atendente de IA 24/7 no WhatsApp e no site para PMEs brasileiras. Agenda, tira dúvidas e vende automaticamente.',
-            url: 'https://verelus.com/attendly',
+            url: 'https://verelus.com/atalaia',
             offers: {
               '@type': 'Offer',
               price: '147.00',

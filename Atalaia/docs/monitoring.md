@@ -4,7 +4,7 @@ Minimal setup pra saber quando algo quebrou em prod sem ter que abrir o dashboar
 
 ## Health endpoint
 
-`GET https://atalaia.verelus.com/api/health/atalaia`
+`GET https://verelus.com/api/health/atalaia`
 
 Retorna JSON com probes de:
 - Supabase (query contra `atalaia_businesses`)
@@ -17,27 +17,28 @@ Status HTTP reflete saúde agregada:
 - `200` — tudo OK
 - `503` — pelo menos um probe falhou
 
-## Uptime monitor — GitHub Actions cron (ativo)
+## Uptime monitor externo
 
-Configurado em `.github/workflows/uptime.yml`. Roda a cada hora (free tier safe: ~720 min/mês). Probe `GET https://atalaia.verelus.com/api/health/atalaia`. Se HTTP != 200 ou status != "healthy":
+Configurar em **Better Stack** (free tier: 10 monitors) ou **UptimeRobot** (free tier: 50 monitors).
 
-- Abre **issue automática** com label `uptime-incident` (ou comenta na issue aberta existente)
-- Notificação chega por email do GitHub (settings → notifications)
-- Quando recupera, comenta "Service recovered" e fecha a issue
+### Better Stack (recomendado)
 
-Trigger manual: GitHub Actions tab → "Uptime Monitor" → "Run workflow".
+1. Criar conta gratuita em <https://betterstack.com/uptime>.
+2. Novo monitor:
+   - Tipo: **HTTP(S)**
+   - URL: `https://verelus.com/api/health/atalaia`
+   - Intervalo: **3 min** (free tier permite 30s mas 3min basta)
+   - Aceitar 2xx apenas
+   - Timeout: 10s
+3. Canal de notificação: email (`luizsfap@gmail.com` ou `founder@verelus.com`).
+4. Opcional: Slack/WhatsApp quando escalar.
 
-### Limitações
-- Granularidade hora (não 5min) — trade-off de cost
-- Sem SLA de notificação (depende do GitHub email)
+### UptimeRobot (alternativa)
 
-### Migrar pra Better Stack quando escalar
-
-Quando primeiro cliente pagante chegar:
-1. Criar conta gratuita em <https://betterstack.com/uptime>
-2. Novo monitor HTTP: URL `https://atalaia.verelus.com/api/health/atalaia`, intervalo 3min, aceitar 2xx, timeout 10s
-3. Email alerts pra `luizsfap@gmail.com`
-4. Desativar workflow `uptime.yml` (ou deixar como redundância)
+1. Conta em <https://uptimerobot.com/>.
+2. Novo monitor HTTP(s) com a mesma URL.
+3. Intervalo mínimo free: **5 min**.
+4. Email alerts (free tier suporta múltiplos contatos).
 
 ## Logs de aplicação
 
@@ -62,8 +63,8 @@ Quando primeiro cliente pagante chegar:
 
 Antes de ligar o primeiro cliente real:
 
-- [x] Uptime monitor ativo (GitHub Actions cron 1x/hora, abre issue se cair)
-- [ ] Confirmado que email de alerta chega (teste: trigger manual workflow_dispatch + simular falha)
-- [x] `/api/health/atalaia` retorna `200` + todos os serviços `ok` (validado 2026-04-29)
+- [ ] Better Stack monitor ativo e disparou pelo menos um ping verde
+- [ ] Confirmado que email de alerta chega (teste: derrubar Supabase ou apagar env temporariamente)
+- [ ] `/api/health/atalaia` retorna `200` + todos os serviços `ok`
 - [ ] Logs em `atalaia_logs` estão preenchendo
-- [x] Cron `atalaia_cleanup_daily` listado em `cron.job` (validado 2026-04-29)
+- [ ] Cron `atalaia_cleanup_daily` listado em `cron.job` e `active = true`

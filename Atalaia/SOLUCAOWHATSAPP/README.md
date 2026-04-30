@@ -1,291 +1,349 @@
 # Solução WhatsApp — Atalaia
 
-Como o Atalaia provisiona números WhatsApp para clientes Pro/Business sem que eles precisem usar o WhatsApp pessoal.
+Como o Atalaia provisiona um **número WhatsApp Business oficial** pra cada cliente Pro/Business, automaticamente, sem usar o WhatsApp pessoal dele e sem o fundador encostar em nada.
 
 ## TL;DR
 
-- **Pro/Business** → número novo oficial Meta via **Zenvia BSP** (Verelus master account + sub-accounts). Sem risco de banimento, NF-e BRL.
-- **Starter** → cliente conecta o próprio número via QR code (**Evolution API** self-hosted, igual hoje).
-- **Cliente Pro/Business que prefere usar próprio número** → link discreto no onboarding "Já tenho um número" → cai no fluxo Evolution (BYO).
-- **Gap KYC** (3-7 dias entre compra e número oficial pronto) → Atalaia provisiona Evolution temporário, migra automaticamente quando KYC aprova.
+- **Pro/Business** → cliente paga → sistema aluga um número brasileiro novo na **Twilio** → submete pra aprovação WhatsApp/Meta → cliente recebe email com o número ativo em **3-5 dias úteis**.
+- **Starter** → cliente conecta o próprio número via QR (**Evolution API** self-hosted, igual hoje).
+- **Cliente Pro/Business que prefere usar próprio número** → link "Já tenho um número" no onboarding cai no fluxo Evolution (BYO).
+- **Cancela assinatura** → número Twilio é liberado automaticamente em segundos.
+- **Custo da Twilio sai do dinheiro do cliente:** Stripe paga você em ~7 dias, Twilio cobra em ~30 dias. Você não tira do bolso.
 
-Decisão estratégica detalhada: `/Users/luizsfap/.claude/plans/gosto-da-opcao-a-resilient-falcon.md`.
-
----
-
-## Arquitetura em 1 diagrama
-
-```
-                          ┌────────────────────┐
-                          │  atalaia_businesses │
-                          │  whatsapp_provider  │
-                          │  (evolution|zenvia) │
-                          └──────────┬──────────┘
-                                     │
-              ┌──────────────────────┴──────────────────────┐
-              │                                              │
-   provider='evolution'                              provider='zenvia'
-   (Starter, BYO, ponte temp)                        (Pro/Business pós-KYC)
-              │                                              │
-   ┌──────────▼─────────┐                       ┌────────────▼──────────┐
-   │ Evolution API      │                       │ Zenvia BSP            │
-   │ wa.verelus.com     │                       │ api.zenvia.com        │
-   │ self-hosted Hetzner│                       │ master + sub-accounts │
-   └──────────┬─────────┘                       └────────────┬──────────┘
-              │                                              │
-   webhook /api/atalaia/                       webhook /api/atalaia/
-   whatsapp/webhook                            whatsapp/zenvia/webhook
-              │                                              │
-              └──────────────────┬───────────────────────────┘
-                                 │
-                       /api/atalaia/chat (SSE)
-                                 │
-                          Claude Haiku 4.5
-```
+Plano técnico detalhado: `/Users/luizsfap/.claude/plans/gosto-da-opcao-a-resilient-falcon.md`.
 
 ---
 
-## Estado atual (Phase 1 — 2026-04-29)
+## Arquitetura, em palavras simples
+
+```
+1. Cliente PME compra Pro (R$297) ou Business (R$597) no checkout Stripe.
+
+2. Stripe nos avisa via webhook ("checkout.session.completed").
+
+3. Sistema do Atalaia chama a Twilio:
+     a) Aluga 1 número brasileiro (DDD da preferência do cliente, tipo 11 ou 21).
+     b) Submete esse número pra aprovação como WhatsApp Business Sender.
+     A Twilio repassa pra Meta validar (3-5 dias úteis).
+
+4. Sistema dispara 2 emails de onboarding:
+     a) Imediato: "sua atendente está em preparação, vamos treinar ela".
+        Link pra preencher serviços, horários, FAQ, tom de voz.
+     b) Agendado +24h via Resend: "regras de transferência humana".
+        Link pra configurar quando a IA deve te chamar.
+
+5. Cliente preenche os dados no dashboard durante a espera.
+   A IA aprende o negócio dele.
+
+6. Cron de hora em hora consulta a Twilio. Quando aprovam:
+     - Sistema marca cliente como ativo.
+     - Email "Seu número está ativo: +55 11 99XXX-XXXX".
+     - Cliente coloca esse número no site, Instagram, cartão.
+
+7. Cliente final do PME manda mensagem WhatsApp pro número novo.
+   Webhook chega no nosso sistema → IA do Claude responde →
+   resposta volta via Twilio. Tudo em segundos.
+
+8. Se cliente cancela assinatura na Stripe:
+     - Sistema desregistra o Sender (Meta).
+     - Sistema libera o número (deixa de cobrar Twilio).
+     - Email "número liberado, dados preservados 90 dias".
+```
+
+## Por que Twilio (e não Zenvia ou Cloud API direto)
+
+**Comparação que fizemos:**
+
+| | Twilio | Zenvia (descartado) | Cloud API direto Meta |
+|---|---|---|---|
+| Mensalidade fixa, mesmo sem cliente | **R$0** | R$300-1.000 | R$0 |
+| Aluguel por número | ~R$8 | ~R$60-150 | só o do provedor (Twilio) |
+| Por conversa | ~R$0,14 | ~R$0,40 | ~R$0 (1000 grátis) ou ~R$0,14 |
+| Tempo pra aprovar número novo | 3-5 dias úteis | ~7 dias | minutos (mas precisa Meta Business verificado) |
+| Aceita CPF brasileiro | sim | sim | só com limite 250 conv/dia |
+| Suporte | inglês | PT-BR | docs Meta |
+| Nota fiscal | fatura USD | NF-e BRL | fatura USD |
+
+**Twilio venceu** porque: zero custo fixo (cabe no perfil "0 cliente hoje"), aceita CPF imediatamente (não precisa CNPJ pra começar), e o "intermediário" Twilio remove a complexidade de verificar Meta Business Manager separadamente.
+
+Limitação aceita: 3-5 dias de espera pra número aprovar. Mitigado com a estratégia de **2 emails de onboarding** que treinam a IA durante essa janela — cliente engaja em vez de esperar parado.
+
+## Fluxo do dinheiro (importante)
+
+A Twilio cobra de **alguém** todo mês. Esse alguém é a sua conta cadastrada na Twilio. Não existe API pra Twilio "debitar da Stripe" — são empresas separadas.
+
+Mas a contagem do tempo te protege:
+
+```
+Dia D     | Cliente paga Stripe R$297 (Pro)
+Dia D+7   | Stripe deposita ~R$289 na sua conta cadastrada
+            (CPF agora, MEI Verelus quando você abrir)
+Dia D+30  | Twilio cobra ~R$15-40 do cartão cadastrado
+            Mas o dinheiro do cliente já está há 23 dias
+            na conta. Saldo positivo.
+```
+
+**Cap de gasto Twilio (R$200/mês recomendado):** se algo bugar e o sistema tentar alugar 50 números num loop, a Twilio trava em R$200. Risco financeiro limitado.
+
+## Estado atual (Phase 1, entregue 2026-04-29)
 
 | Componente | Status |
-|-----------|--------|
-| Migration `014_atalaia_whatsapp_provider.sql` | ✅ aplicada em prod (Supabase verelus) |
-| Provider abstraction (`lib/atalaia/whatsapp/`) | ✅ commit `440f4bb` |
-| `POST /api/atalaia/whatsapp/zenvia/webhook` | ✅ código em prod, NÃO testado em runtime |
-| `POST /api/atalaia/whatsapp/provision` | ✅ código em prod, NÃO testado em runtime |
-| Health check Zenvia probe | ✅ ativo, falha enquanto env vars não setadas |
-| Notifications BSP (provisioning + approved) | ✅ |
-| **Branch** `feat/whatsapp-zenvia-bsp` | ⏳ NÃO pushed; CF Pages só builda do `origin/main` |
-| **Env vars CF Pages** | ❌ pendente — bloqueia testes reais |
-| **Zenvia partner contract** | ❌ pendente — bloqueia provisionamento |
-| **Webhook URL no painel Zenvia** | ❌ pendente |
-| Phase 2 (Stripe → auto-provision, cron poll, wizard UI) | ❌ não iniciada (depende de Phase 1 validar com 1 cliente real) |
-
----
+|------------|--------|
+| Migration 015 (provider enum + campos Twilio) | ✅ aplicada em prod Supabase |
+| Lib Twilio (`src/lib/atalaia/whatsapp/twilio/`) | ✅ 4 arquivos: client, numbers, sender, messaging |
+| Endpoint `/provision` (idempotente) | ✅ código pronto |
+| Endpoint `/deprovision` (idempotente) | ✅ código pronto |
+| Endpoint `/twilio/webhook` (inbound, HMAC validado) | ✅ código pronto |
+| Cron `twilio-approval-poll` (1h) | ✅ código pronto |
+| Stripe webhook → trigger provision/deprovision | ✅ código pronto |
+| 5 emails (provisioning, approved, rejected, deprovisioned, onboarding-day-2) | ✅ código pronto |
+| Resend `scheduledAt` (envio agendado de email +24h) | ✅ implementado |
+| Health check probe Twilio | ✅ código pronto |
+| Tests (16 novos pra Twilio) | ✅ 142/142 verde |
+| Build CF Workers | ✅ 4 rotas novas compiladas |
+| Branch `feat/whatsapp-zenvia-bsp` (nome legado) | ⏳ NÃO pushed |
+| Conta Twilio Verelus | ❌ pendente operador |
+| Sender Profile Verelus aprovado pela Twilio | ❌ pendente operador (~1-2d após submeter) |
+| Env vars Twilio no CF Pages | ❌ pendente operador |
+| Cron `twilio-approval-poll` registrado no scheduler | ❌ pendente operador |
+| Phase 2 (UI provider-aware no setup wizard, dashboard admin) | ❌ não iniciada |
 
 ## Como ativar — passo a passo
 
-### 1. Conta Zenvia (manual, fora do código)
+### 1. Criar conta Twilio (~10min)
 
-Verelus precisa virar parceiro Zenvia. Caminho típico:
+1. Vai em <https://www.twilio.com/try-twilio>
+2. Preenche email + telefone + valida SMS
+3. Cadastro pessoal com CPF (até abrir MEI/CNPJ; depois migra)
+4. Adiciona método de pagamento — cartão pessoal OU débito automático
+5. **CRÍTICO:** vai em **Account → Billing → Spending Limits** e seta `Monthly Spend Limit = $40 USD` (~R$200). Sem isso, é risco aberto.
+6. Copia `Account SID` e `Auth Token` da home do Console (vai precisar).
 
-1. Abrir conta business Zenvia: <https://www.zenvia.com>.
-2. Pedir contrato **partner** ou **WhatsApp Business API com sub-accounts** (modelo white-label). Isso libera os endpoints `/v2/accounts/*` e `/v2/channels/whatsapp/numbers` que o código depende.
-3. Submeter KYC da Verelus (CNPJ + business owner + comprovantes). KYC da Verelus é único e cobre todas as sub-accounts dos clientes.
-4. Pegar:
-   - **Token master** (header `X-API-TOKEN`) → `ZENVIA_API_KEY`
-   - **CNPJ Verelus** → `VERELUS_CNPJ`
-   - Definir um **secret HMAC** para webhook → `ZENVIA_WEBHOOK_SECRET` (gerar via `openssl rand -hex 32`)
-5. Confirmar com suporte Zenvia os paths exatos dos endpoints partner-tier (paths default no código estão com TODO em `subaccounts.ts`/`numbers.ts`). Override via `ZENVIA_SUBACCOUNT_PATH` e `ZENVIA_NUMBERS_PATH` se precisar.
+### 2. Submeter Sender Profile Verelus (~1-2 dias pra aprovar)
 
-### 2. Env vars no Cloudflare Pages
+Antes de cada número virar WhatsApp Business, a Twilio precisa aprovar uma vez o "Sender Profile" da Verelus (sua marca). Faz uma vez só.
 
-Painel CF → Pages → projeto `tunesignal-bandbrain` → Settings → Environment variables. Adicionar em **Production E Preview**:
+1. Twilio Console → **Messaging → Senders → Configure WhatsApp Sender**
+2. Preenche: nome da empresa (Verelus), website (verelus.com), email, descrição.
+3. Submete. Twilio aprova em ~1-2 dias úteis.
+4. Quando aprovar, copia o `Sender Profile SID` (`MGxxxx...`).
+
+### 3. Comprar 1 número de teste (R$8) pra validar a integração antes do primeiro cliente real
+
+1. Console → **Phone Numbers → Manage → Buy a Number**
+2. Filtros: Country = Brazil, Capabilities = WhatsApp + SMS
+3. Compra 1 número. Custa ~$1.50 USD/mês = R$8.
+4. Anota o `Phone Number SID` (PNxxx).
+
+(Esse número pode ficar parado depois do teste; cancela manualmente se não usar.)
+
+### 4. Configurar env vars no Cloudflare Pages
+
+Painel CF → Pages → projeto `tunesignal-bandbrain` → **Settings → Environment variables**. Adicionar em **Production E Preview**:
 
 ```
-ZENVIA_API_URL=https://api.zenvia.com
-ZENVIA_API_KEY=<token master>          (Encrypted)
-ZENVIA_WEBHOOK_SECRET=<hex 64 chars>   (Encrypted)
-VERELUS_CNPJ=<14 dígitos sem máscara>  (Encrypted)
+TWILIO_ACCOUNT_SID=AC...                       (Plain text)
+TWILIO_AUTH_TOKEN=<token do passo 1>           (Encrypted)
+TWILIO_SENDER_PROFILE_SID=MG...                (Plain text)
+TWILIO_WEBHOOK_VALIDATION_TOKEN=<mesmo Auth Token>  (Encrypted)
 ```
 
-Opcionais (só se Zenvia confirmar paths diferentes):
+`TWILIO_WEBHOOK_VALIDATION_TOKEN` é redundante mas explícito — pode ser exatamente o mesmo valor do `TWILIO_AUTH_TOKEN`. Usado pra validar HMAC do webhook.
+
+### 5. Configurar webhook URL na Twilio (acontece automaticamente no provision)
+
+O endpoint `/provision` no nosso sistema **já passa a URL do webhook** quando submete cada Sender:
+
 ```
-ZENVIA_SUBACCOUNT_PATH=/v2/accounts        (default)
-ZENVIA_NUMBERS_PATH=/v2/channels/whatsapp/numbers   (default)
+https://verelus.com/api/atalaia/whatsapp/twilio/webhook
 ```
 
-### 3. Webhook no painel Zenvia
+Você só precisa garantir que o endpoint está acessível publicamente (CF Pages cuida disso após merge na main).
 
-URL: `https://verelus.com/api/atalaia/whatsapp/zenvia/webhook`
-Método: `POST`
-Content-Type: `application/json`
-Auth: HMAC-SHA256 do raw body usando `ZENVIA_WEBHOOK_SECRET`. Header esperado (na ordem de tentativa): `X-Zenvia-Signature` → `X-Hub-Signature-256` → `X-Signature`. Aceita `sha256=<hex>` ou `<hex>` puro.
+### 6. Configurar cron `twilio-approval-poll`
 
-Subscriba em: `MESSAGE` (eventos de inbound). Receipts/delivery são ignorados sem erro.
+Esse cron de hora em hora consulta a Twilio pra ver se um Sender aprovou. Sem ele, números aprovados não são marcados como ativos no sistema.
 
-### 4. Push do branch + merge
+**Opção A — Cloudflare Cron Triggers (recomendado, já no CF):**
+
+Adicionar em `wrangler.toml` (criar se não existe):
+```toml
+[triggers]
+crons = ["0 * * * *"]
+```
+
+E criar handler que faz `fetch` pro endpoint. (Verificar template existente do projeto pra padrão.)
+
+**Opção B — GitHub Actions:**
+
+Criar `.github/workflows/twilio-poll.yml`:
+```yaml
+on:
+  schedule:
+    - cron: '0 * * * *'
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -X POST https://verelus.com/api/atalaia/cron/twilio-approval-poll \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+```
+
+### 7. Push do branch + merge
 
 ```bash
 cd "/Users/luizsfap/Desktop/Claude CODE Projects/verelus"
 git push -u origin feat/whatsapp-zenvia-bsp
-# Abrir PR pra main, mergear, CF Pages auto-builda em ~2min.
+# Abrir PR pra main, mergear, CF Pages auto-deploya em ~2min.
 ```
 
-CF Pages só faz auto-deploy do `origin/main` — push isolado em branch não dispara.
+CF Pages só faz auto-deploy do `origin/main`.
 
-### 5. Smoke test em produção
+### 8. Smoke test em produção
 
-#### 5a. Health check
 ```bash
-curl https://verelus.com/api/health/atalaia | jq '.checks.zenvia, .env_missing'
+# 1. Health check inclui Twilio + env vars setadas
+curl https://verelus.com/api/health/atalaia | jq '.checks.twilio, .env_missing'
 # Espera: { ok: true, latency_ms: < 1000 } e env_missing: []
-```
 
-#### 5b. Provision manual (1 cliente real Pro/Business)
-```bash
-curl -X POST https://verelus.com/api/atalaia/whatsapp/provision \
-  -H "Authorization: Bearer $CRON_SECRET" \
-  -H "Content-Type: application/json" \
-  -d '{"business_id":"<uuid_de_um_cliente_pro>"}'
-# Espera: 200 com bsp_subaccount_id no response
-```
+# 2. Provision manual num cliente Pro/Business de teste
+# (compra 1 plano com cartão de teste Stripe 4242...)
+# Deve aparecer logs no Stripe webhook + atalaia_bsp_provisioning_log
 
-Verifica no Supabase:
-```sql
-SELECT id, name, bsp_kyc_status, bsp_subaccount_id, bsp_evolution_bridge_until
+# Verificar SQL:
+SELECT id, name, whatsapp_provider, twilio_phone_sid, twilio_sender_sid,
+       bsp_kyc_status, onboarding_email_1_sent_at
 FROM atalaia_businesses
-WHERE id = '<uuid>';
--- Espera: bsp_kyc_status='pending', bsp_subaccount_id preenchido,
--- bsp_evolution_bridge_until ~14d no futuro
+WHERE id='<uuid>';
+# Espera: provider='twilio', phone_sid+sender_sid preenchidos,
+# kyc_status='pending', email_1_sent_at preenchido
 
 SELECT event, details, created_at
 FROM atalaia_bsp_provisioning_log
-WHERE business_id = '<uuid>'
+WHERE business_id='<uuid>'
 ORDER BY created_at;
--- Espera: subaccount_created, kyc_submitted, evolution_bridge_started
-```
+# Espera: twilio_number_rented, twilio_sender_submitted,
+# onboarding_email_1_sent, onboarding_email_2_scheduled
 
-Cliente recebe email "estamos preparando seu número oficial" (template `buildBSPProvisioningEmail`).
+# 3. Cliente recebe email "preparando seu número" imediato.
+# 24h depois: email 2 "regras de transferência" via Resend scheduled.
 
-#### 5c. Aprovação KYC manual (Phase 1 — sem cron poll ainda)
-
-Aguarde Zenvia aprovar (3-7 dias). Quando aprovar, painel Zenvia mostra o número novo. Atualize manualmente no SQL:
-
-```sql
-UPDATE atalaia_businesses
-SET
-  bsp_kyc_status='approved',
-  bsp_kyc_decided_at=now(),
-  bsp_phone_number_id='<id_zenvia>',
-  bsp_provisioned_at=now(),
-  bsp_active_at=now(),
-  whatsapp_provider='zenvia',
-  whatsapp_number='<numero_e164_sem_+>',
-  bsp_evolution_bridge_until=now() + interval '7 days'
-WHERE id='<uuid>';
-
-INSERT INTO atalaia_bsp_provisioning_log (business_id, event, details)
-VALUES
-  ('<uuid>', 'kyc_approved', '{}'::jsonb),
-  ('<uuid>', 'phone_provisioned', '{"e164":"<numero>","phone_number_id":"<id>"}'::jsonb),
-  ('<uuid>', 'migrated_from_evolution', '{}'::jsonb);
-```
-
-(Phase 2 automatiza isso via cron `bsp-kyc-poll` + endpoint `/migrate`.)
-
-#### 5d. Inbound real
-
-Do seu celular, manda "oi" pro número novo Zenvia. Espera:
-
-1. Webhook Zenvia recebe POST → valida HMAC → dedupe.
-2. Resolve business via `bsp_phone_number_id` ou `whatsapp_number`.
-3. Chama `/api/atalaia/chat` (channel='whatsapp') → SSE stream.
-4. `zenvia.sendText` envia resposta da IA → você recebe no WhatsApp.
-
-Verificação:
-```sql
-SELECT event_id, processed_at FROM atalaia_zenvia_events_processed
-ORDER BY processed_at DESC LIMIT 3;
--- Espera: 1 event_id pra mensagem que mandou
-
-SELECT * FROM atalaia_logs
-WHERE endpoint = '/api/atalaia/whatsapp/zenvia/webhook'
+# 4. Esperar 3-5 dias.
+# Cron de hora em hora detecta aprovação → marca approved.
+# Verificar logs cron:
+SELECT event, created_at FROM atalaia_bsp_provisioning_log
+WHERE event IN ('twilio_sender_approved', 'phone_provisioned')
 ORDER BY created_at DESC LIMIT 5;
--- Sem erros
+
+# 5. Cliente recebe email "número ativo: +55..."
+# Coloca no site/Instagram, recebe mensagens reais.
+
+# 6. Cancelar assinatura via Stripe Customer Portal:
+# Verifica que customer.subscription.deleted dispara deprovision.
+SELECT event FROM atalaia_bsp_provisioning_log
+WHERE business_id='<uuid>' AND event IN
+  ('twilio_sender_deregistered', 'twilio_number_released');
+# Twilio Console: número não aparece mais como ativo.
 ```
 
----
+## Quando abrir o MEI
 
-## Decisões já fechadas (não revisitar sem novo contexto)
+Não há urgência absoluta — o sistema funciona com Twilio CPF. Mas vale abrir MEI quando:
 
-- BSP = Zenvia (NF-e BRL, KYC simples, suporte PT-BR). Twilio/360dialog/Gupshup descartados.
-- Custo BSP embutido em Pro/Business; Starter fica Evolution-only pra preservar margem.
-- Verelus = master account; cliente nem sabe que existe Zenvia. KYC só da Verelus (1 vez).
-- Default Pro/Business = Zenvia. BYO Evolution = link discreto, não bloqueado.
-- Bridge Evolution após approved = 7 dias de grace (rollback se Zenvia falhar). Cron `bsp-bridge-cleanup` apaga depois.
+1. **Você tem 2-3 clientes pagantes** — receita já justifica os R$70/mês de DAS.
+2. **Cliente PME pede NF-e formal** — só PJ emite NF-e válida.
+3. **Caixa Verelus precisa separar do pessoal** — controle financeiro fica caótico misturado.
 
----
+Quando abrir, migra os 2 cadastros (Stripe + Twilio) pra PJ Verelus em ~1h. Stripe e Twilio aceitam mudança de entidade sem dor.
 
-## Schema de referência (após migration 014)
+## Schema (após migration 015)
 
 ```
 atalaia_businesses
-├─ whatsapp_provider     'evolution' | 'zenvia'              (default 'evolution')
-├─ whatsapp_byo          boolean                             (default false)
-├─ bsp_kyc_status        'pending'|'approved'|'rejected'|null
-├─ bsp_kyc_started_at    timestamptz
-├─ bsp_kyc_decided_at    timestamptz
-├─ bsp_kyc_rejection_reason text
-├─ bsp_waba_id           text
-├─ bsp_phone_number_id   text   (UNIQUE quando NOT NULL)
-├─ bsp_subaccount_id     text
-├─ bsp_provisioned_at    timestamptz
-├─ bsp_active_at         timestamptz
-└─ bsp_evolution_bridge_until timestamptz   (até quando Evolution ainda atende durante KYC ou grace)
+├─ whatsapp_provider          'evolution' | 'zenvia' | 'twilio'  (default 'evolution')
+├─ whatsapp_byo               boolean (cliente trouxe próprio número)
+├─ whatsapp_number            E.164 do número ativo (qualquer provider)
+├─ bsp_kyc_status             'pending' | 'approved' | 'rejected' | null
+├─ bsp_kyc_started_at, bsp_kyc_decided_at, bsp_kyc_rejection_reason
+├─ twilio_phone_sid           PNxxx — UNIQUE quando NOT NULL
+├─ twilio_sender_sid          XExxx — UNIQUE quando NOT NULL
+├─ onboarding_email_1_sent_at TIMESTAMPTZ
+└─ onboarding_email_2_scheduled_at TIMESTAMPTZ
 
-atalaia_zenvia_events_processed (event_id PK)         — idempotência inbound
-atalaia_bsp_provisioning_log (business_id, event)     — audit trail KYC/provision
+atalaia_twilio_events_processed (event_id PK)         — idempotência inbound
+atalaia_bsp_provisioning_log (business_id, event)     — audit trail completo
 ```
-
-Índices: `idx_biz_kyc_pending` (parcial pendente), `idx_biz_provider`, `uq_biz_bsp_phone_number_id` (parcial).
-
----
 
 ## Roadmap
 
 ### Phase 1 (✅ entregue 2026-04-29)
-Foundation + provisionamento manual. 1 cliente Pro/Business pode usar Zenvia em produção, founder dispara `/provision` via curl, processa KYC manual no SQL.
+Foundation completa. End-to-end automatizado: compra → provision → emails → cron → approval → mensagens → cancel → deprovision.
 
 ### Phase 2 (não iniciada)
-- Stripe webhook `checkout.session.completed` chama `/provision` automático
-- Cron `bsp-kyc-poll` (4h) detecta KYC approved + chama `/migrate`
-- Cron `bsp-bridge-cleanup` (diário) deleta instância Evolution após 7d
-- Wizard `SetupWizard` provider-aware (pending/approved/rejected/byo/starter)
-- Settings tab WhatsApp provider-aware
-- Link "Já tenho um número" → BYO no checkout
-- Notifications: `buildBSPMigrationCompleteEmail`, `buildBSPRejectedEmail`
+- UI provider-aware no SetupWizard (mostra "preparando seu número" durante pending)
+- Settings tab WhatsApp mostra status do sender por estágio
+- Link discreto "Já tenho um número" → fluxo BYO Evolution
+- Dashboard admin founder-only com counts por status (pending, approved, rejected)
+- Suporte a portar número existente do cliente (em vez de comprar novo)
+- Política de retorno cliente cancelado dentro de 30 dias (reativa mesmo número)
 
 ### Phase 3 (opcional)
-- Refactor Evolution dentro da interface provider (eliminar duplicação `sendText`)
-- Dashboard admin founder-only com KYC counts
-- Template messages WhatsApp (janela 24h+)
-- Política downgrade Pro→Starter (libera número Zenvia)
-- E2E Playwright cobrindo wizard
-
----
+- Pool de números pré-aprovados (R$80/mês ocioso) pra ativação instantânea premium
+- Refactor Evolution dentro da interface provider (eliminar duplicação)
+- Template messages WhatsApp pra notificar fora da janela 24h
+- Migração automática para WhatsApp Business Cloud API direto Meta quando MEI virar ME ou LTDA (pra reduzir custo por conversa em volume alto)
 
 ## Riscos conhecidos
 
 | Risco | Mitigação |
 |-------|-----------|
-| Paths Zenvia partner-tier divergem dos defaults | Override via env `ZENVIA_SUBACCOUNT_PATH` / `ZENVIA_NUMBERS_PATH` sem recompilar |
-| KYC reprovado | Cliente fica Evolution permanente; email com motivo; pode reabrir ticket |
-| Cliente cancela durante KYC pending | `customer.subscription.deleted` pausa business; sub-account Zenvia órfã (cleanup mensal manual) |
-| Evolution offline durante bridge | Email atual `buildWhatsAppDisconnectedEmail` cobre; banner no dashboard explica |
-| Race condition na transição de provider | Dedupe em tabelas separadas (zenvia/evolution). `sendOutboundMessage` lê `whatsapp_provider` no momento do envio |
-| Limite de sub-accounts por master Verelus | Validar com Zenvia antes de Phase 2 (auto-provision pode bater limite) |
-
----
+| Cap Twilio R$200 estoura por bug/spike | Notificação Twilio + halt automático. Cap protege bolso. |
+| KYC rejeitado pela Meta (raro, motivo: business não verificado) | Email pro cliente com motivo + abrir ticket. Cliente fica em Evolution permanente até resolver. |
+| Cliente cancela durante KYC pending | Stripe webhook deleted dispara deprovision; sub-account Twilio orfã ainda paga aluguel. Operador limpa manualmente via Console se ficar muito tempo. |
+| Twilio fora do ar | Fallback: cliente sem WhatsApp por horas/dias. Health check captura, alerta operador. Sem migração automática pra Evolution porque número Twilio é único. |
+| Twilio API muda estrutura de Senders | Endpoints com TODO no código (`subaccounts.ts` partner-tier). Operador atualiza paths via env vars sem rebuild. |
+| Race condition cancel + inbound chegando | Dedupe via `MessageSid`; webhook responde 200 mesmo se business já deprovisionado (mensagem cai no vazio, comportamento esperado). |
+| Limite Twilio sub-accounts por master | Twilio aceita milhares de sub-accounts num master. Não é bottleneck próximo. |
 
 ## Arquivos do código
 
 ```
 src/lib/atalaia/whatsapp/
-├── provider.ts            BusinessProviderContext + resolveProvider()
-├── send.ts                sendOutboundMessage() com switch evolution|zenvia
-├── evolution/messaging.ts sendText() Evolution (extraído do webhook) + toJid()
-└── zenvia/
-    ├── client.ts          ZenviaClient + getZenviaClient()
-    ├── messaging.ts       sendText() + parseInbound()
-    ├── subaccounts.ts     createSubaccount, submitKyc, fetchKycStatus  ⚠️ partner-tier
-    └── numbers.ts         provisionPhoneNumber, releasePhoneNumber     ⚠️ partner-tier
+├── provider.ts            BusinessProviderContext + resolveProvider() — recognize 'twilio'
+├── send.ts                sendOutboundMessage() — branch twilio antes de zenvia/evolution
+├── evolution/messaging.ts sendText() Evolution (legado, ainda usado pra Starter/BYO)
+├── zenvia/                4 arquivos (DORMENTE — referência futura, não roda)
+└── twilio/
+    ├── client.ts          REST wrapper + Basic Auth
+    ├── numbers.ts         rentBrazilianNumber, releaseNumber, extractAreaCode
+    ├── sender.ts          requestSenderApproval, fetchSenderStatus, deregisterSender
+    └── messaging.ts       sendText, parseInbound (form-encoded webhook)
 
 src/app/api/atalaia/whatsapp/
-├── webhook/route.ts       Evolution (modificado: importa evolutionSendText)
-├── provision/route.ts     POST cria sub-account + KYC (idempotente, CRON_SECRET)
-└── zenvia/webhook/route.ts POST inbound Zenvia (HMAC + dedupe + chat + sendText)
+├── webhook/route.ts        Evolution (legado)
+├── zenvia/webhook/         (dormente)
+├── twilio/webhook/route.ts INBOUND Twilio: HMAC validado, dedupe MessageSid, chama /chat
+├── provision/route.ts      POST cria sub-account + KYC; idempotente; dispara emails
+├── deprovision/route.ts    POST libera Twilio + volta provider pra evolution; idempotente
+├── connect/route.ts        Evolution (legado)
+└── status/route.ts         Status atual
 
-src/__tests__/lib/atalaia/whatsapp-provider.test.ts   7 cases p/ resolveProvider
-supabase/migrations/014_atalaia_whatsapp_provider.sql migration aplicada
+src/app/api/atalaia/cron/
+├── trial-reminder/         existente
+└── twilio-approval-poll/   NOVO — 1h cron, walk pending, approve/reject
+
+src/app/api/webhook/stripe/route.ts
+  - checkout.session.completed → triggerProvision (Pro/Business)
+  - customer.subscription.updated → triggerProvision (upgrade) OU triggerDeprovision (downgrade)
+  - customer.subscription.deleted → triggerDeprovision (Pro/Business)
+
+src/lib/atalaia/notifications.ts
+  - notifyOwnerEmail estendido com scheduledAt opcional
+  - buildTwilioProvisioningEmail, buildTwilioApprovedEmail,
+    buildTwilioRejectedEmail, buildTwilioDeprovisionedEmail,
+    buildOnboardingTrainingEmail2
+
+src/__tests__/lib/atalaia/whatsapp-twilio.test.ts   16 cases
+supabase/migrations/015_atalaia_twilio_provider.sql aplicada em prod
 ```

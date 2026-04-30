@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { POSTS } from './blog/posts';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = 'https://verelus.com';
+  const base = 'https://atalaia.verelus.com';
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [

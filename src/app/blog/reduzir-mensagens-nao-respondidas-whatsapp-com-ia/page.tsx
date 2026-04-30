@@ -6,25 +6,25 @@ import { getPostBySlug } from '../posts';
 const meta = getPostBySlug('reduzir-mensagens-nao-respondidas-whatsapp-com-ia')!;
 
 export const metadata: Metadata = {
-  title: `${meta.title} | Verelus`,
+  title: `${meta.title} | Atalaia`,
   description: meta.description,
   keywords: meta.keywords,
   openGraph: {
     title: meta.title,
     description: meta.description,
     type: 'article',
-    url: `https://verelus.com/blog/${meta.slug}`,
-    siteName: 'Verelus',
+    url: `https://atalaia.verelus.com/blog/${meta.slug}`,
+    siteName: 'Atalaia',
     publishedTime: meta.publishedAt,
-    images: [{ url: 'https://verelus.com/og-atalaia.png', width: 1200, height: 630, alt: meta.title }],
+    images: [{ url: 'https://atalaia.verelus.com/og-atalaia.png', width: 1200, height: 630, alt: meta.title }],
   },
   twitter: {
     card: 'summary_large_image',
     title: meta.title,
     description: meta.description,
-    images: ['https://verelus.com/og-atalaia.png'],
+    images: ['https://atalaia.verelus.com/og-atalaia.png'],
   },
-  alternates: { canonical: `https://verelus.com/blog/${meta.slug}` },
+  alternates: { canonical: `https://atalaia.verelus.com/blog/${meta.slug}` },
 };
 
 export default function Post() {

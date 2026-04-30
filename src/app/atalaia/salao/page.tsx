@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     description:
       'Sua cliente quer marcar às 22h? IA atende, agenda e confirma 24h por dia. Teste 7 dias grátis.',
     type: 'website',
-    url: 'https://verelus.com/atalaia/salao',
+    url: 'https://atalaia.verelus.com/atalaia/salao',
     siteName: 'Atalaia',
     images: [
       {
-        url: 'https://verelus.com/og-atalaia.png',
+        url: 'https://atalaia.verelus.com/og-atalaia.png',
         width: 1200,
         height: 630,
         alt: 'Atalaia — Atendente IA para salão de beleza',
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Atendente IA para salão de beleza | Atalaia',
     description: 'Agenda manicure, corte e coloração 24h pelo WhatsApp. 7 dias grátis.',
-    images: ['https://verelus.com/og-atalaia.png'],
+    images: ['https://atalaia.verelus.com/og-atalaia.png'],
   },
-  alternates: { canonical: 'https://verelus.com/atalaia/salao' },
+  alternates: { canonical: 'https://atalaia.verelus.com/atalaia/salao' },
 };
 
 export default function SalaoPage() {

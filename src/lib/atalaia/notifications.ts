@@ -9,7 +9,7 @@ interface NotifyOwnerParams {
 export async function notifyOwnerEmail(params: NotifyOwnerParams) {
   try {
     const body: Record<string, unknown> = {
-      from: 'Atalaia <contato@verelus.com>',
+      from: 'Atalaia <contato@atalaia.verelus.com>',
       to: params.to,
       subject: params.subject,
       html: params.html,
@@ -203,7 +203,7 @@ export function buildBSPProvisioningEmail(businessName: string, dashboardUrl: st
     html: `
       <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;color:#0f172a;">
         <h2 style="color:#1e3a5f;">Seu número oficial está a caminho</h2>
-        <p>O <strong>${businessName}</strong> vai receber um número WhatsApp Business <strong>oficial</strong>, gerenciado pela Verelus. Sem usar seu WhatsApp pessoal.</p>
+        <p>O <strong>${businessName}</strong> vai receber um número WhatsApp Business <strong>oficial</strong>, gerenciado pelo Atalaia. Sem usar seu WhatsApp pessoal.</p>
         <p style="background:#f1f5f9;padding:12px 16px;border-left:3px solid #1e3a5f;border-radius:0 8px 8px 0;">
           <strong>Prazo:</strong> 3 a 7 dias úteis (verificação Meta).
         </p>

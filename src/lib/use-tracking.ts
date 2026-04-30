@@ -129,7 +129,7 @@ export function useTracking() {
 function getOrCreateSessionId(): string {
   if (typeof window === "undefined") return "";
 
-  const KEY = "verelus_session_id";
+  const KEY = "atalaia_session_id";
   let id = sessionStorage.getItem(KEY);
   if (!id) {
     id = crypto.randomUUID();

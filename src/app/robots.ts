@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/dashboard', '/api', '/auth', '/p/'],
       },
     ],
-    sitemap: 'https://verelus.com/sitemap.xml',
-    host: 'https://verelus.com',
+    sitemap: 'https://atalaia.verelus.com/sitemap.xml',
+    host: 'https://atalaia.verelus.com',
   };
 }

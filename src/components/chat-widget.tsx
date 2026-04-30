@@ -7,11 +7,11 @@ interface Message {
   content: string;
 }
 
-const STORAGE_KEY = 'verelus-chat-messages';
+const STORAGE_KEY = 'atalaia-chat-messages';
 const WELCOME_MESSAGE: Message = {
   role: 'assistant',
   content:
-    'Ola! Eu sou a Vee, assistente virtual do Verelus. Como posso te ajudar hoje? Posso tirar duvidas sobre a plataforma, funcionalidades, planos e muito mais!',
+    'Ola! Eu sou a Vee, assistente virtual do Atalaia. Como posso te ajudar hoje? Posso tirar duvidas sobre a plataforma, funcionalidades, planos e muito mais!',
 };
 
 export default function ChatWidget() {
@@ -130,7 +130,7 @@ export default function ChatWidget() {
                 V
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">Vee - Assistente Verelus</h3>
+                <h3 className="text-sm font-semibold text-white">Vee - Assistente Atalaia</h3>
                 <p className="text-[11px] text-brand-muted">Online</p>
               </div>
             </div>

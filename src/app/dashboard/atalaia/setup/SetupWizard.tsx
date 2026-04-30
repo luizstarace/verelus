@@ -230,7 +230,7 @@ export default function SetupWizard() {
   }
 
   async function copyWidgetCode() {
-    const code = `<script src="https://verelus.com/widget.js" data-business="${businessId}" async></script>`;
+    const code = `<script src="https://atalaia.verelus.com/widget.js" data-business="${businessId}" async></script>`;
     await navigator.clipboard.writeText(code);
     setCopied(true);
     markComplete(5);
@@ -534,7 +534,7 @@ export default function SetupWizard() {
     if (!businessId) {
       return <p className="text-sm text-brand-muted">Salve a seção 1 primeiro.</p>;
     }
-    const widgetCode = `<script src="https://verelus.com/widget.js" data-business="${businessId}" async></script>`;
+    const widgetCode = `<script src="https://atalaia.verelus.com/widget.js" data-business="${businessId}" async></script>`;
     return (
       <div className="space-y-4">
         <p className="text-sm text-brand-muted">

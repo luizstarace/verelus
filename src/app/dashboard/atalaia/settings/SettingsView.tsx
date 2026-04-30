@@ -745,10 +745,10 @@ export default function SettingsView() {
           <div>
             <h3 className="text-sm font-medium text-brand-text mb-2">Código de instalação</h3>
             <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative">
-              <code>{`<script src="https://verelus.com/widget.js" data-business="${business.id}" async></script>`}</code>
+              <code>{`<script src="https://atalaia.verelus.com/widget.js" data-business="${business.id}" async></script>`}</code>
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(`<script src="https://verelus.com/widget.js" data-business="${business.id}" async></script>`);
+                  navigator.clipboard.writeText(`<script src="https://atalaia.verelus.com/widget.js" data-business="${business.id}" async></script>`);
                   showToast('Código copiado!');
                 }}
                 className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded transition"

@@ -142,7 +142,7 @@ export function formatBriefingEmail(data: DailyBriefingData): string {
   return `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;background:#080a0f;color:#e8eaf0;padding:40px 30px;border-radius:12px;">
       <div style="text-align:center;margin-bottom:30px;">
-        <h1 style="color:#fff;font-size:24px;margin:0;">Verelus Daily Briefing</h1>
+        <h1 style="color:#fff;font-size:24px;margin:0;">Atalaia Daily Briefing</h1>
         <p style="color:#6b7280;font-size:14px;margin:4px 0 0;">${date}</p>
       </div>
 
@@ -195,7 +195,7 @@ export function formatBriefingEmail(data: DailyBriefingData): string {
       }
 
       <div style="text-align:center;border-top:1px solid rgba(255,255,255,0.05);padding-top:20px;margin-top:8px;">
-        <p style="color:#6b7280;font-size:12px;margin:0;">Verelus Daily Briefing - Gerado automaticamente</p>
+        <p style="color:#6b7280;font-size:12px;margin:0;">Atalaia Daily Briefing - Gerado automaticamente</p>
       </div>
     </div>
   `;

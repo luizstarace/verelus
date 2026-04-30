@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     description:
       'Cardápio, reservas e pedidos respondidos em segundos. Cliente não espera mesmo no pico. 7 dias grátis.',
     type: 'website',
-    url: 'https://verelus.com/atalaia/restaurante',
+    url: 'https://atalaia.verelus.com/atalaia/restaurante',
     siteName: 'Atalaia',
     images: [
       {
-        url: 'https://verelus.com/og-atalaia.png',
+        url: 'https://atalaia.verelus.com/og-atalaia.png',
         width: 1200,
         height: 630,
         alt: 'Atalaia — Atendente IA para restaurantes e delivery',
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Atendente IA para restaurantes | Atalaia',
     description: 'Cardápio + reservas + pedidos pelo WhatsApp. 7 dias grátis.',
-    images: ['https://verelus.com/og-atalaia.png'],
+    images: ['https://atalaia.verelus.com/og-atalaia.png'],
   },
-  alternates: { canonical: 'https://verelus.com/atalaia/restaurante' },
+  alternates: { canonical: 'https://atalaia.verelus.com/atalaia/restaurante' },
 };
 
 export default function RestaurantePage() {

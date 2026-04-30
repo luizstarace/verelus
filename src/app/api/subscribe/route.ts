@@ -46,7 +46,7 @@ function generateToken(): string {
 
 async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: string) {
   try {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://verelus.com";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://atalaia.verelus.com";
     const unsubscribeUrl = `${appUrl}/api/unsubscribe?token=${unsubscribeToken}&email=${encodeURIComponent(email)}`;
 
     const res = await fetch("https://api.resend.com/emails", {
@@ -56,20 +56,20 @@ async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: s
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Verelus Newsletter <contato@verelus.com>",
+        from: "Atalaia Newsletter <contato@atalaia.verelus.com>",
         to: [email],
-        subject: "Bem-vindo à Verelus!",
+        subject: "Bem-vindo ao Atalaia!",
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #e5e5e5; padding: 40px 30px; border-radius: 12px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #f5f5f5; font-size: 28px; margin: 0;">Verelus</h1>
-              <p style="color: #a3a3a3; font-size: 14px; margin: 4px 0 0;">Produtos com IA para o seu negócio</p>
+              <h1 style="color: #f5f5f5; font-size: 28px; margin: 0;">Atalaia</h1>
+              <p style="color: #a3a3a3; font-size: 14px; margin: 4px 0 0;">Atendente IA 24/7 para PMEs brasileiras</p>
             </div>
 
             <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 30px; margin-bottom: 24px; border: 1px solid #262626;">
               <h2 style="color: #f5f5f5; margin: 0 0 16px; font-size: 22px;">Olá, ${name.replace(/[<>&"']/g, '')}!</h2>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0 0 16px;">
-                Obrigado por se cadastrar. Você vai receber novidades da Verelus, lançamentos dos nossos produtos com IA (o primeiro é o <strong style="color: #60a5fa;">Atalaia</strong> — atendente virtual 24h via WhatsApp e widget), e dicas práticas para automatizar atendimento no seu negócio.
+                Obrigado por se cadastrar. Você vai receber novidades do <strong style="color: #60a5fa;">Atalaia</strong> — nosso atendente virtual de IA 24h via WhatsApp e widget — e dicas práticas para automatizar o atendimento do seu negócio.
               </p>
               <p style="color: #d4d4d4; line-height: 1.7; margin: 0;">
                 Sem spam. Frequência baixa, só quando tem algo útil de verdade.
@@ -87,25 +87,25 @@ async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: s
               </div>
               <div>
                 <strong style="color: #f5f5f5;">Guias práticos</strong>
-                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Passo-a-passo curto pra tirar o máximo das nossas ferramentas</p>
+                <p style="color: #a3a3a3; margin: 4px 0 0; font-size: 14px;">Passo-a-passo curto pra tirar o máximo do Atalaia</p>
               </div>
             </div>
 
             <div style="background: #171717; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 24px; border: 1px solid #262626;">
               <p style="color: #d4d4d4; margin: 0 0 12px; font-size: 15px;">
-                Conheça o Atalaia — nosso atendente virtual de IA pra PMEs brasileiras.
+                Pronto pra testar? São 7 dias grátis sem cartão.
               </p>
               <a href="${appUrl}/atalaia" style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 15px;">
-                Ver o Atalaia
+                Começar teste grátis
               </a>
             </div>
 
             <div style="text-align: center; border-top: 1px solid #262626; padding-top: 20px;">
               <p style="color: #737373; font-size: 13px; margin: 0;">
-                <strong style="color: #a3a3a3;">Verelus</strong> — Produtos com IA para o seu negócio
+                <strong style="color: #a3a3a3;">Atalaia</strong> — Atendente IA 24/7 para PMEs brasileiras
               </p>
               <p style="color: #525252; font-size: 12px; margin: 8px 0 0;">
-                &copy; 2026 Verelus. Todos os direitos reservados.
+                &copy; 2026 Atalaia. Todos os direitos reservados.
               </p>
               <p style="color: #525252; font-size: 11px; margin: 12px 0 0;">
                 <a href="${unsubscribeUrl}" style="color: #525252; text-decoration: underline;">Cancelar inscrição</a>

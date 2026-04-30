@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const origin = new URL(request.url).origin || process.env.NEXT_PUBLIC_APP_URL || "https://verelus.com";
+    const origin = new URL(request.url).origin || process.env.NEXT_PUBLIC_APP_URL || "https://atalaia.verelus.com";
 
     // Get authenticated user email to pre-fill Stripe checkout
     const checkoutParams: Record<string, string> = {

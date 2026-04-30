@@ -84,9 +84,9 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-10">
           <a href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-brand-text tracking-tight">Verelus</h1>
+            <h1 className="text-3xl font-bold text-brand-text tracking-tight">Atalaia</h1>
           </a>
-          <p className="text-brand-muted mt-2 text-sm">Produtos com IA para o seu negócio</p>
+          <p className="text-brand-muted mt-2 text-sm">Atendente IA 24/7 para PMEs brasileiras</p>
         </div>
 
         <div className="bg-white shadow-xl border border-brand-border rounded-2xl p-8">
@@ -158,7 +158,7 @@ export default function ResetPasswordPage() {
         </div>
 
         <p className="text-center text-brand-muted text-xs mt-8">
-          &copy; 2026 Verelus. Todos os direitos reservados.
+          &copy; 2026 Atalaia. Todos os direitos reservados.
         </p>
       </div>
     </div>

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 // Shared shell for blog index + each post page. Includes nav/footer (consistent
 // with /atalaia) and a typography-styled article container.
 
-const SITE_BASE = 'https://verelus.com';
+const SITE_BASE = 'https://atalaia.verelus.com';
 
 export type BlogPostMeta = {
   slug: string;
@@ -23,15 +23,9 @@ export function BlogShell({ children }: { children: ReactNode }) {
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-brand-border">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
           <Link href="/" className="text-2xl font-bold text-brand-primary tracking-tight">
-            Verelus
+            Atalaia
           </Link>
           <div className="flex items-center gap-6">
-            <Link
-              href="/atalaia"
-              className="text-sm font-medium text-brand-muted hover:text-brand-trust transition-colors"
-            >
-              Atalaia
-            </Link>
             <Link
               href="/blog"
               className="text-sm font-semibold text-brand-trust border-b-2 border-brand-trust pb-0.5"
@@ -54,7 +48,7 @@ export function BlogShell({ children }: { children: ReactNode }) {
       <footer className="bg-white border-t border-brand-border">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-brand-muted">
-            &copy; {new Date().getFullYear()} Verelus. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Atalaia. Todos os direitos reservados.
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="text-sm text-brand-muted hover:text-brand-text transition-colors">
@@ -80,12 +74,12 @@ export function BlogPostShell({ meta, children }: { meta: BlogPostMeta; children
     dateModified: meta.updatedAt || meta.publishedAt,
     author: {
       '@type': 'Organization',
-      name: 'Verelus',
+      name: 'Atalaia',
       url: SITE_BASE,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Verelus',
+      name: 'Atalaia',
       url: SITE_BASE,
     },
     mainEntityOfPage: {
@@ -100,7 +94,7 @@ export function BlogPostShell({ meta, children }: { meta: BlogPostMeta; children
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Verelus', item: SITE_BASE },
+      { '@type': 'ListItem', position: 1, name: 'Atalaia', item: SITE_BASE },
       { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_BASE}/blog` },
       { '@type': 'ListItem', position: 3, name: meta.title, item: `${SITE_BASE}/blog/${meta.slug}` },
     ],

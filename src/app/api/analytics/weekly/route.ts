@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
           messages: [
             {
               role: "user",
-              content: `Você é o Growth Analyst do Verelus, uma plataforma SaaS de inteligência musical com IA para artistas independentes brasileiros. Planos: Free, Pro (R$29,90/mês), Business (R$79,90/mês).
+              content: `Você é o Growth Analyst do Atalaia, um atendente de IA 24/7 no WhatsApp e widget de chat para PMEs brasileiras (salões, clínicas, restaurantes, academias). Planos: Starter (R$147/mês, 500 msgs), Pro (R$297/mês, 2.500 msgs), Business (R$597/mês, 10.000 msgs).
 
 Aqui estão as métricas da última semana e do último mês:
 
@@ -146,9 +146,9 @@ Seja direto, use números, e foque em ações que um founder solo pode executar.
           Authorization: `Bearer ${resendKey}`,
         },
         body: JSON.stringify({
-          from: "Verelus Analytics <contato@verelus.com>",
+          from: "Atalaia Analytics <contato@atalaia.verelus.com>",
           to: [founderEmail],
-          subject: `[Verelus] Relatorio Semanal de Growth #${weekNumber} — ${formattedDate}`,
+          subject: `[Atalaia] Relatorio Semanal de Growth #${weekNumber} — ${formattedDate}`,
           html: buildReportEmail(reportContent, metrics, weekNumber),
         }),
       });
@@ -210,7 +210,7 @@ function buildReportEmail(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verelus Growth Report #${weekNumber}</title>
+  <title>Atalaia Growth Report #${weekNumber}</title>
 </head>
 <body style="margin:0;padding:0;background:#050508;font-family:'Inter',-apple-system,sans-serif;">
   <div style="max-width:700px;margin:0 auto;background:#0a0a0f;">
@@ -247,10 +247,10 @@ function buildReportEmail(
 
     <div style="padding:24px;text-align:center;border-top:1px solid #1e1e2e;">
       <p style="color:#52525b;font-size:12px;margin:4px 0;">
-        Gerado automaticamente por Verelus Growth Analyst
+        Gerado automaticamente por Atalaia Growth Analyst
       </p>
       <p style="color:#52525b;font-size:12px;margin:4px 0;">
-        &copy; 2026 Verelus. Todos os direitos reservados.
+        &copy; 2026 Atalaia. Todos os direitos reservados.
       </p>
     </div>
   </div>

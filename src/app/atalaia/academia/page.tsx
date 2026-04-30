@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     description:
       'Aluno quer saber preço ou horário de aula? IA responde 24h pelo WhatsApp. 7 dias grátis.',
     type: 'website',
-    url: 'https://verelus.com/atalaia/academia',
+    url: 'https://atalaia.verelus.com/atalaia/academia',
     siteName: 'Atalaia',
     images: [
       {
-        url: 'https://verelus.com/og-atalaia.png',
+        url: 'https://atalaia.verelus.com/og-atalaia.png',
         width: 1200,
         height: 630,
         alt: 'Atalaia — Atendente IA para academias e estúdios',
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Atendente IA para academias | Atalaia',
     description: 'Planos, horários e avaliação física pelo WhatsApp. 7 dias grátis.',
-    images: ['https://verelus.com/og-atalaia.png'],
+    images: ['https://atalaia.verelus.com/og-atalaia.png'],
   },
-  alternates: { canonical: 'https://verelus.com/atalaia/academia' },
+  alternates: { canonical: 'https://atalaia.verelus.com/atalaia/academia' },
 };
 
 export default function AcademiaPage() {

@@ -51,7 +51,7 @@ export default function WidgetSection({ business, onSaved }: Props) {
   }
 
   async function copyCode() {
-    const code = `<script src="https://verelus.com/widget.js" data-business="${business.id}" async></script>`;
+    const code = `<script src="https://atalaia.verelus.com/widget.js" data-business="${business.id}" async></script>`;
     await navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -60,7 +60,7 @@ export default function WidgetSection({ business, onSaved }: Props) {
   const inputClass =
     'w-full px-3 py-2 rounded-lg border border-brand-border bg-white text-brand-text placeholder:text-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-trust focus:border-transparent transition text-sm';
 
-  const widgetCode = `<script src="https://verelus.com/widget.js" data-business="${business.id}" async></script>`;
+  const widgetCode = `<script src="https://atalaia.verelus.com/widget.js" data-business="${business.id}" async></script>`;
 
   return (
     <div className="space-y-4">

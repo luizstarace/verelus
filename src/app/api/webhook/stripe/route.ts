@@ -23,7 +23,7 @@ function isAtalaiaPaidPlan(product: string | null | undefined): boolean {
  */
 async function triggerProvision(userId: string) {
   if (!process.env.CRON_SECRET) return;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://verelus.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://atalaia.verelus.com';
   try {
     await fetch(`${baseUrl}/api/atalaia/whatsapp/provision`, {
       method: 'POST',
@@ -40,7 +40,7 @@ async function triggerProvision(userId: string) {
 
 async function triggerDeprovision(userId: string) {
   if (!process.env.CRON_SECRET) return;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://verelus.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://atalaia.verelus.com';
   try {
     await fetch(`${baseUrl}/api/atalaia/whatsapp/deprovision`, {
       method: 'POST',
@@ -59,7 +59,7 @@ async function sendPurchaseEmail(email: string, plan: string) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return;
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://verelus.com";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://atalaia.verelus.com";
 
   // Map raw product string to user-facing label (Atalaia plans + legacy fallback).
   let planLabel = "Pro";
@@ -76,7 +76,7 @@ async function sendPurchaseEmail(email: string, plan: string) {
         Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
-        from: "Atalaia <contato@verelus.com>",
+        from: "Atalaia <contato@atalaia.verelus.com>",
         to: [email],
         subject: `Seu plano Atalaia ${planLabel} está ativo!`,
         html: `
@@ -112,15 +112,15 @@ async function sendPurchaseEmail(email: string, plan: string) {
             </div>
             <div style="background: #171717; border-radius: 8px; padding: 16px; margin-bottom: 24px; border: 1px solid #262626;">
               <p style="color: #d4d4d4; margin: 0; font-size: 14px; line-height: 1.6;">
-                Precisa de ajuda? O manual completo está em <a href="${appUrl}/ajuda" style="color: #60a5fa;">verelus.com/ajuda</a> e você pode responder este email direto que a gente lê.
+                Precisa de ajuda? O manual completo está em <a href="${appUrl}/ajuda" style="color: #60a5fa;">atalaia.verelus.com/ajuda</a> e você pode responder este email direto que a gente lê.
               </p>
             </div>
             <div style="text-align: center; border-top: 1px solid #262626; padding-top: 20px;">
               <p style="color: #737373; font-size: 13px; margin: 0;">
-                <strong style="color: #a3a3a3;">Verelus</strong> — Produtos com IA para o seu negócio
+                <strong style="color: #a3a3a3;">Atalaia</strong> — Atendente IA 24/7 no WhatsApp e no site
               </p>
               <p style="color: #525252; font-size: 12px; margin: 8px 0 0;">
-                &copy; 2026 Verelus. Todos os direitos reservados.
+                &copy; 2026 Atalaia. Todos os direitos reservados.
               </p>
             </div>
           </div>

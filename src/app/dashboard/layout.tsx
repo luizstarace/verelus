@@ -104,7 +104,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {sidebarOpen ? (
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-xl font-bold text-brand-primary tracking-tight">Verelus</h1>
+                    <h1 className="text-xl font-bold text-brand-primary tracking-tight">Atalaia</h1>
                     {!tierData.loading && (
                       <span className={`text-[10px] font-mono uppercase ${
                         tierData.tier === 'pro' ? 'text-brand-trust' : 'text-brand-muted/50'
@@ -116,7 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <span className="text-brand-muted/50 text-xs lg:hidden">&times;</span>
                 </div>
               ) : (
-                <span className="text-xl font-bold text-brand-text block text-center">V</span>
+                <span className="text-xl font-bold text-brand-text block text-center">A</span>
               )}
             </button>
           </div>
@@ -183,7 +183,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <path d="M3 5h12M3 9h12M3 13h12" />
               </svg>
             </button>
-            <h1 className="text-sm font-bold text-brand-primary tracking-tight">Verelus</h1>
+            <h1 className="text-sm font-bold text-brand-primary tracking-tight">Atalaia</h1>
             {!tierData.loading && tierData.tier === 'pro' && (
               <span className="text-[9px] font-mono uppercase ml-auto text-brand-trust">Pro</span>
             )}

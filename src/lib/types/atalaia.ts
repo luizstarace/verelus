@@ -1,4 +1,4 @@
-export type WhatsAppProvider = 'evolution' | 'zenvia';
+export type WhatsAppProvider = 'evolution' | 'zenvia' | 'twilio';
 export type BspKycStatus = 'not_started' | 'pending' | 'approved' | 'rejected';
 
 export interface AtalaiaBusiness {
@@ -36,6 +36,10 @@ export interface AtalaiaBusiness {
   bsp_provisioned_at: string | null;
   bsp_active_at: string | null;
   bsp_evolution_bridge_until: string | null;
+  twilio_phone_sid: string | null;
+  twilio_sender_sid: string | null;
+  onboarding_email_1_sent_at: string | null;
+  onboarding_email_2_scheduled_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -25,6 +25,8 @@ const REQUIRED_ENV = [
   'ZENVIA_API_URL',
   'ZENVIA_API_KEY',
   'ZENVIA_WEBHOOK_SECRET',
+  'TWILIO_ACCOUNT_SID',
+  'TWILIO_AUTH_TOKEN',
 ] as const;
 
 export async function GET() {
@@ -94,6 +96,21 @@ export async function GET() {
     checks.zenvia = { ok: res.ok, latency_ms: Date.now() - zvStart };
   } catch (err) {
     checks.zenvia = { ok: false, latency_ms: Date.now() - zvStart, error: String(err) };
+  }
+
+  // Twilio probe — fetch the account resource. Cheap, and returns 401 fast on
+  // bad credentials, 200 on healthy account. Uses Basic Auth with SID:Token.
+  const twStart = Date.now();
+  try {
+    const sid = process.env.TWILIO_ACCOUNT_SID;
+    const token = process.env.TWILIO_AUTH_TOKEN;
+    if (!sid || !token) throw new Error('TWILIO_ACCOUNT_SID/TOKEN not set');
+    const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
+      headers: { 'Authorization': `Basic ${btoa(`${sid}:${token}`)}` },
+    });
+    checks.twilio = { ok: res.ok, latency_ms: Date.now() - twStart };
+  } catch (err) {
+    checks.twilio = { ok: false, latency_ms: Date.now() - twStart, error: String(err) };
   }
 
   // Env presence — only reports whether keys are set, never their values.

@@ -11,6 +11,50 @@ function getSupabase() {
   );
 }
 
+function isAtalaiaPaidPlan(product: string | null | undefined): boolean {
+  return product === 'atalaia_pro' || product === 'atalaia_business';
+}
+
+/**
+ * Fire-and-forget trigger for Twilio number provisioning. Errors are logged
+ * but don't block the Stripe webhook response — the cron approval poll will
+ * eventually pick up businesses that didn't get provisioned, OR a manual
+ * /provision retry can be issued.
+ */
+async function triggerProvision(userId: string) {
+  if (!process.env.CRON_SECRET) return;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://verelus.com';
+  try {
+    await fetch(`${baseUrl}/api/atalaia/whatsapp/provision`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user_id: userId }),
+    });
+  } catch (err) {
+    console.error('triggerProvision failed:', err);
+  }
+}
+
+async function triggerDeprovision(userId: string) {
+  if (!process.env.CRON_SECRET) return;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://verelus.com';
+  try {
+    await fetch(`${baseUrl}/api/atalaia/whatsapp/deprovision`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user_id: userId }),
+    });
+  } catch (err) {
+    console.error('triggerDeprovision failed:', err);
+  }
+}
+
 async function sendPurchaseEmail(email: string, plan: string) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return;
@@ -287,6 +331,12 @@ export async function POST(req: NextRequest) {
         // Send post-purchase welcome email via Resend
         await sendPurchaseEmail(email.toLowerCase().trim(), productType);
 
+        // Auto-provision a Twilio WhatsApp Sender for paid plans (Pro/Business).
+        // Idempotent — /provision skips businesses that already have a number.
+        if (isAtalaiaPaidPlan(productType)) {
+          await triggerProvision(user.id);
+        }
+
             break;
       }
 
@@ -320,6 +370,35 @@ export async function POST(req: NextRequest) {
 
           if (sub?.user_id) {
             const bizStatus = status === "active" ? "active" : "paused";
+
+            // Detect upgrade Starter → Pro/Business. We compare current biz
+            // provider with the new product: if the user is on a paid plan
+            // now AND has no Twilio number yet, provision one.
+            if (isAtalaiaPaidPlan(productType) && status === 'active') {
+              const { data: biz } = await supabase
+                .from('atalaia_businesses')
+                .select('twilio_phone_sid, whatsapp_byo')
+                .eq('user_id', sub.user_id)
+                .maybeSingle();
+              if (biz && !biz.twilio_phone_sid && !biz.whatsapp_byo) {
+                await triggerProvision(sub.user_id);
+              }
+            }
+
+            // Detect downgrade Pro/Business → Starter (or anything non-paid).
+            // If the user has an active Twilio number but is no longer on a paid
+            // plan, release it.
+            if (!isAtalaiaPaidPlan(productType) && status === 'active') {
+              const { data: biz } = await supabase
+                .from('atalaia_businesses')
+                .select('twilio_phone_sid')
+                .eq('user_id', sub.user_id)
+                .maybeSingle();
+              if (biz?.twilio_phone_sid) {
+                await triggerDeprovision(sub.user_id);
+              }
+            }
+
             await supabase
               .from("atalaia_businesses")
               .update({ status: bizStatus })
@@ -351,12 +430,17 @@ export async function POST(req: NextRequest) {
           { onConflict: "stripe_subscription_id" }
         );
 
-        // Pause Atalaia business on cancellation
+        // Pause Atalaia business on cancellation, and release the Twilio number
+        // if the cancelled subscription was a paid plan with a provisioned number.
         if (existingSub && isAtalaiaProduct(existingSub.product)) {
           await supabase
             .from("atalaia_businesses")
             .update({ status: "paused" })
             .eq("user_id", existingSub.user_id);
+
+          if (isAtalaiaPaidPlan(existingSub.product)) {
+            await triggerDeprovision(existingSub.user_id);
+          }
         }
 
         break;

@@ -9,6 +9,8 @@ const baseBiz = {
   bsp_phone_number_id: null as string | null,
   bsp_subaccount_id: null as string | null,
   bsp_evolution_bridge_until: null as string | null,
+  twilio_phone_sid: null as string | null,
+  twilio_sender_sid: null as string | null,
 };
 
 describe('resolveProvider', () => {

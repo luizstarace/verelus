@@ -146,7 +146,7 @@ Seja direto, use números, e foque em ações que um founder solo pode executar.
           Authorization: `Bearer ${resendKey}`,
         },
         body: JSON.stringify({
-          from: "Atalaia Analytics <contato@atalaia.verelus.com>",
+          from: "Atalaia Analytics <atalaia@verelus.com>",
           to: [founderEmail],
           subject: `[Atalaia] Relatorio Semanal de Growth #${weekNumber} — ${formattedDate}`,
           html: buildReportEmail(reportContent, metrics, weekNumber),

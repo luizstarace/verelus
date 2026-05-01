@@ -76,7 +76,7 @@ async function sendPurchaseEmail(email: string, plan: string) {
         Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
-        from: "Atalaia <contato@atalaia.verelus.com>",
+        from: "Atalaia <atalaia@verelus.com>",
         to: [email],
         subject: `Seu plano Atalaia ${planLabel} está ativo!`,
         html: `

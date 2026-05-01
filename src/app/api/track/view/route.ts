@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
             Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
           },
           body: JSON.stringify({
-            from: 'Atalaia <contato@atalaia.verelus.com>',
+            from: 'Atalaia <atalaia@verelus.com>',
             to: [owner.email],
             subject: `Proposta visualizada: ${proposal.project_title}`,
             html: `<p>Sua proposta <strong>${proposal.project_title}</strong> para <strong>${proposal.client_name}</strong> foi visualizada.</p>`,

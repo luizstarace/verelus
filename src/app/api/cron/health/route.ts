@@ -35,7 +35,7 @@ export async function GET(request: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Atalaia Monitor <contato@atalaia.verelus.com>',
+          from: 'Atalaia Monitor <atalaia@verelus.com>',
           to: [process.env.FOUNDER_EMAIL || 'luizsfap@gmail.com'],
           subject: `[ALERT] Atalaia health check: ${data.status}`,
           html: `

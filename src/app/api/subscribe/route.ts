@@ -56,7 +56,7 @@ async function sendWelcomeEmail(name: string, email: string, unsubscribeToken: s
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Atalaia Newsletter <contato@atalaia.verelus.com>",
+        from: "Atalaia Newsletter <atalaia@verelus.com>",
         to: [email],
         subject: "Bem-vindo ao Atalaia!",
         html: `

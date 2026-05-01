@@ -309,7 +309,7 @@ export default function AjudaPage() {
             <h2 className="text-xl font-semibold text-brand-text mb-3">12. Suporte</h2>
             <p>
               Para qualquer assunto — dúvidas de uso, cobrança, privacidade ou LGPD — escreva para{' '}
-              <a href="mailto:contato@atalaia.verelus.com" className="text-brand-trust hover:underline">contato@atalaia.verelus.com</a>.
+              <a href="mailto:atalaia@verelus.com" className="text-brand-trust hover:underline">atalaia@verelus.com</a>.
             </p>
             <p className="mt-3 text-xs text-brand-muted">
               Resposta em até 1 dia útil. Para clientes Business, atendimento prioritário em até 4 horas em dias úteis.

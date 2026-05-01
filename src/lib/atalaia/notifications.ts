@@ -9,7 +9,7 @@ interface NotifyOwnerParams {
 export async function notifyOwnerEmail(params: NotifyOwnerParams) {
   try {
     const body: Record<string, unknown> = {
-      from: 'Atalaia <contato@atalaia.verelus.com>',
+      from: 'Atalaia <atalaia@verelus.com>',
       to: params.to,
       subject: params.subject,
       html: params.html,

@@ -217,7 +217,7 @@
     // Footer
     var footer = document.createElement('div');
     footer.className = 'aw-footer';
-    footer.innerHTML = 'Powered by <a href="https://verelus.com/atalaia" target="_blank" rel="noopener">Atalaia</a>';
+    footer.innerHTML = 'Powered by <a href="https://atalaia.verelus.com" target="_blank" rel="noopener">Atalaia</a>';
     panel.appendChild(footer);
 
     // ── Open/Close ───────────────────────────────────────

@@ -35,9 +35,9 @@ export async function POST(request: Request) {
           Authorization: `Bearer ${resendKey}`,
         },
         body: JSON.stringify({
-          from: "Verelus Briefing <contato@verelus.com>",
+          from: "Atalaia Briefing <atalaia@verelus.com>",
           to: [founderEmail],
-          subject: `Verelus Daily Briefing - ${new Date().toLocaleDateString("pt-BR")}`,
+          subject: `Atalaia Daily Briefing - ${new Date().toLocaleDateString("pt-BR")}`,
           html: emailHtml,
         }),
       });
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       const mrr = data.subscriptions.pro * 97 + data.subscriptions.business * 297;
 
       const discordMessage = [
-        `**Verelus Daily Briefing** - ${new Date().toLocaleDateString("pt-BR")}`,
+        `**Atalaia Daily Briefing** - ${new Date().toLocaleDateString("pt-BR")}`,
         "",
         `**Usuários:** ${data.users.total} total | +${data.users.new_today} hoje | ${data.users.active_today} ativos`,
         `**MRR Estimado:** R$ ${mrr.toLocaleString("pt-BR")}`,

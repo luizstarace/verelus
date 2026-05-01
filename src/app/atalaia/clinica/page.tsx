@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     description:
       'Pacientes marcam consulta 24h pelo WhatsApp. Recepção liberada pra cuidar de quem está na clínica. 7 dias grátis.',
     type: 'website',
-    url: 'https://verelus.com/atalaia/clinica',
+    url: 'https://atalaia.verelus.com/atalaia/clinica',
     siteName: 'Atalaia',
     images: [
       {
-        url: 'https://verelus.com/og-atalaia.png',
+        url: 'https://atalaia.verelus.com/og-atalaia.png',
         width: 1200,
         height: 630,
         alt: 'Atalaia — Atendente IA para clínicas e consultórios',
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Atendente IA para clínicas e consultórios | Atalaia',
     description: 'Marca consulta 24h pelo WhatsApp. LGPD compliant. 7 dias grátis.',
-    images: ['https://verelus.com/og-atalaia.png'],
+    images: ['https://atalaia.verelus.com/og-atalaia.png'],
   },
-  alternates: { canonical: 'https://verelus.com/atalaia/clinica' },
+  alternates: { canonical: 'https://atalaia.verelus.com/atalaia/clinica' },
 };
 
 export default function ClinicaPage() {

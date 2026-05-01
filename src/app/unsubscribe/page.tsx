@@ -40,7 +40,7 @@ function UnsubscribeContent() {
             Inscrição cancelada
           </h1>
           <p className="text-brand-muted text-sm mb-6">
-            Você foi removido(a) da lista do Verelus. Sentiremos sua falta!
+            Você foi removido(a) da lista do Atalaia. Sentiremos sua falta!
           </p>
           <p className="text-brand-muted/50 text-xs mb-6">
             Se foi um engano, você pode se inscrever novamente a qualquer momento.
@@ -49,7 +49,7 @@ function UnsubscribeContent() {
             href="/"
             className="inline-block px-6 py-3 border border-brand-trust/50 text-brand-trust font-semibold rounded-lg hover:bg-brand-trust/10 transition-colors text-sm"
           >
-            Voltar ao Verelus
+            Voltar ao Atalaia
           </a>
         </div>
       </div>
@@ -87,7 +87,7 @@ function UnsubscribeContent() {
             Cancelar inscrição
           </h1>
           <p className="text-brand-muted text-sm">
-            Digite seu email para cancelar a newsletter do Verelus.
+            Digite seu email para cancelar a newsletter do Atalaia.
           </p>
         </div>
 
@@ -114,7 +114,7 @@ function UnsubscribeContent() {
             href="/"
             className="text-xs text-brand-muted hover:text-brand-trust transition-colors"
           >
-            Voltar ao Verelus
+            Voltar ao Atalaia
           </a>
         </div>
       </div>

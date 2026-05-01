@@ -34,6 +34,8 @@ interface Business {
   faq?: { question: string; answer: string }[];
   widget_config?: { color?: string; position?: 'bottom-right' | 'bottom-left'; greeting?: string };
   whatsapp_number: string | null;
+  whatsapp_last_state?: string | null;
+  whatsapp_state_changed_at?: string | null;
   voice_id: string | null;
   trial_ends_at: string | null;
   status: string;
@@ -239,6 +241,19 @@ export default function OverviewDashboard() {
   const currentVoice = ATALAIA_VOICES.find((v) => v.id === currentVoiceId);
   const planLabel = stats?.plan ? PLAN_LABELS[stats.plan] : 'Starter';
   const isWaConnected = !!business.whatsapp_number;
+  const waLastState = business.whatsapp_last_state || null;
+  const waDisconnected =
+    isWaConnected && waLastState !== null && waLastState !== 'open' && waLastState !== 'connecting';
+  const waDisconnectedSince = (() => {
+    if (!waDisconnected || !business.whatsapp_state_changed_at) return null;
+    const ms = Date.now() - new Date(business.whatsapp_state_changed_at).getTime();
+    if (ms < 0) return null;
+    const hours = Math.floor(ms / (60 * 60 * 1000));
+    if (hours < 1) return 'há menos de 1 hora';
+    if (hours < 24) return `há ${hours}h`;
+    const days = Math.floor(hours / 24);
+    return `há ${days} ${days === 1 ? 'dia' : 'dias'}`;
+  })();
   const usagePct = stats?.usage_percentage || 0;
   const voicePct =
     stats && stats.voice_limit_seconds > 0
@@ -310,9 +325,15 @@ export default function OverviewDashboard() {
         <KpiCard label="Mensagens no mês" value={stats?.msgs_month ?? 0} hint={`${planLabel} · ${usagePct}% usado`} />
         <KpiCard
           label="WhatsApp"
-          value={isWaConnected ? 'Conectado' : 'Desconectado'}
-          hint={isWaConnected ? business.whatsapp_number || '' : 'Conecte para atender por WhatsApp'}
-          tone={isWaConnected ? 'success' : 'warning'}
+          value={waDisconnected ? 'Caiu' : isWaConnected ? 'Conectado' : 'Desconectado'}
+          hint={
+            waDisconnected
+              ? waDisconnectedSince || 'Verificar Painel'
+              : isWaConnected
+              ? business.whatsapp_number || ''
+              : 'Conecte para atender por WhatsApp'
+          }
+          tone={waDisconnected || !isWaConnected ? 'warning' : 'success'}
         />
         <KpiCard
           label="Voz do atendente"
@@ -462,12 +483,42 @@ export default function OverviewDashboard() {
         <PanelCard title="WhatsApp" linkHref="/dashboard/atalaia/settings?tab=whatsapp" linkLabel="Abrir ajustes completos →">
           <div className="flex items-center gap-2 mb-3">
             <span
-              className={`w-3 h-3 rounded-full ${isWaConnected ? 'bg-brand-success' : 'bg-brand-error'}`}
+              className={`w-3 h-3 rounded-full ${
+                waDisconnected ? 'bg-brand-error animate-pulse' : isWaConnected ? 'bg-brand-success' : 'bg-brand-error'
+              }`}
             />
             <span className="text-sm font-medium text-brand-text">
-              {isWaConnected ? `Conectado (${business.whatsapp_number})` : 'Não conectado'}
+              {waDisconnected
+                ? `Conexão caiu ${waDisconnectedSince || ''}`.trim()
+                : isWaConnected
+                ? `Conectado (${business.whatsapp_number})`
+                : 'Não conectado'}
             </span>
           </div>
+
+          {waDisconnected && (
+            <div className="border border-red-300 bg-red-50 rounded-lg p-3 text-sm text-red-900 space-y-2 mb-3">
+              <p>
+                <strong>Sua conexão com o WhatsApp caiu.</strong> Pode ser uma restrição temporária
+                do WhatsApp (timelock — costuma sumir em 24-72h). A IA não responde até reconectar.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                <a
+                  href="/dashboard/atalaia/settings?tab=whatsapp"
+                  className="inline-block bg-brand-cta text-white font-medium px-3 py-1.5 rounded text-xs hover:brightness-110 transition text-center"
+                >
+                  Tentar reconectar
+                </a>
+                <a
+                  href="/dashboard/atalaia/support?category=whatsapp_disconnect&prefill=1"
+                  className="inline-block border border-red-300 text-red-900 font-medium px-3 py-1.5 rounded text-xs hover:bg-red-100 transition text-center"
+                >
+                  Pedir ajuda
+                </a>
+              </div>
+            </div>
+          )}
+
           {!isWaConnected && (
             <>
               <WhatsAppBanWarning />
@@ -479,7 +530,7 @@ export default function OverviewDashboard() {
               </a>
             </>
           )}
-          {isWaConnected && (
+          {isWaConnected && !waDisconnected && (
             <p className="text-xs text-brand-muted">
               Filtros de horário e whitelist ficam em Ajustes &gt; WhatsApp.
             </p>

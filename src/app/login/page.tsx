@@ -103,9 +103,9 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-10">
           <a href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-brand-text tracking-tight">Verelus</h1>
+            <h1 className="text-3xl font-bold text-brand-text tracking-tight">Atalaia</h1>
           </a>
-          <p className="text-brand-muted mt-2 text-sm">Produtos com IA para o seu negócio</p>
+          <p className="text-brand-muted mt-2 text-sm">Atendente IA 24/7 para PMEs brasileiras</p>
         </div>
 
         {/* Card */}
@@ -223,7 +223,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-brand-muted text-xs mt-8">
-          &copy; 2026 Verelus. Todos os direitos reservados.
+          &copy; 2026 Atalaia. Todos os direitos reservados.
         </p>
       </div>
     </div>

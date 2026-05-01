@@ -4,25 +4,25 @@ import { BlogShell } from './_components/BlogPostShell';
 import { POSTS } from './posts';
 
 export const metadata: Metadata = {
-  title: 'Blog Verelus — IA para PMEs brasileiras',
+  title: 'Blog Atalaia — IA para PMEs brasileiras',
   description:
     'Artigos sobre atendimento automático, IA no WhatsApp, automação de PMEs e crescimento de negócio. Conteúdo prático para donos de negócios brasileiros.',
   openGraph: {
-    title: 'Blog Verelus — IA para PMEs brasileiras',
+    title: 'Blog Atalaia — IA para PMEs brasileiras',
     description: 'Conteúdo prático sobre IA, atendimento automático e crescimento de PMEs.',
     type: 'website',
-    url: 'https://verelus.com/blog',
-    siteName: 'Verelus',
+    url: 'https://atalaia.verelus.com/blog',
+    siteName: 'Atalaia',
     images: [
       {
-        url: 'https://verelus.com/og-atalaia.png',
+        url: 'https://atalaia.verelus.com/og-atalaia.png',
         width: 1200,
         height: 630,
-        alt: 'Blog Verelus',
+        alt: 'Blog Atalaia',
       },
     ],
   },
-  alternates: { canonical: 'https://verelus.com/blog' },
+  alternates: { canonical: 'https://atalaia.verelus.com/blog' },
 };
 
 export default function BlogIndex() {
@@ -34,7 +34,7 @@ export default function BlogIndex() {
     <BlogShell>
       <header className="max-w-3xl mx-auto px-6 pt-20 pb-10 text-center">
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-5">
-          Blog Verelus
+          Blog Atalaia
         </h1>
         <p className="text-lg text-brand-muted leading-relaxed">
           Conteúdo prático sobre IA, atendimento automático e crescimento de PMEs.

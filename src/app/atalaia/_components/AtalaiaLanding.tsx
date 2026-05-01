@@ -7,7 +7,7 @@ import AtalaiaLogo from '@/components/atalaia/AtalaiaLogo';
 // vary per vertical; everything else (nav, comparison, pricing, etc.) is
 // identical across pages.
 
-const SITE_BASE = 'https://verelus.com';
+const SITE_BASE = 'https://atalaia.verelus.com';
 
 export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
   const fullUrl = `${SITE_BASE}${config.canonicalPath}`;
@@ -29,7 +29,7 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
     },
     provider: {
       '@type': 'Organization',
-      name: 'Verelus',
+      name: 'Atalaia',
       url: SITE_BASE,
     },
   };
@@ -40,13 +40,11 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
     itemListElement:
       config.slug === 'atalaia'
         ? [
-            { '@type': 'ListItem', position: 1, name: 'Verelus', item: SITE_BASE },
-            { '@type': 'ListItem', position: 2, name: 'Atalaia', item: fullUrl },
+            { '@type': 'ListItem', position: 1, name: 'Atalaia', item: fullUrl },
           ]
         : [
-            { '@type': 'ListItem', position: 1, name: 'Verelus', item: SITE_BASE },
-            { '@type': 'ListItem', position: 2, name: 'Atalaia', item: `${SITE_BASE}/atalaia` },
-            { '@type': 'ListItem', position: 3, name: config.breadcrumbName, item: fullUrl },
+            { '@type': 'ListItem', position: 1, name: 'Atalaia', item: `${SITE_BASE}/atalaia` },
+            { '@type': 'ListItem', position: 2, name: config.breadcrumbName, item: fullUrl },
           ],
   };
 
@@ -83,7 +81,7 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-brand-border">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
           <Link href="/" className="text-2xl font-bold text-brand-primary tracking-tight">
-            Verelus
+            Atalaia
           </Link>
           <div className="flex items-center gap-6">
             <Link
@@ -600,7 +598,7 @@ export default function AtalaiaLanding({ config }: { config: VerticalConfig }) {
       <footer className="bg-white border-t border-brand-border">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-brand-muted">
-            &copy; {new Date().getFullYear()} Verelus. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Atalaia. Todos os direitos reservados.
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="text-sm text-brand-muted hover:text-brand-text transition-colors">

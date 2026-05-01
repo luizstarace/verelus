@@ -1,75 +1,12 @@
 export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { rateLimit, getRateLimitHeaders } from '@/lib/atalaia/rate-limit';
 import { isInsideBusinessHours } from '@/lib/atalaia/hours';
 import { phoneVariants, timingSafeEqual } from '@/lib/atalaia/phone';
 import { logAtalaia } from '@/lib/atalaia/logger';
-
-const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
-
-async function sendWhatsAppMessage(
-  supabase: SupabaseClient,
-  businessId: string,
-  instanceName: string,
-  toJid: string,
-  text: string
-): Promise<{ ok: boolean; status: number; error?: unknown }> {
-  if (!text.trim()) return { ok: true, status: 0 };
-  if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
-    await logAtalaia(supabase, {
-      business_id: businessId,
-      endpoint: '/api/atalaia/whatsapp/send',
-      channel: 'whatsapp',
-      status_code: 0,
-      error: 'EVOLUTION_API_URL or EVOLUTION_API_KEY missing',
-    });
-    return { ok: false, status: 0, error: 'env_missing' };
-  }
-
-  // Retry on transient 5xx / network errors. Cap total wait < 2s so we stay
-  // within CF Workers wall-clock budget.
-  const BACKOFFS_MS = [150, 500]; // 3 tries total (initial + 2 retries)
-  let lastStatus = 0;
-  let lastErr: unknown = null;
-
-  for (let attempt = 0; attempt <= BACKOFFS_MS.length; attempt++) {
-    try {
-      const res = await fetch(`${EVOLUTION_API_URL}/message/sendText/${instanceName}`, {
-        method: 'POST',
-        headers: {
-          'apikey': EVOLUTION_API_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ number: toJid, text }),
-      });
-      lastStatus = res.status;
-      if (res.ok) return { ok: true, status: res.status };
-      // 4xx is not retryable (bad input, auth) — bail out
-      if (res.status >= 400 && res.status < 500) {
-        lastErr = `Evolution returned ${res.status}`;
-        break;
-      }
-      lastErr = `Evolution returned ${res.status}`;
-    } catch (err) {
-      lastErr = err;
-    }
-    if (attempt < BACKOFFS_MS.length) {
-      await new Promise((r) => setTimeout(r, BACKOFFS_MS[attempt]));
-    }
-  }
-
-  await logAtalaia(supabase, {
-    business_id: businessId,
-    endpoint: '/api/atalaia/whatsapp/send',
-    channel: 'whatsapp',
-    status_code: lastStatus || 502,
-    error: lastErr,
-  });
-  return { ok: false, status: lastStatus, error: lastErr };
-}
+import { sendText as evolutionSendText } from '@/lib/atalaia/whatsapp/evolution/messaging';
 
 export async function POST(request: Request) {
   // Validate API key FIRST (before rate-limit) so unauthenticated spam
@@ -115,7 +52,70 @@ export async function POST(request: Request) {
     }
     const businessId = instance.replace('atalaia_', '');
 
-    // Ignore non-message events (CONNECTION_UPDATE etc.)
+    // Connection-state events: persist + alert owner when an established
+    // connection drops unexpectedly (typical timelock/ban signature).
+    if (event === 'connection.update' || event === 'CONNECTION_UPDATE') {
+      const newState: string = msgData?.state || body.data?.state || 'unknown';
+      const { data: bizBefore } = await supabase
+        .from('atalaia_businesses')
+        .select('id, name, user_id, whatsapp_number, whatsapp_last_state')
+        .eq('id', businessId)
+        .single();
+
+      if (!bizBefore) {
+        return NextResponse.json({ ok: true, ignored: 'unknown_business' });
+      }
+
+      // Only update + alert if state actually changed (Evolution may resend).
+      if (bizBefore.whatsapp_last_state === newState) {
+        return NextResponse.json({ ok: true, no_change: true });
+      }
+
+      await supabase
+        .from('atalaia_businesses')
+        .update({
+          whatsapp_last_state: newState,
+          whatsapp_state_changed_at: new Date().toISOString(),
+        })
+        .eq('id', businessId);
+
+      // Drop alert: number was previously connected (whatsapp_number is set
+      // and last state was 'open') and now closed/disconnected. Don't fire on
+      // initial setup transitions (qr → connecting → open).
+      const droppedFromOpen =
+        bizBefore.whatsapp_number &&
+        bizBefore.whatsapp_last_state === 'open' &&
+        (newState === 'close' || newState === 'closed');
+
+      if (droppedFromOpen) {
+        try {
+          const { notifyOwnerEmail, buildWhatsAppDisconnectedEmail } = await import('@/lib/atalaia/notifications');
+          const { data: ownerUser } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', bizBefore.user_id)
+            .maybeSingle();
+          if (ownerUser?.email) {
+            const supportUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://atalaia.verelus.com'}/dashboard/atalaia/support?category=whatsapp_disconnect&prefill=1`;
+            const emailData = buildWhatsAppDisconnectedEmail(bizBefore.name, supportUrl);
+            emailData.to = ownerUser.email;
+            notifyOwnerEmail(emailData).catch(() => {});
+          }
+        } catch (err) {
+          await logAtalaia(supabase, {
+            business_id: businessId,
+            endpoint: '/api/atalaia/whatsapp/webhook',
+            channel: 'whatsapp',
+            status_code: 0,
+            error: `disconnect alert email failed: ${err instanceof Error ? err.message : String(err)}`,
+          });
+        }
+      }
+
+      return NextResponse.json({ ok: true, state: newState });
+    }
+
+    // Ignore other non-message events
     if (event && event !== 'messages.upsert' && event !== 'MESSAGES_UPSERT') {
       return NextResponse.json({ ok: true });
     }
@@ -224,7 +224,7 @@ export async function POST(request: Request) {
     // Strip the [TRANSFER] tag — customer shouldn't see it
     const cleanText = fullText.replace(/\[TRANSFER\]/g, '').trim();
     if (cleanText) {
-      await sendWhatsAppMessage(supabase, businessId, instance, remoteJid, cleanText);
+      await evolutionSendText(supabase, businessId, instance, remoteJid, cleanText);
     }
 
     return NextResponse.json({ ok: true });

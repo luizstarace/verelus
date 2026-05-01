@@ -183,17 +183,6 @@ export function AcceptForm({ slug }: { slug: string }) {
           </button>
         </form>
 
-        {/* Footer */}
-        <div className="text-center pt-10">
-          <a
-            href="https://verelus.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-gray-400 hover:text-gray-500 transition-colors"
-          >
-            Feito com Verelus
-          </a>
-        </div>
       </div>
     </div>
   );

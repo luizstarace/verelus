@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://verelus.com';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://atalaia.verelus.com';
 
   try {
     // Call health check endpoint
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Atalaia Monitor <contato@verelus.com>',
+          from: 'Atalaia Monitor <atalaia@verelus.com>',
           to: [process.env.FOUNDER_EMAIL || 'luizsfap@gmail.com'],
           subject: `[ALERT] Atalaia health check: ${data.status}`,
           html: `

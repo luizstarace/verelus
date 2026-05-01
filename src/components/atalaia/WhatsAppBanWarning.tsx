@@ -60,6 +60,13 @@ export default function WhatsAppBanWarning() {
               ligações, contatos salvos) raramente são banidos.
             </p>
             <p>
+              <strong>Antes do banimento, o WhatsApp aplica &quot;timelock&quot;</strong> — uma
+              restrição temporária de 24-72h em que o número não consegue se conectar via API.
+              Some sozinha. Se o Atalaia avisar que sua conexão caiu, espere a restrição passar e
+              tente reconectar. Banimento permanente costuma vir só depois de várias violações ou
+              de chip muito problemático.
+            </p>
+            <p>
               <strong>No futuro</strong>, vamos oferecer integração com o <strong>WhatsApp Business
               Cloud API</strong> oficial — mais caro e burocrático (precisa de CNPJ verificado e
               templates aprovados pela Meta), mas com risco zero de ban.

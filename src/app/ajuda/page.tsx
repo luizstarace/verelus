@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 
 export const metadata = {
-  title: 'Manual do Atalaia — Verelus',
+  title: 'Manual do Atalaia',
   description:
     'Guia passo-a-passo para configurar e usar o Atalaia: atendente de IA para PMEs via WhatsApp e widget de chat.',
 };
@@ -10,7 +10,7 @@ export default function AjudaPage() {
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text">
       <nav className="flex items-center justify-between px-6 py-4 max-w-4xl mx-auto border-b border-brand-border">
-        <a href="/" className="text-xl font-bold tracking-tight">VERELUS</a>
+        <a href="/" className="text-xl font-bold tracking-tight">ATALAIA</a>
         <div className="flex items-center gap-4 text-sm">
           <a href="/dashboard/atalaia" className="text-brand-muted hover:text-brand-text transition">Dashboard</a>
           <a href="/login" className="text-brand-muted hover:text-brand-text transition">Entrar</a>
@@ -67,7 +67,7 @@ export default function AjudaPage() {
           <section id="cadastro">
             <h2 className="text-xl font-semibold text-brand-text mb-3">2. Criar conta e teste grátis</h2>
             <ol className="list-decimal pl-6 space-y-2">
-              <li>Acesse <a href="/login" className="text-brand-trust hover:underline">verelus.com/login</a> e clique em <strong>&quot;Criar conta&quot;</strong>.</li>
+              <li>Acesse <a href="/login" className="text-brand-trust hover:underline">atalaia.verelus.com/login</a> e clique em <strong>&quot;Criar conta&quot;</strong>.</li>
               <li>Informe seu email e crie uma senha.</li>
               <li>Confirme o email pelo link que enviamos (cheque a caixa de spam se não chegar em 1 minuto).</li>
               <li>Faça login. Você cai no painel do Atalaia com 7 dias grátis ativos. <strong>Não pedimos cartão</strong> nessa etapa.</li>
@@ -133,7 +133,7 @@ export default function AjudaPage() {
             </p>
             <p className="mt-3 text-xs text-brand-muted">
               <strong>Dica:</strong> teste o widget abrindo seu site numa aba anônima. Se você estiver
-              logado no Verelus na mesma aba, o atendente pode usar modo preview no lugar
+              logado no Atalaia na mesma aba, o atendente pode usar modo preview no lugar
               do modo cliente.
             </p>
           </section>
@@ -309,7 +309,7 @@ export default function AjudaPage() {
             <h2 className="text-xl font-semibold text-brand-text mb-3">12. Suporte</h2>
             <p>
               Para qualquer assunto — dúvidas de uso, cobrança, privacidade ou LGPD — escreva para{' '}
-              <a href="mailto:contato@verelus.com" className="text-brand-trust hover:underline">contato@verelus.com</a>.
+              <a href="mailto:atalaia@verelus.com" className="text-brand-trust hover:underline">atalaia@verelus.com</a>.
             </p>
             <p className="mt-3 text-xs text-brand-muted">
               Resposta em até 1 dia útil. Para clientes Business, atendimento prioritário em até 4 horas em dias úteis.

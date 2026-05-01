@@ -246,17 +246,6 @@ export function PublicProposal({ slug }: { slug: string }) {
           </Link>
         )}
 
-        {/* Footer */}
-        <div className="text-center pt-8 border-t border-gray-100">
-          <a
-            href="https://verelus.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-gray-400 hover:text-gray-500 transition-colors"
-          >
-            Feito com Verelus
-          </a>
-        </div>
       </div>
     </div>
   );

@@ -80,7 +80,7 @@ export async function POST(
             Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
           },
           body: JSON.stringify({
-            from: 'Verelus <contato@verelus.com>',
+            from: 'Atalaia <atalaia@verelus.com>',
             to: [owner.email],
             subject: `Proposta aceita: ${proposal.project_title}`,
             html: `<p>Sua proposta <strong>${proposal.project_title}</strong> para <strong>${proposal.client_name}</strong> foi aceita por <strong>${acceptor_name}</strong>.</p><p>Valor: <strong>${priceBRL}</strong></p>`,

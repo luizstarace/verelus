@@ -32,9 +32,16 @@ jobs:
           STATUS=$(echo "$PAYLOAD" | jq -r '.status // "unknown"' 2>/dev/null || echo "unknown")
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
 
+          SUPABASE_OK=$(echo "$PAYLOAD" | jq -r '.checks.supabase.ok // false' 2>/dev/null || echo "false")
+          CLAUDE_OK=$(echo "$PAYLOAD" | jq -r '.checks.claude.ok // false' 2>/dev/null || echo "false")
+          EVOLUTION_OK=$(echo "$PAYLOAD" | jq -r '.checks.evolution.ok // false' 2>/dev/null || echo "false")
+          echo "- Critical: supabase=\`$SUPABASE_OK\` claude=\`$CLAUDE_OK\` evolution=\`$EVOLUTION_OK\`" >> "$GITHUB_STEP_SUMMARY"
+
           # Build a compact failure summary for issue body
           {
             echo "**HTTP**: \`$HTTP_CODE\`"
+            echo ""
+            echo "**Critical checks**: supabase=\`$SUPABASE_OK\` claude=\`$CLAUDE_OK\` evolution=\`$EVOLUTION_OK\`"
             echo ""
             echo "**Body**:"
             echo '```json'
@@ -44,12 +51,19 @@ jobs:
           } > /tmp/probe-summary.md
           echo "summary_path=/tmp/probe-summary.md" >> "$GITHUB_OUTPUT"
 
-          if [ "$HTTP_CODE" != "200" ] || [ "$STATUS" != "healthy" ]; then
-            echo "FAIL: HTTP=$HTTP_CODE status=$STATUS"
+          # Endpoint unreachable (anything other than 200/503 — both indicate the app responded).
+          if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "503" ]; then
+            echo "FAIL: HTTP=$HTTP_CODE (endpoint unreachable)"
             echo "failed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "OK: HTTP=200 status=healthy"
+          # Critical services down (Supabase / Claude / Evolution). Zenvia/Twilio são opcionais.
+          if [ "$SUPABASE_OK" != "true" ] || [ "$CLAUDE_OK" != "true" ] || [ "$EVOLUTION_OK" != "true" ]; then
+            echo "FAIL: critical service down (supabase=$SUPABASE_OK claude=$CLAUDE_OK evolution=$EVOLUTION_OK)"
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "OK: HTTP=$HTTP_CODE, critical services healthy"
           echo "failed=false" >> "$GITHUB_OUTPUT"
 
       - name: Open / update incident issue if down
@@ -58,14 +72,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Look for an existing open incident issue
-          existing=$(gh issue list --label uptime-incident --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label uptime-incident --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
           body_file=${{ steps.probe.outputs.summary_path }}
 
           if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body-file "$body_file"
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body-file "$body_file"
             echo "Commented on existing incident #$existing"
           else
             gh issue create \
+              --repo "$GITHUB_REPOSITORY" \
               --title "🚨 Atalaia uptime alert — $(date -u +%Y-%m-%d\ %H:%M\ UTC)" \
               --label uptime-incident \
               --body-file "$body_file"
@@ -77,9 +92,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          existing=$(gh issue list --label uptime-incident --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label uptime-incident --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
           if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body "✅ Service recovered at $(date -u +%Y-%m-%dT%H:%M:%SZ)."
-            gh issue close "$existing" --reason completed
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "✅ Service recovered at $(date -u +%Y-%m-%dT%H:%M:%SZ)."
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --reason completed
             echo "Auto-closed recovered incident #$existing"
           fi
